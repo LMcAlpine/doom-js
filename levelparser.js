@@ -172,8 +172,8 @@ class LevelParser {
    *    rightChild: - The right child area of the node, may be another node (subnode).
    *    leftChild: - The left child area of the node, may be another node (subnode).
    *
-   * @param {Object} nodesLump
-   * @returns
+   * @param {Object} nodesLump - The nodes lump data to parse.
+   * @returns {Array} An array of node objects, each containing, partitionLineX, partitionLineY, changeInX, changeInY, rightBoundingBox, leftBoundingBox, rightChild, and leftChild.
    */
 
   parseNodes(nodesLump) {
