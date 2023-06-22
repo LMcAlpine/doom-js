@@ -169,8 +169,8 @@ class LevelParser {
    *    changeInY: - The change in y from start to end of partition line.
    *    rightBoundingBox: - The right bounding box which describes a rectangle of the area covered by the right child.
    *    leftBoundingBox: - The left bounding box which describes a rectangle of the area covered by the left child.
-   *    rightChild: - The right child area of the node, may be another node (subnode).
-   *    leftChild: - The left child area of the node, may be another node (subnode).
+   *    rightChild: - The right child area of the node, may be another node (subnode) or subsector.
+   *    leftChild: - The left child area of the node, may be another node (subnode) or subsector.
    *
    * @param {Object} nodesLump - The nodes lump data to parse.
    * @returns {Array} An array of node objects, each containing, partitionLineX, partitionLineY, changeInX, changeInY, rightBoundingBox, leftBoundingBox, rightChild, and leftChild.
