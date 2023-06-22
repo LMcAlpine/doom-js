@@ -25,9 +25,14 @@ class LevelParser {
 
     console.log(linedefs);
 
+    const sidedefsLump = levelLumps.find((lump) => lump.name === "SIDEDEFS");
+    const sidedefs = this.parseSidedefs(sidedefsLump);
+
+    console.log(sidedefs);
+
     // ...Parse other map components like linedefs, sidedefs, sectors, things, etc.
 
-    return { vertices /*, other map components... */ };
+    return { vertices, linedefs };
   }
 
   parseVertices(verticesLump) {
@@ -69,7 +74,29 @@ class LevelParser {
     return linedefs;
   }
 
-  parseSidedefs() {}
+  parseSidedefs(sidedefsLump) {
+    const dataView = new DataView(sidedefsLump.data);
+    const sidedefs = [];
+
+    for (let i = 0; i < sidedefsLump.size; i += 30) {
+      const xOffset = dataView.getInt16(i, true);
+      const yOffset = dataView.getInt16(i + 2, true);
+      const upperTextureName = dataView.getInt16(i + 4, true);
+      const lowerTextureName = dataView.getInt16(i + 6, true);
+      const middleTextureName = dataView.getInt16(i + 8, true);
+      const sector = dataView.getInt16(i + 10, true);
+
+      sidedefs.push({
+        xOffset,
+        yOffset,
+        upperTextureName,
+        lowerTextureName,
+        middleTextureName,
+        sector,
+      });
+    }
+    return sidedefs;
+  }
 
   parseNodes() {}
 
