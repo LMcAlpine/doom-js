@@ -7,10 +7,12 @@ document
       return;
     }
 
-    const wadParser = new WADParser(file);
+    const wadFileReader = new WADFileReader(file);
+    const arrayBuffer = await wadFileReader.readFile();
+    const wadParser = new WADParser(arrayBuffer);
     const lumpData = await wadParser.parse();
     const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse();
+    const levels = levelParser.parse("E1M1");
 
     // try {
     //   await wadParser.parse();
