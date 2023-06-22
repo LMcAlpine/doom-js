@@ -15,7 +15,7 @@ document
     const wadParser = new WADParser(arrayBuffer);
     const lumpData = await wadParser.parse();
     const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse("E1M4");
+    const levels = levelParser.parse("E1M1");
 
     const vertices = levels.vertices;
     const renderer = new Renderer("myCanvas");
