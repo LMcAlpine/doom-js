@@ -185,10 +185,20 @@ class LevelParser {
       const partitionLineY = dataView.getInt16(i + 2, true);
       const changeInX = dataView.getInt16(i + 4, true);
       const changeInY = dataView.getInt16(i + 6, true);
-      const rightBoundingBox = dataView.getInt16(i + 8, true);
-      const leftBoundingBox = dataView.getInt16(i + 10, true);
-      const rightChild = dataView.getInt16(i + 12, true);
-      const leftChild = dataView.getInt16(i + 14, true);
+      const rightBoundingBox = {
+        top: dataView.getInt16(i + 8, true),
+        bottom: dataView.getInt16(i + 10, true),
+        left: dataView.getInt16(i + 12, true),
+        right: dataView.getInt16(i + 14, true),
+      };
+      const leftBoundingBox = {
+        top: dataView.getInt16(i + 16, true),
+        bottom: dataView.getInt16(i + 18, true),
+        left: dataView.getInt16(i + 20, true),
+        right: dataView.getInt16(i + 22, true),
+      };
+      const rightChild = dataView.getInt16(i + 24, true);
+      const leftChild = dataView.getInt16(i + 26, true);
 
       nodes.push({
         partitionLineX,
