@@ -44,7 +44,12 @@ class LevelParser {
 
     console.log(sidedefs);
 
-    return { vertices, linedefs };
+    const nodesLump = levelLumps.find((lump) => lump.name === "NODES");
+    const nodes = this.parseNodes(nodesLump);
+
+    console.log(nodes);
+
+    return { vertices, linedefs, sidedefs, nodes };
   }
 
   /**
@@ -153,8 +158,51 @@ class LevelParser {
     }
     return sidedefs;
   }
+  /**
+   * Parses nodes lumps data from a WAD file.
+   *
+   * Nodes lump is a component of a level and constitutes a binary space partition of the level.
+   * A node is a 28-byte structure containing the following fields:
+   *    partitionLineX: - The x coordinate of partition line start.
+   *    partitionLineY: - The y coordinate of partition line start.
+   *    changeInX: - The change in x from start to end of partition line.
+   *    changeInY: - The change in y from start to end of partition line.
+   *    rightBoundingBox: - The right bounding box which describes a rectangle of the area covered by the right child.
+   *    leftBoundingBox: - The left bounding box which describes a rectangle of the area covered by the left child.
+   *    rightChild: - The right child area of the node, may be another node (subnode).
+   *    leftChild: - The left child area of the node, may be another node (subnode).
+   *
+   * @param {Object} nodesLump
+   * @returns
+   */
 
-  parseNodes() {}
+  parseNodes(nodesLump) {
+    const dataView = new DataView(nodesLump.data);
+    const nodes = [];
+
+    for (let i = 0; i < nodesLump.size; i += 28) {
+      const partitionLineX = dataView.getInt16(i, true);
+      const partitionLineY = dataView.getInt16(i + 2, true);
+      const changeInX = dataView.getInt16(i + 4, true);
+      const changeInY = dataView.getInt16(i + 6, true);
+      const rightBoundingBox = dataView.getInt16(i + 8, true);
+      const leftBoundingBox = dataView.getInt16(i + 10, true);
+      const rightChild = dataView.getInt16(i + 12, true);
+      const leftChild = dataView.getInt16(i + 14, true);
+
+      nodes.push({
+        partitionLineX,
+        partitionLineY,
+        changeInX,
+        changeInY,
+        rightBoundingBox,
+        leftBoundingBox,
+        rightChild,
+        leftChild,
+      });
+    }
+    return nodes;
+  }
 
   parseSubsectors() {}
 
