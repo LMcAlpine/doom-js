@@ -53,7 +53,11 @@ class LevelParser {
     const subsectors = this.parseSubsectors(subsectorsLump);
     console.log(subsectors);
 
-    return { vertices, linedefs, sidedefs, nodes, subsectors };
+    const segsLump = levelLumps.find((lump) => lump.name === "SEGS");
+    const segs = this.parseSegs(segsLump);
+    console.log(segs);
+
+    return { vertices, linedefs, sidedefs, nodes, subsectors, segs };
   }
 
   /**
@@ -247,7 +251,30 @@ class LevelParser {
     return subsectors;
   }
 
-  parseSegs() {}
+  parseSegs(segsLump) {
+    const dataView = new DataView(segsLump.data);
+    const segs = [];
+
+    for (let i = 0; i < segsLump.size; i += 12) {
+      const startingVertexNumber = dataView.getInt16(i, true);
+      const endingVertexNumber = dataView.getInt16(i + 2, true);
+      const angle = dataView.getInt16(i + 4, true);
+      const linedefNumber = dataView.getInt16(i + 6, true);
+      const direction = dataView.getInt16(i + 8, true);
+      const offset = dataView.getInt16(i + 10, true);
+
+      segs.push({
+        startingVertexNumber,
+        endingVertexNumber,
+        angle,
+        linedefNumber,
+        direction,
+        offset,
+      });
+    }
+
+    return segs;
+  }
 
   parseSectors() {}
 }
