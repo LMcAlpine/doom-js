@@ -251,6 +251,26 @@ class LevelParser {
     return subsectors;
   }
 
+/**
+ * 
+ * Parses segs lump data from a WAD file.
+ * 
+ * Segs are segments of linedefs, and they describe the portion of a linedef that borders the subsector that the seg belongs to. 
+ * 
+ * The seg entries are referenced from the subsector entries, which are referenced from the nodes lump.
+ * 
+ *  - startingVertexNumber - index into the vertexes lump
+ *  - endingVertexNumber - index into the vertexes lump
+ *  - angle - used to calculate the direction the seg faces
+ *  - linedefNumber - index into the linedef that this segment is part of
+ *  - direction - the side of the linedef that this segment represents (0 for right or front, 1 for left or back)
+ *  - offset - distance along linedef to the start of seg
+ * 
+ * 
+ * @param {Object} segsLump 
+ * @returns {Array} An array of seg objects
+ */
+
   parseSegs(segsLump) {
     const dataView = new DataView(segsLump.data);
     const segs = [];
