@@ -49,7 +49,15 @@ class LevelParser {
 
     console.log(nodes);
 
-    return { vertices, linedefs, sidedefs, nodes };
+    const subsectorsLump = levelLumps.find((lump) => lump.name === "SSECTORS");
+    const subsectors = this.parseSubsectors(subsectorsLump);
+    console.log(subsectors);
+
+    const segsLump = levelLumps.find((lump) => lump.name === "SEGS");
+    const segs = this.parseSegs(segsLump);
+    console.log(segs);
+
+    return { vertices, linedefs, sidedefs, nodes, subsectors, segs };
   }
 
   /**
@@ -214,9 +222,59 @@ class LevelParser {
     return nodes;
   }
 
-  parseSubsectors() {}
+  /**
+   * Parses subsectors lump data from a WAD file.
+   *
+   * Subsector is a WAD lump that is a component of a level.
+   *
+   * A subsector is a range of seg (linedef segment) numbers. The segs form part or all of a single sector.
+   * Each subsector is construced so that depending on the player location within a specific subsector, any part of a eeg will not block the view of any other seg in a subsector
+   *
+   *  A subsector is a 4-byte structure containing the following fields:
+   *    segCount - the number of segs in this subsector. The number of segs to process
+   *    firstSegNumber - the index that points to the first seg (line segment) of this subsector in an array of segs
+   *
+   * @param {Object} subsectorsLump - The subsectors lump data to parse.
+   * @returns {Array} An array of subsector objects, each containing segCount and firstSegNumber
+   */
 
-  parseSegs() {}
+  parseSubsectors(subsectorsLump) {
+    const dataView = new DataView(subsectorsLump.data);
+    const subsectors = [];
+
+    for (let i = 0; i < subsectorsLump.size; i += 4) {
+      const segCount = dataView.getInt16(i, true);
+      const firstSegNumber = dataView.getInt16(i + 2, true);
+
+      subsectors.push({ segCount, firstSegNumber });
+    }
+    return subsectors;
+  }
+
+  parseSegs(segsLump) {
+    const dataView = new DataView(segsLump.data);
+    const segs = [];
+
+    for (let i = 0; i < segsLump.size; i += 12) {
+      const startingVertexNumber = dataView.getInt16(i, true);
+      const endingVertexNumber = dataView.getInt16(i + 2, true);
+      const angle = dataView.getInt16(i + 4, true);
+      const linedefNumber = dataView.getInt16(i + 6, true);
+      const direction = dataView.getInt16(i + 8, true);
+      const offset = dataView.getInt16(i + 10, true);
+
+      segs.push({
+        startingVertexNumber,
+        endingVertexNumber,
+        angle,
+        linedefNumber,
+        direction,
+        offset,
+      });
+    }
+
+    return segs;
+  }
 
   parseSectors() {}
 }
