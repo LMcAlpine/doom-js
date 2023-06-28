@@ -57,6 +57,10 @@ class LevelParser {
     const segs = this.parseSegs(segsLump);
     console.log(segs);
 
+    const sectorsLump = levelLumps.find((lump) => lump.name === "SECTORS");
+    const sectors = this.parseSectors(sectorsLump);
+    console.log(sectors);
+
     return { vertices, linedefs, sidedefs, nodes, subsectors, segs };
   }
 
@@ -251,25 +255,25 @@ class LevelParser {
     return subsectors;
   }
 
-/**
- * 
- * Parses segs lump data from a WAD file.
- * 
- * Segs are segments of linedefs, and they describe the portion of a linedef that borders the subsector that the seg belongs to. 
- * 
- * The seg entries are referenced from the subsector entries, which are referenced from the nodes lump.
- * 
- *  - startingVertexNumber - index into the vertexes lump
- *  - endingVertexNumber - index into the vertexes lump
- *  - angle - used to calculate the direction the seg faces
- *  - linedefNumber - index into the linedef that this segment is part of
- *  - direction - the side of the linedef that this segment represents (0 for right or front, 1 for left or back)
- *  - offset - distance along linedef to the start of seg
- * 
- * 
- * @param {Object} segsLump 
- * @returns {Array} An array of seg objects
- */
+  /**
+   *
+   * Parses segs lump data from a WAD file.
+   *
+   * Segs are segments of linedefs, and they describe the portion of a linedef that borders the subsector that the seg belongs to.
+   *
+   * The seg entries are referenced from the subsector entries, which are referenced from the nodes lump.
+   *
+   *  - startingVertexNumber - index into the vertexes lump
+   *  - endingVertexNumber - index into the vertexes lump
+   *  - angle - used to calculate the direction the seg faces
+   *  - linedefNumber - index into the linedef that this segment is part of
+   *  - direction - the side of the linedef that this segment represents (0 for right or front, 1 for left or back)
+   *  - offset - distance along linedef to the start of seg
+   *
+   *
+   * @param {Object} segsLump
+   * @returns {Array} An array of seg objects
+   */
 
   parseSegs(segsLump) {
     const dataView = new DataView(segsLump.data);
@@ -296,5 +300,42 @@ class LevelParser {
     return segs;
   }
 
-  parseSectors() {}
+  /**
+   * Parses sectors lump data from a WAD file.
+   *
+   * Sectors are areas within a Doom level, usually rooms or parts of rooms.
+   *
+   * @param {Object} sectorsLump - The sectors lump data to parse.
+   * @returns {Array} An array of sector objects, each containing floorHeight, ceilingHeight, floorTexture, ceilingTexture, lightLevel, specialType, and tag.
+   */
+  parseSectors(sectorsLump) {
+    const dataView = new DataView(sectorsLump.data);
+    const sectors = [];
+
+    for (let i = 0; i < sectorsLump.size; i += 26) {
+      const floorHeight = dataView.getInt16(i, true);
+      const ceilingHeight = dataView.getInt16(i + 2, true);
+      const floorTexture = String.fromCharCode(
+        ...new Uint8Array(sectorsLump.data.slice(i + 4, i + 12))
+      ).replace(/\0/g, "");
+      const ceilingTexture = String.fromCharCode(
+        ...new Uint8Array(sectorsLump.data.slice(i + 12, i + 20))
+      ).replace(/\0/g, "");
+
+      const lightLevel = dataView.getInt16(i + 20, true);
+      const specialType = dataView.getInt16(i + 22, true);
+      const tag = dataView.getInt16(i + 24, true);
+
+      sectors.push({
+        floorHeight,
+        ceilingHeight,
+        floorTexture,
+        ceilingTexture,
+        lightLevel,
+        specialType,
+        tag,
+      });
+    }
+    return sectors;
+  }
 }
