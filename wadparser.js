@@ -35,9 +35,10 @@ class WADParser {
   parseLumps(header, arrayBuffer) {
     const dataView = new DataView(arrayBuffer);
     const lumps = [];
+    const directoryEntryLength = 16; // 16 bytes. Each entry in the directory is 16 bytes.
 
     for (let i = 0; i < header.numLumps; i++) {
-      const offset = header.lumpDirectoryOffset + i * 16;
+      const offset = header.lumpDirectoryOffset + i * directoryEntryLength;
       const lump = {
         filePos: dataView.getInt32(offset, true),
         size: dataView.getInt32(offset + 4, true),
