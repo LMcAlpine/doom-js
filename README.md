@@ -1,4 +1,4 @@
-# JS_WAD_reader
+# doom-js
 
 Exploring the file structure of a WAD from Doom (1993):
 
