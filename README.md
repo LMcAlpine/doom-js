@@ -1,4 +1,4 @@
-# Doom JS
+# Doom JS - This repository is currently under construction
 
 A personal project to rewrite the original DOOM in JavaScript. I aim to understand the original C code and design a similar architecture in JavaScript while keeping the original game mechanics. 
 
