@@ -25,6 +25,16 @@ class WADParser {
       lumpDirectoryOffset: dataView.getInt32(8, true),
     };
 
+    // Print the bytes for numLumps
+    for (let i = 0; i < 4; i++) {
+      console.log("numLumps byte", i, ":", dataView.getUint8(4 + i));
+    }
+
+    // Print the bytes for lumpDirectoryOffset
+    for (let i = 0; i < 4; i++) {
+      console.log("lumpDirectoryOffset byte", i, ":", dataView.getUint8(8 + i));
+    }
+
     if (header.wadType !== "IWAD" && header.wadType !== "PWAD") {
       throw new Error("Invalid WAD file.");
     }

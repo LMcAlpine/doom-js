@@ -5,6 +5,7 @@ class Renderer {
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
     this.marginMultiplier = marginMultiplier;
+    console.log(MyGame);
   }
 
   drawVertices(vertices) {
@@ -30,7 +31,9 @@ class Renderer {
     vertices.forEach((element) => {
       const drawX = margin + (element.x - minX) * scaleX;
       const drawY = this.canvasHeight - margin - (element.y - minY) * scaleY;
-      this.ctx.fillRect(drawX, drawY, rectangleSize, rectangleSize);
+      putPixel(drawX, drawY, [190, 0, 210]);
+      updateCanvas();
+      //  this.ctx.fillRect(drawX, drawY, rectangleSize, rectangleSize);
     });
   }
 }
