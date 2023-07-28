@@ -16,10 +16,9 @@ class Renderer {
 
     const { scaleX, scaleY } = this.calculateScale2D(maxX, minX, maxY, minY);
 
-    vertices.forEach((element) => {
-      const drawX = this.margin + (element.x - minX) * scaleX;
-      const drawY =
-        this.canvasHeight - this.margin - (element.y - minY) * scaleY;
+    vertices.forEach((vertex) => {
+      const drawX = this.remapXToScreen(vertex, minX, scaleX);
+      const drawY = this.remapYToScreen(vertex, minY, scaleY);
       putPixel(drawX, drawY, [190, 0, 210]);
       updateCanvas();
     });
@@ -42,16 +41,22 @@ class Renderer {
       const vertex1 = vertices[linedef.startVertex];
       const vertex2 = vertices[linedef.endVertex];
 
-      const drawX = this.margin + (vertex1.x - minX) * scaleX;
-      const drawY =
-        this.canvasHeight - this.margin - (vertex1.y - minY) * scaleY;
+      const drawX = this.remapXToScreen(vertex1, minX, scaleX);
+      const drawY = this.remapYToScreen(vertex1, minY, scaleY);
 
-      const drawX2 = this.margin + (vertex2.x - minX) * scaleX;
-      const drawY2 =
-        this.canvasHeight - this.margin - (vertex2.y - minY) * scaleY;
+      const drawX2 = this.remapXToScreen(vertex2, minX, scaleX);
+      const drawY2 = this.remapYToScreen(vertex2, minY, scaleY);
       this.drawLine({ x: drawX, y: drawY }, { x: drawX2, y: drawY2 });
       updateCanvas();
     });
+  }
+
+  remapYToScreen(vertex, minY, scaleY) {
+    return this.canvasHeight - this.margin - (vertex.y - minY) * scaleY;
+  }
+
+  remapXToScreen(vertex, minX, scaleX) {
+    return this.margin + (vertex.x - minX) * scaleX;
   }
 
   calculateMinMax(vertices) {
@@ -70,8 +75,10 @@ class Renderer {
   }
 
   drawLine(point0, point1) {
+    // slope or change
     let dx = Math.trunc(point1.x - point0.x);
     let dy = Math.trunc(point1.y - point0.y);
+    // To see if there are more values of x to draw than values of y
     if (Math.abs(dx) > Math.abs(dy)) {
       // The line is horizontal-ish. Make sure it's left to right.
       ({ point0, point1 } = this.swap(dx, point0, point1));
@@ -121,6 +128,8 @@ class Renderer {
     let d = d0;
     for (let i = i0; i <= i1; i++) {
       values.push(d);
+      // we know the d+1 point can be calculated by adding the slope to d.
+      // avoids a multiplication
       d = d + slope;
     }
     return values;
