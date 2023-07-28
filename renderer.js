@@ -6,73 +6,51 @@ class Renderer {
     this.canvasHeight = canvas.height;
     this.marginMultiplier = marginMultiplier;
     console.log(MyGame);
+
+    this.margin = 10; // The size of the margin you want to keep
+    this.marginsPerSide = 2;
   }
 
   drawVertices(vertices) {
-    // let minX = Infinity,
-    //   maxX = -Infinity,
-    //   minY = Infinity,
-    //   maxY = -Infinity;
-
-    // vertices.forEach((element) => {
-    //   minX = Math.min(minX, element.x);
-    //   maxX = Math.max(maxX, element.x);
-    //   minY = Math.min(minY, element.y);
-    //   maxY = Math.max(maxY, element.y);
-    // });
     let { maxX, minX, maxY, minY } = this.calculateMinMax(vertices);
 
-    const margin = 10; // The size of the margin you want to keep
-    const marginsPerSide = 2;
-    const scaleX = (this.canvasWidth - marginsPerSide * margin) / (maxX - minX);
-    const scaleY =
-      (this.canvasHeight - marginsPerSide * margin) / (maxY - minY);
-    const scale = Math.min(scaleX, scaleY);
-    const rectangleSize = 1 / scale;
+    const { scaleX, scaleY } = this.calculateScale2D(maxX, minX, maxY, minY);
+
     vertices.forEach((element) => {
-      const drawX = margin + (element.x - minX) * scaleX;
-      const drawY = this.canvasHeight - margin - (element.y - minY) * scaleY;
+      const drawX = this.margin + (element.x - minX) * scaleX;
+      const drawY =
+        this.canvasHeight - this.margin - (element.y - minY) * scaleY;
       putPixel(drawX, drawY, [190, 0, 210]);
       updateCanvas();
-      //  this.ctx.fillRect(drawX, drawY, rectangleSize, rectangleSize);
     });
+  }
+
+  calculateScale2D(maxX, minX, maxY, minY) {
+    const scaleX =
+      (this.canvasWidth - this.marginsPerSide * this.margin) / (maxX - minX);
+    const scaleY =
+      (this.canvasHeight - this.marginsPerSide * this.margin) / (maxY - minY);
+    return { scaleX, scaleY };
   }
 
   drawLinedefs(linedefs, vertices) {
     let { maxX, minX, maxY, minY } = this.calculateMinMax(vertices);
 
-    const margin = 10; // The size of the margin you want to keep
-    const marginsPerSide = 2;
-    const scaleX = (this.canvasWidth - marginsPerSide * margin) / (maxX - minX);
-    const scaleY =
-      (this.canvasHeight - marginsPerSide * margin) / (maxY - minY);
-    const scale = Math.min(scaleX, scaleY);
+    const { scaleX, scaleY } = this.calculateScale2D(maxX, minX, maxY, minY);
 
     linedefs.forEach((linedef) => {
-      // console.log(linedef.startVertex);
-      //console.log(linedef.endVertex);
-      // these above are indices into which vertex
-      // i need to use these indices to access the vertices and to draw a line between those two points
       const vertex1 = vertices[linedef.startVertex];
       const vertex2 = vertices[linedef.endVertex];
-      console.log(vertex1);
-      console.log(vertex2);
-      let drawX = margin + (vertex1.x - minX) * scaleX;
-      let drawY = this.canvasHeight - margin - (vertex1.y - minY) * scaleY;
-      // putPixel(drawX, drawY, [190, 0, 210]);
-      // updateCanvas();
-      let drawX2 = margin + (vertex2.x - minX) * scaleX;
-      let drawY2 = this.canvasHeight - margin - (vertex2.y - minY) * scaleY;
+
+      const drawX = this.margin + (vertex1.x - minX) * scaleX;
+      const drawY =
+        this.canvasHeight - this.margin - (vertex1.y - minY) * scaleY;
+
+      const drawX2 = this.margin + (vertex2.x - minX) * scaleX;
+      const drawY2 =
+        this.canvasHeight - this.margin - (vertex2.y - minY) * scaleY;
       this.drawLine({ x: drawX, y: drawY }, { x: drawX2, y: drawY2 });
       updateCanvas();
-
-      // this.ctx.beginPath();
-      // this.ctx.moveTo(drawX, drawY);
-      // drawX = margin + (vertex2.x - minX) * scaleX;
-      // drawY = this.canvasHeight - margin - (vertex2.y - minY) * scaleY;
-      // this.ctx.lineTo(drawX, drawY);
-      // this.ctx.stroke();
-      // I need to convert these vertices to fit into screenspace
     });
   }
 
@@ -96,11 +74,7 @@ class Renderer {
     let dy = Math.trunc(point1.y - point0.y);
     if (Math.abs(dx) > Math.abs(dy)) {
       // The line is horizontal-ish. Make sure it's left to right.
-      if (dx < 0) {
-        const swap = point0;
-        point0 = point1;
-        point1 = swap;
-      }
+      ({ point0, point1 } = this.swap(dx, point0, point1));
 
       // Compute the Y values and draw.
       const yValues = this.interpolate(
@@ -114,11 +88,7 @@ class Renderer {
       }
     } else {
       // The line is verical-ish. Make sure it's bottom to top.
-      if (dy < 0) {
-        const swap = point0;
-        point0 = point1;
-        point1 = swap;
-      }
+      ({ point0, point1 } = this.swap(dy, point0, point1));
 
       // Compute the X values and draw.
       const xValues = this.interpolate(
@@ -131,6 +101,15 @@ class Renderer {
         putPixel(xValues[(y - point0.y) | 0], y, [190, 0, 210]);
       }
     }
+  }
+
+  swap(d, point0, point1) {
+    if (d < 0) {
+      const swap = point0;
+      point0 = point1;
+      point1 = swap;
+    }
+    return { point0, point1 };
   }
 
   interpolate(i0, d0, i1, d1) {

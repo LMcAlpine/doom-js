@@ -107,12 +107,7 @@ let updateCanvas = function () {
     // This can include animations, physics calculations, and updating object positions.
 
     let color = [190, 0, 210];
-    // iterate through canvas
-    // for (let x = -canvas.width / 2; x < canvas.width / 2; x++) {
-    //   for (let y = -canvas.height / 2; y < canvas.height / 2; y++) {
-    //     putPixel(x, y, color);
-    //   }
-    // }
+
     // updateCanvas();
 
     // Draw game elements, backgrounds, player characters, etc.
