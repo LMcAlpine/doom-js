@@ -19,7 +19,12 @@ document
 
     const vertices = levels.vertices;
     const renderer = new Renderer("myCanvas");
-    renderer.drawVertices(vertices);
+    // renderer.drawVertices(vertices);
+
+    const linedefs = levels.linedefs;
+    renderer.drawLinedefs(linedefs, vertices);
+
+    console.log(levels.linedefs);
 
     // try {
     //   await wadParser.parse();

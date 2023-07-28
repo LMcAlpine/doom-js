@@ -79,7 +79,7 @@ let updateCanvas = function () {
     if (frameCount % 60 === 0) {
       // Calculate average every 60 frames (adjust as needed)
       const averageTicks = totalTicks / frameCount;
-      console.log("Average numTicks per frame: " + averageTicks);
+      // console.log("Average numTicks per frame: " + averageTicks);
     }
 
     queueUpdates(numTicks);
