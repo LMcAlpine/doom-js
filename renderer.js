@@ -15,29 +15,25 @@ class Renderer {
     this.marginsPerSide = 2;
   }
 
+  /**
+   * Determines if a given point is on the left side of the splitter line.
+   * Uses the cross product to calculate the direction of a vector based on player's position and the splitter line.
+   *
+   * @param {number} xPosition - The player's X position.
+   * @param {number} yPosition - The player's Y position.
+   * @param {object} nodeID - The node object containing the splitter line's coordinates and direction.
+   * @param {number} nodeID.partitionLineX - The X coordinate of the splitter line.
+   * @param {number} nodeID.partitionLineY - The Y coordinate of the splitter line.
+   * @param {number} nodeID.changeInY - The distance to move in the Y direction to go to the end of the splitter line.
+   * @param {number} nodeID.changeInX - The distance to move in the X direction to go to the end of the splitter line.
+   * @returns {boolean} True if the point is on the left side of the splitter line, false otherwise.
+   */
+
   isPointOnLeftSide(xPosition, yPosition, nodeID) {
-    // determine if the given point is on the left side of the splitter line
-    // this will help in traversing the tree
-
-    // find the X point relative to the player location
-    // xPosition is the player's X value
-    // nodeID.PartitionX is the X coordinate of the splitter line
-
     const dx = xPosition - nodeID.partitionLineX;
-    // find the Y point relative to the player location
-    // yPosition is the player's Y value
-    // nodeID.PartitionY is the Y coordinate of the splitter line
+
     const dy = yPosition - nodeID.partitionLineY;
 
-    // cross product here
-    // recall a vector has a magnitude and a direction.
-    // we know the cross product performs an operation on two vectors and outputs another vector
-    // the output vector will have a direction. Based on the direction it can be determined if it points up or down
-    // based on the sign of the cross product
-
-    // A x B = Ax*By-Ay*Bx
-    // nodeID.PartitionYDifference is the distance to move in the Y direction to go to the end of the splitter line
-    // nodeID.PartitionXDifference is the distance to move in the X direction to go to the end of the splitter line
     const result = Math.round(dx * nodeID.changeInY - dy * nodeID.changeInX);
 
     return result <= 0;
