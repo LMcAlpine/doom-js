@@ -61,7 +61,11 @@ class LevelParser {
     const sectors = this.parseSectors(sectorsLump);
     console.log(sectors);
 
-    return { vertices, linedefs, sidedefs, nodes, subsectors, segs };
+    const thingsLump = levelLumps.find((lump) => lump.name === "THINGS");
+    const things = this.parseThings(thingsLump);
+    console.log(things);
+
+    return { vertices, linedefs, sidedefs, nodes, subsectors, segs, things };
   }
 
   /**
@@ -337,5 +341,21 @@ class LevelParser {
       });
     }
     return sectors;
+  }
+
+  parseThings(thingsLump) {
+    const dataView = new DataView(thingsLump.data);
+    const things = [];
+
+    for (let i = 0; i < thingsLump.size; i += 10) {
+      const xPosition = dataView.getInt16(i, true);
+      const yPosition = dataView.getInt16(i + 2, true);
+      const direction = dataView.getInt16(i + 4, true);
+      const type = dataView.getInt16(i + 6, true);
+      const flag = dataView.getInt16(i + 8, true);
+
+      things.push({ xPosition, yPosition, direction, type, flag });
+    }
+    return things;
   }
 }

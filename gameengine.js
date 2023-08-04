@@ -7,6 +7,7 @@ class GameEngine {
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
     console.log(this.nodes.length);
+
   }
 
   loop(tFrame) {

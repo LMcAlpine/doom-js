@@ -7,6 +7,11 @@ class Renderer {
     this.marginMultiplier = marginMultiplier;
     // console.log(MyGame);
 
+    this.things = levels.things;
+    console.log(this.things);
+    this.player = this.things[0];
+    console.log(this.player);
+
     this.linedefs = levels.linedefs;
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
@@ -48,22 +53,28 @@ class Renderer {
   }
 
   renderBSPNode(nodeID) {
-    console.log(nodeID);
-    console.log(this.nodes);
+    //  console.log(nodeID);
+    // console.log(this.nodes);
 
     // check for is this node a leaf node.
     if (this.isSubsector(nodeID)) {
       // getSubsector gives the number of subsector
       // this ID is passed into the renderSubsector method
       //this.renderSubsector(this.getSubsector(nodeID), ctx);
-      console.log("subsector found");
+      //  console.log("subsector found");
       return;
     }
 
     const bsp = this.nodes[nodeID];
 
     //1056,-3616
-    const isOnLeft = this.isPointOnLeftSide(1056, -3616, bsp);
+    // console.log(this.player.xPosition);
+    // console.log(this.player.yPosition);
+    const isOnLeft = this.isPointOnLeftSide(
+      this.player.xPosition,
+      this.player.yPosition,
+      bsp
+    );
 
     // traversing left
     if (isOnLeft) {
