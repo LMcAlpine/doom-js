@@ -76,8 +76,50 @@ class Renderer {
       bsp
     );
 
+    //want to draw splitter
+    // convert partitionLineX to screenSpace
+    //convert partitionLineY to screenSpace
+
+    this.maxX;
+    this.minX;
+    this.maxY;
+    this.minY;
+    bsp.partitionLineX;
+
+    let { maxX, minX, maxY, minY } = this.calculateMinMax(this.vertices);
+
+    const { scaleX, scaleY } = this.calculateScale2D(maxX, minX, maxY, minY);
+
+    const drawX = this.margin + (bsp.partitionLineX - minX) * scaleX;
+
+    const drawY =
+      this.canvasHeight - this.margin - (bsp.partitionLineY - minY) * scaleY;
+
+    const drawX2 =
+      this.margin + (bsp.partitionLineX + bsp.changeInX - minX) * scaleX;
+    const drawY2 =
+      this.canvasHeight -
+      this.margin -
+      (bsp.partitionLineY + bsp.changeInY - minY) * scaleY;
+
+    this.drawLine(
+      { x: drawX, y: drawY },
+      { x: drawX2, y: drawY2 },
+      [255, 255, 0]
+    );
+    updateCanvas();
+
+    // draw bounding boxes?
+    // console.log(bsp.rightBoundingBox);
+
     // traversing left
     if (isOnLeft) {
+      console.log(bsp.rightBoundingBox);
+
+      // want to draw left bounding box
+
+      // want to draw right bounding box
+
       this.renderBSPNode(bsp.leftChild);
       this.renderBSPNode(bsp.rightChild);
     } else {
@@ -150,7 +192,7 @@ class Renderer {
     return { maxX, minX, maxY, minY };
   }
 
-  drawLine(point0, point1) {
+  drawLine(point0, point1, color = [255, 255, 255]) {
     // slope or change
     let dx = Math.trunc(point1.x - point0.x);
     let dy = Math.trunc(point1.y - point0.y);
@@ -167,7 +209,7 @@ class Renderer {
         point1.y
       );
       for (let x = point0.x; x <= point1.x; x++) {
-        putPixel(x, yValues[(x - point0.x) | 0], [255, 255, 255]);
+        putPixel(x, yValues[(x - point0.x) | 0], color);
       }
     } else {
       // The line is verical-ish. Make sure it's bottom to top.
@@ -181,7 +223,7 @@ class Renderer {
         point1.x
       );
       for (let y = point0.y; y <= point1.y; y++) {
-        putPixel(xValues[(y - point0.y) | 0], y, [255, 255, 255]);
+        putPixel(xValues[(y - point0.y) | 0], y, color);
       }
     }
   }
