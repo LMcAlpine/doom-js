@@ -1,14 +1,83 @@
 class Renderer {
-  constructor(canvasID, marginMultiplier = 2) {
+  constructor(canvasID, marginMultiplier = 2, levels) {
     const canvas = document.getElementById(canvasID);
     this.ctx = canvas.getContext("2d");
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
     this.marginMultiplier = marginMultiplier;
-    console.log(MyGame);
+    // console.log(MyGame);
+
+    this.linedefs = levels.linedefs;
+    this.vertices = levels.vertices;
+    this.nodes = levels.nodes;
 
     this.margin = 10; // The size of the margin you want to keep
     this.marginsPerSide = 2;
+  }
+
+  isPointOnLeftSide(xPosition, yPosition, nodeID) {
+    // determine if the given point is on the left side of the splitter line
+    // this will help in traversing the tree
+
+    // find the X point relative to the player location
+    // xPosition is the player's X value
+    // nodeID.PartitionX is the X coordinate of the splitter line
+
+    const dx = xPosition - nodeID.partitionLineX;
+    // find the Y point relative to the player location
+    // yPosition is the player's Y value
+    // nodeID.PartitionY is the Y coordinate of the splitter line
+    const dy = yPosition - nodeID.partitionLineY;
+
+    // cross product here
+    // recall a vector has a magnitude and a direction.
+    // we know the cross product performs an operation on two vectors and outputs another vector
+    // the output vector will have a direction. Based on the direction it can be determined if it points up or down
+    // based on the sign of the cross product
+
+    // A x B = Ax*By-Ay*Bx
+    // nodeID.PartitionYDifference is the distance to move in the Y direction to go to the end of the splitter line
+    // nodeID.PartitionXDifference is the distance to move in the X direction to go to the end of the splitter line
+    const result = Math.round(dx * nodeID.changeInY - dy * nodeID.changeInX);
+
+    return result <= 0;
+  }
+
+  isSubsector(node) {
+    return (node & 0xffff8000) != 0;
+  }
+
+  getSubsector(node) {
+    return node ^ 0xffff8000;
+  }
+
+  renderBSPNode(nodeID) {
+    console.log(nodeID);
+    console.log(this.nodes);
+
+    // check for is this node a leaf node.
+    if (this.isSubsector(nodeID)) {
+      // getSubsector gives the number of subsector
+      // this ID is passed into the renderSubsector method
+      //this.renderSubsector(this.getSubsector(nodeID), ctx);
+      console.log("subsector found");
+      return;
+    }
+
+    const bsp = this.nodes[nodeID];
+
+    //1056,-3616
+    const isOnLeft = this.isPointOnLeftSide(1056, -3616, bsp);
+
+    // traversing left
+    if (isOnLeft) {
+      this.renderBSPNode(bsp.leftChild);
+      this.renderBSPNode(bsp.rightChild);
+    } else {
+      // traversing right
+      this.renderBSPNode(bsp.rightChild);
+      this.renderBSPNode(bsp.leftChild);
+    }
   }
 
   drawVertices(vertices) {
@@ -19,7 +88,7 @@ class Renderer {
     vertices.forEach((vertex) => {
       const drawX = this.remapXToScreen(vertex, minX, scaleX);
       const drawY = this.remapYToScreen(vertex, minY, scaleY);
-      putPixel(drawX, drawY, [190, 0, 210]);
+      putPixel(drawX, drawY, [255, 255, 255]);
       updateCanvas();
     });
   }
@@ -91,7 +160,7 @@ class Renderer {
         point1.y
       );
       for (let x = point0.x; x <= point1.x; x++) {
-        putPixel(x, yValues[(x - point0.x) | 0], [190, 0, 210]);
+        putPixel(x, yValues[(x - point0.x) | 0], [255, 255, 255]);
       }
     } else {
       // The line is verical-ish. Make sure it's bottom to top.
@@ -105,7 +174,7 @@ class Renderer {
         point1.x
       );
       for (let y = point0.y; y <= point1.y; y++) {
-        putPixel(xValues[(y - point0.y) | 0], y, [190, 0, 210]);
+        putPixel(xValues[(y - point0.y) | 0], y, [255, 255, 255]);
       }
     }
   }

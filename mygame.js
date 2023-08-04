@@ -1,4 +1,30 @@
-var MyGame = {};
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+let canvasBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+let canvasPitch = canvasBuffer.width * 4;
+
+function putPixel(x, y, color) {
+  // x = canvas.width / 2 + x;
+  // y = canvas.height / 2 - y - 1;
+  x = Math.round(x); // Round the x-coordinate to the nearest integer
+  y = Math.round(y); // Round the y-coordinate to the nearest integer
+
+  if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
+    return;
+  }
+
+  let offset = 4 * x + canvasPitch * y;
+  canvasBuffer.data[offset++] = color[0];
+  canvasBuffer.data[offset++] = color[1];
+  canvasBuffer.data[offset++] = color[2];
+  canvasBuffer.data[offset++] = 255; // Alpha = 255 (full opacity)
+}
+
+let updateCanvas = function () {
+  ctx.putImageData(canvasBuffer, 0, 0);
+};
+
+// var MyGame = {};
 
 /*
  * Starting with the semicolon is in case whatever line of code above this example
@@ -27,104 +53,83 @@ var MyGame = {};
  * setInitialState() Performs whatever tasks are leftover before the main loop must run.
  *                   It is just a generic example function that you might have added.
  */
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-let canvasBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
-let canvasPitch = canvasBuffer.width * 4;
-
-function putPixel(x, y, color) {
-  // x = canvas.width / 2 + x;
-  // y = canvas.height / 2 - y - 1;
-  x = Math.round(x); // Round the x-coordinate to the nearest integer
-  y = Math.round(y); // Round the y-coordinate to the nearest integer
-
-  if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
-    return;
-  }
-
-  let offset = 4 * x + canvasPitch * y;
-  canvasBuffer.data[offset++] = color[0];
-  canvasBuffer.data[offset++] = color[1];
-  canvasBuffer.data[offset++] = color[2];
-  canvasBuffer.data[offset++] = 255; // Alpha = 255 (full opacity)
-}
-
-let updateCanvas = function () {
-  ctx.putImageData(canvasBuffer, 0, 0);
-};
 
 //main loop
-(() => {
-  let totalTicks = 0;
-  let frameCount = 0;
+// (() => {
+//   let totalTicks = 0;
+//   let frameCount = 0;
+//   console.log("here");
 
-  function main(tFrame) {
-    MyGame.stopMain = window.requestAnimationFrame(main);
-    const nextTick = MyGame.lastTick + MyGame.tickLength;
-    //  console.log("next tick " + nextTick);
-    let numTicks = 0;
+//   const renderer = new Renderer("myCanvas");
 
-    // If tFrame < nextTick then 0 ticks need to be updated (0 is default for numTicks).
-    // If tFrame = nextTick then 1 tick needs to be updated (and so forth).
-    // Note: As we mention in summary, you should keep track of how large numTicks is.
-    // If it is large, then either your game was asleep, or the machine cannot keep up.
-    if (tFrame > nextTick) {
-      const timeSinceTick = tFrame - MyGame.lastTick;
-      numTicks = Math.floor(timeSinceTick / MyGame.tickLength);
-      //   console.log(numTicks);
-    }
-    totalTicks += numTicks;
-    frameCount++;
+//   function main(tFrame) {
+//     MyGame.stopMain = window.requestAnimationFrame(main);
+//     const nextTick = MyGame.lastTick + MyGame.tickLength;
+//     //  console.log("next tick " + nextTick);
+//     let numTicks = 0;
 
-    if (frameCount % 60 === 0) {
-      // Calculate average every 60 frames (adjust as needed)
-      const averageTicks = totalTicks / frameCount;
-      // console.log("Average numTicks per frame: " + averageTicks);
-    }
+//     // If tFrame < nextTick then 0 ticks need to be updated (0 is default for numTicks).
+//     // If tFrame = nextTick then 1 tick needs to be updated (and so forth).
+//     // Note: As we mention in summary, you should keep track of how large numTicks is.
+//     // If it is large, then either your game was asleep, or the machine cannot keep up.
+//     if (tFrame > nextTick) {
+//       const timeSinceTick = tFrame - MyGame.lastTick;
+//       numTicks = Math.floor(timeSinceTick / MyGame.tickLength);
+//       //   console.log(numTicks);
+//     }
+//     totalTicks += numTicks;
+//     frameCount++;
 
-    queueUpdates(numTicks);
-    render(tFrame);
-    MyGame.lastRender = tFrame;
-  }
+//     if (frameCount % 60 === 0) {
+//       // Calculate average every 60 frames (adjust as needed)
+//       const averageTicks = totalTicks / frameCount;
+//       // console.log("Average numTicks per frame: " + averageTicks);
+//     }
 
-  function queueUpdates(numTicks) {
-    for (let i = 0; i < numTicks; i++) {
-      MyGame.lastTick += MyGame.tickLength; // Now lastTick is this tick.
-      update(MyGame.lastTick);
-    }
-  }
+//     queueUpdates(numTicks);
+//     render(tFrame);
+//     MyGame.lastRender = tFrame;
+//   }
 
-  function update(lastTick) {
-    //  console.log("lastTick " + lastTick);
-  }
+//   function queueUpdates(numTicks) {
+//     for (let i = 0; i < numTicks; i++) {
+//       MyGame.lastTick += MyGame.tickLength; // Now lastTick is this tick.
+//       update(MyGame.lastTick);
+//     }
+//   }
 
-  function render(frame) {
-    //  console.log(frame);
-    // Calculate the time since the last render
-    //const timeElapsed = frame - MyGame.lastRender;
+//   function update(lastTick) {
+//     //  console.log("lastTick " + lastTick);
+//   }
 
-    // Update the game scene based on the time elapsed
-    // This can include animations, physics calculations, and updating object positions.
+//   function render(frame) {
+//     renderer.renderBSPNode(1);
+//     //  console.log(frame);
+//     // Calculate the time since the last render
+//     //const timeElapsed = frame - MyGame.lastRender;
 
-    let color = [190, 0, 210];
+//     // Update the game scene based on the time elapsed
+//     // This can include animations, physics calculations, and updating object positions.
 
-    // updateCanvas();
+//     let color = [190, 0, 210];
 
-    // Draw game elements, backgrounds, player characters, etc.
+//     // updateCanvas();
 
-    // Update MyGame.lastRender to keep track of the last rendered frame
-    //  MyGame.lastRender = frame;
-  }
+//     // Draw game elements, backgrounds, player characters, etc.
 
-  MyGame.lastTick = performance.now();
-  MyGame.lastRender = MyGame.lastTick; // Pretend the first draw was on first update.
-  MyGame.tickLength = 50; // This sets your simulation to run at 20Hz (50ms)
+//     // Update MyGame.lastRender to keep track of the last rendered frame
+//     //  MyGame.lastRender = frame;
+//   }
 
-  setInitialState();
+//   MyGame.lastTick = performance.now();
+//   MyGame.lastRender = MyGame.lastTick; // Pretend the first draw was on first update.
+//   MyGame.tickLength = 50; // This sets your simulation to run at 20Hz (50ms)
 
-  function setInitialState() {
-    console.log("running");
-  }
+//   setInitialState();
 
-  main(performance.now()); // Start the cycle
-})();
+//   function setInitialState() {
+//     console.log("running");
+//   }
+
+//   //main(performance.now()); // Start the cycle
+// })();
