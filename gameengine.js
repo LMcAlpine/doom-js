@@ -1,6 +1,9 @@
 class GameEngine {
   constructor(canvasId, tickLength, levels) {
-    this.renderer = new Renderer(canvasId, 50, levels);
+    this.canvas = new Canvas(canvasId);
+    this.subsector = new Subsector();
+    this.bspTraversal = new BSPTraversal(levels);
+
     this.logic = new GameLogic(tickLength);
 
     this.linedefs = levels.linedefs;
@@ -10,15 +13,12 @@ class GameEngine {
   }
 
   loop(tFrame) {
-    // core loop
-    this.stopMain = window.requestAnimationFrame(this.loop.bind(this));
-    let numTicks = this.logic.calculateTicks(tFrame);
-    this.logic.queueUpdates(numTicks);
+    this.canvas.clearCanvas();
+    this.canvas.drawLinedefs(this.linedefs, this.vertices);
+    this.bspTraversal.renderBSPNode(this.nodes.length - 1);
+    this.canvas.updateCanvas();
 
-    this.renderer.drawLinedefs(this.linedefs, this.vertices);
-    this.renderer.renderBSPNode(this.nodes.length - 1);
-    this.logic.lastRender = tFrame;
-    //  console.log("looping");
+    this.stopMain = requestAnimationFrame(this.loop.bind(this));
   }
 
   start() {

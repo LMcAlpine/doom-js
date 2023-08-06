@@ -1,25 +1,61 @@
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-let canvasBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
-let canvasPitch = canvasBuffer.width * 4;
+this.canvasWidth = document.getElementById("myCanvas").width;
+this.canvasHeight = document.getElementById("myCanvas").height;
 
-function putPixel(x, y, color) {
-  // x = canvas.width / 2 + x;
-  // y = canvas.height / 2 - y - 1;
-  x = Math.round(x); // Round the x-coordinate to the nearest integer
-  y = Math.round(y); // Round the y-coordinate to the nearest integer
+this.margin = 10; // The size of the margin you want to keep
+this.marginsPerSide = 2;
 
-  if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
-    return;
-  }
-
-  let offset = 4 * x + canvasPitch * y;
-  canvasBuffer.data[offset++] = color[0];
-  canvasBuffer.data[offset++] = color[1];
-  canvasBuffer.data[offset++] = color[2];
-  canvasBuffer.data[offset++] = 255; // Alpha = 255 (full opacity)
+function calculateScale2D(maxX, minX, maxY, minY) {
+  const scaleX =
+    (this.canvasWidth - this.marginsPerSide * this.margin) / (maxX - minX);
+  const scaleY =
+    (this.canvasHeight - this.marginsPerSide * this.margin) / (maxY - minY);
+  return { scaleX, scaleY };
 }
 
-let updateCanvas = function () {
-  ctx.putImageData(canvasBuffer, 0, 0);
-};
+function remapYToScreen(yCoordinate, minY, scaleY) {
+  return this.canvasHeight - this.margin - (yCoordinate - minY) * scaleY;
+}
+
+function remapXToScreen(xCoordinate, minX, scaleX) {
+  return this.margin + (xCoordinate - minX) * scaleX;
+}
+
+function calculateMinMax(vertices) {
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
+
+  vertices.forEach((element) => {
+    minX = Math.min(minX, element.x);
+    maxX = Math.max(maxX, element.x);
+    minY = Math.min(minY, element.y);
+    maxY = Math.max(maxY, element.y);
+  });
+  return { maxX, minX, maxY, minY };
+}
+
+function swap(d, point0, point1) {
+  if (d < 0) {
+    const swap = point0;
+    point0 = point1;
+    point1 = swap;
+  }
+  return { point0, point1 };
+}
+
+function interpolate(i0, d0, i1, d1) {
+  if (i0 === i1) {
+    return [d0];
+  }
+  let values = [];
+  let slope = (d1 - d0) / (i1 - i0);
+  let d = d0;
+  for (let i = i0; i <= i1; i++) {
+    values.push(d);
+    // we know the d+1 point can be calculated by adding the slope to d.
+    // avoids a multiplication
+    d = d + slope;
+  }
+  return values;
+}
