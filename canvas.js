@@ -16,8 +16,12 @@ class Canvas {
 
   clearCanvas() {
     console.log("Clearing canvas...");
-
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
+      this.canvasBuffer.data[i] = 0;
+      this.canvasBuffer.data[i + 1] = 0;
+      this.canvasBuffer.data[i + 2] = 0;
+      this.canvasBuffer.data[i + 3] = 0;
+    }
   }
 
   putPixel(x, y, color) {
