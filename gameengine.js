@@ -2,7 +2,12 @@ class GameEngine {
   constructor(canvasId, tickLength, levels) {
     this.canvas = new Canvas(canvasId);
     this.ctx = this.canvas.ctx;
-    const subsector = new Subsector();
+    const subsector = new Subsector(
+      levels.subsectors,
+      levels.segs,
+      levels.vertices,
+      this.canvas
+    );
     this.bspTraversal = new BSPTraversal(levels, subsector);
 
     this.logic = new GameLogic(tickLength);
@@ -65,11 +70,11 @@ class GameEngine {
       this.rightclick = getXandY(e);
     });
 
-    document.addEventListener(
+    this.ctx.canvas.addEventListener(
       "keydown",
       (event) => (this.keys[event.key] = true)
     );
-    document.addEventListener(
+    this.ctx.canvas.addEventListener(
       "keyup",
       (event) => (this.keys[event.key] = false)
     );

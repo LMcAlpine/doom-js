@@ -7,17 +7,6 @@ class GameLogic {
     this.frameCount = 0;
   }
 
-  // update(lastTick) {
-  //   // Add your update logic here
-  // }
-
-  // queueUpdates(numTicks) {
-  //   for (let i = 0; i < numTicks; i++) {
-  //     this.lastTick += this.tickLength;
-  //     this.update(this.lastTick);
-  //   }
-  // }
-
   calculateTicks(tFrame) {
     const nextTick = this.lastTick + this.tickLength;
     let numTicks = 0;

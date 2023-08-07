@@ -15,7 +15,7 @@ class Canvas {
   }
 
   clearCanvas() {
-    console.log("Clearing canvas...");
+    //  console.log("Clearing canvas...");
     for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
       this.canvasBuffer.data[i] = 0;
       this.canvasBuffer.data[i + 1] = 0;
@@ -144,20 +144,19 @@ class Canvas {
   }
 
   drawLinedefs(linedefs, vertices) {
-    let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
-
-    const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+    const scaleData = calculateScale(vertices);
 
     linedefs.forEach((linedef) => {
-      const vertex1 = vertices[linedef.startVertex];
-      const vertex2 = vertices[linedef.endVertex];
+      const vertexPair = convertToScreenCoordinates(
+        vertices,
+        linedef.startVertex,
+        linedef.endVertex,
+        scaleData
+      );
 
-      const drawX = remapXToScreen(vertex1.x, minX, scaleX);
-      const drawY = remapYToScreen(vertex1.y, minY, scaleY);
-
-      const drawX2 = remapXToScreen(vertex2.x, minX, scaleX);
-      const drawY2 = remapYToScreen(vertex2.y, minY, scaleY);
-      this.drawLine({ x: drawX, y: drawY }, { x: drawX2, y: drawY2 });
+      const p1 = vertexPair.v1;
+      const p2 = vertexPair.v2;
+      this.drawLine(p1, p2);
     });
   }
 }

@@ -59,3 +59,26 @@ function interpolate(i0, d0, i1, d1) {
   }
   return values;
 }
+
+function calculateScale(vertices) {
+  const { maxX, minX, maxY, minY } = calculateMinMax(vertices);
+
+  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+  return {
+    scale: { scaleX, scaleY },
+    min: { x: minX, y: minY },
+  };
+}
+
+function convertToScreenCoordinates(vertices, startIndex, endIndex, data) {
+  const v1 = vertices[startIndex];
+  const v2 = vertices[endIndex];
+
+  const drawX = remapXToScreen(v1.x, data.min.x, data.scale.scaleX);
+  const drawY = remapYToScreen(v1.y, data.min.y, data.scale.scaleY);
+
+  const drawX2 = remapXToScreen(v2.x, data.min.x, data.scale.scaleX);
+  const drawY2 = remapYToScreen(v2.y, data.min.y, data.scale.scaleY);
+
+  return { v1: { x: drawX, y: drawY }, v2: { x: drawX2, y: drawY2 } };
+}

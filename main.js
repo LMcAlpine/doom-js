@@ -1,4 +1,3 @@
-// const gameEngine = new GameEngine("myCanvas");
 document
   .getElementById("fileInput")
   .addEventListener("change", async (event) => {
@@ -27,6 +26,7 @@ document
       { scaleX: scaleX, scaleY: scaleY },
       gameEngine
     );
+
     gameEngine.addEntity(player);
 
     gameEngine.start();
