@@ -1,21 +1,26 @@
 class BSPTraversal {
-  constructor(levels) {
+  constructor(levels, subsector) {
     this.things = levels.things;
-    console.log(this.things);
+
     this.player = this.things[0];
-    console.log(this.player);
 
     this.nodes = levels.nodes;
+
+    this.subsector = subsector;
   }
 
-  renderBSPNode(nodeID) {
+  update() {
+    this.traverseBSP(this.nodes.length - 1);
+  }
+
+  draw(ctx) {}
+
+  traverseBSP(nodeID) {
     // check for is this node a leaf node.
     if (this.isSubsector(nodeID)) {
       // getSubsector gives the number of subsector
       // this ID is passed into the renderSubsector method
-      //this.renderSubsector(this.getSubsector(nodeID), ctx);
-      //  console.log("subsector found");
-
+      this.subsector.handleSubsector(this.getSubsector(nodeID));
       return;
     }
 
@@ -29,13 +34,13 @@ class BSPTraversal {
 
     // traversing left
     if (isOnLeft) {
-      this.renderBSPNode(bsp.leftChild);
-      //  this.renderBSPNode(bsp.rightChild);
+      this.traverseBSP(bsp.leftChild);
+      this.traverseBSP(bsp.rightChild);
     } else {
       // traversing right
 
-      this.renderBSPNode(bsp.rightChild);
-      // this.renderBSPNode(bsp.leftChild);
+      this.traverseBSP(bsp.rightChild);
+      this.traverseBSP(bsp.leftChild);
     }
   }
 
