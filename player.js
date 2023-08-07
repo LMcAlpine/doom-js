@@ -6,10 +6,6 @@ class Player {
     this.game = game;
   }
   update() {
-    // this.x += 5;
-    // this.y += 5;
-
-    // console.log(this.game);
     if (this.game.keys["w"] === true) {
       this.y -= 1;
     }

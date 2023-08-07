@@ -159,4 +159,26 @@ class Canvas {
       this.drawLine(p1, p2);
     });
   }
+
+  drawSegs(segs, vertices) {
+    const scaleData = calculateScale(vertices);
+
+    segs.forEach((seg) => {
+      const vertexPair = convertToScreenCoordinates(
+        vertices,
+        seg.startingVertexNumber,
+        seg.endingVertexNumber,
+        scaleData
+      );
+
+      const p1 = vertexPair.v1;
+      const p2 = vertexPair.v2;
+      this.drawLine(p1, p2, [
+        Math.floor(Math.random() * 256),
+        Math.floor(Math.random() * 256),
+        Math.floor(Math.random() * 256),
+      ]);
+      this.updateCanvas();
+    });
+  }
 }

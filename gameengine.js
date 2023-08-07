@@ -12,6 +12,8 @@ class GameEngine {
 
     this.logic = new GameLogic(tickLength);
 
+    this.subsector = subsector;
+
     this.linedefs = levels.linedefs;
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
@@ -41,31 +43,19 @@ class GameEngine {
     });
 
     this.ctx.canvas.addEventListener("mousemove", (e) => {
-      // if (this.options.debugging) {
-      //   console.log("MOUSE_MOVE", getXandY(e));
-      // }
       this.mouse = getXandY(e);
     });
 
     this.ctx.canvas.addEventListener("click", (e) => {
-      // if (this.options.debugging) {
-      //   console.log("CLICK", getXandY(e));
-      // }
       this.click = getXandY(e);
     });
 
     this.ctx.canvas.addEventListener("wheel", (e) => {
-      // if (this.options.debugging) {
-      //   console.log("WHEEL", getXandY(e), e.wheelDelta);
-      // }
       e.preventDefault(); // Prevent Scrolling
       this.wheel = e;
     });
 
     this.ctx.canvas.addEventListener("contextmenu", (e) => {
-      // if (this.options.debugging) {
-      //   console.log("RIGHT_CLICK", getXandY(e));
-      // }
       e.preventDefault(); // Prevent Context Menu
       this.rightclick = getXandY(e);
     });
@@ -84,25 +74,20 @@ class GameEngine {
     this.entities.push(entity);
   }
 
-  // clears canvas
-  // calls draw methods...?
   draw() {
     // clear the canvas each frame
     this.canvas.clearCanvas();
-    // draw world space...?
-    this.canvas.drawLinedefs(this.linedefs, this.vertices);
 
-    // then updatecanvas
-    // this.canvas.updateCanvas();
-    // then draw entities....?
+    //this.canvas.drawLinedefs(this.linedefs, this.vertices);
+    //  this.canvas.drawSegs(this.subsector.segsToDraw, this.vertices);
+
     // Draw latest things first
     for (let i = this.entities.length - 1; i >= 0; i--) {
       this.entities[i].draw(this.canvas, this);
     }
-    this.canvas.updateCanvas();
+    //  this.canvas.updateCanvas();
   }
 
-  // updates logic...?
   update() {
     let entitiesCount = this.entities.length;
 
