@@ -1,5 +1,5 @@
 class Subsector {
-  constructor(subsectors, segs, vertices, canvas) {
+  constructor(subsectors, segs, vertices) {
     this.subsectors = subsectors;
     this.segs = segs;
     this.vertices = vertices;
