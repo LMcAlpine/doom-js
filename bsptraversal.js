@@ -21,6 +21,7 @@ class BSPTraversal {
       // getSubsector gives the number of subsector
       // this ID is passed into the renderSubsector method
       this.subsector.handleSubsector(this.getSubsector(nodeID));
+
       return;
     }
 
