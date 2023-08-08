@@ -16,24 +16,26 @@ class Subsector {
 
       const segStartVertex = this.vertices[seg.startingVertexNumber];
       const segEndVertex = this.vertices[seg.endingVertexNumber];
-      gameEngine.player.checkIfSegInFOV({
+      const result = gameEngine.player.checkIfSegInFOV({
         vertex1: segStartVertex,
         vertex2: segEndVertex,
       });
 
-      const vertices = convertToScreenCoordinates(
-        this.vertices,
-        seg.startingVertexNumber,
-        seg.endingVertexNumber,
-        scaleData
-      );
-      const p1 = vertices.v1;
-      const p2 = vertices.v2;
-      this.canvas.drawLine(p1, p2, [
-        Math.floor(Math.random() * 256),
-        Math.floor(Math.random() * 256),
-        Math.floor(Math.random() * 256),
-      ]);
+      if (result) {
+        const vertices = convertToScreenCoordinates(
+          this.vertices,
+          seg.startingVertexNumber,
+          seg.endingVertexNumber,
+          scaleData
+        );
+        const p1 = vertices.v1;
+        const p2 = vertices.v2;
+        this.canvas.drawLine(p1, p2, [
+          Math.floor(Math.random() * 256),
+          Math.floor(Math.random() * 256),
+          Math.floor(Math.random() * 256),
+        ]);
+      }
     }
   }
 }

@@ -12,11 +12,15 @@ class Angle {
   }
 
   add(otherAngle) {
-    return new Angle(this.angle + otherAngle.angle);
+    return new Angle(this.angle + otherAngle);
   }
 
   subtract(otherAngle) {
-    return new Angle(this.angle - otherAngle.angle);
+    return new Angle(this.angle - otherAngle);
+  }
+
+  static subtract(angle1, angle2) {
+    return new Angle(angle1 - angle2);
   }
 
   negateAngle() {

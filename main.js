@@ -8,6 +8,7 @@ document
       console.error("No file selected.");
       return;
     }
+    gameEngine.entities = [];
 
     const wadFileReader = new WADFileReader(file);
     const arrayBuffer = await wadFileReader.readFile();
