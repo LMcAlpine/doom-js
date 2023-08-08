@@ -3,10 +3,7 @@ class Subsector {
     this.subsectors = subsectors;
     this.segs = segs;
     this.vertices = vertices;
-    this.canvas = canvas;
-
-    this.segsToDraw = [];
-    this.count = 0;
+    this.canvas = gameEngine.canvas;
   }
 
   handleSubsector(subsectorID) {
@@ -16,9 +13,14 @@ class Subsector {
 
     for (let i = 0; i < subsector.segCount; i++) {
       const seg = this.segs[subsector.firstSegNumber + i];
-      this.segsToDraw.push(seg);
-      this.count++;
-      // console.log(seg);
+
+      const segStartVertex = this.vertices[seg.startingVertexNumber];
+      const segEndVertex = this.vertices[seg.endingVertexNumber];
+      gameEngine.player.checkIfSegInFOV({
+        vertex1: segStartVertex,
+        vertex2: segEndVertex,
+      });
+
       const vertices = convertToScreenCoordinates(
         this.vertices,
         seg.startingVertexNumber,
@@ -33,6 +35,5 @@ class Subsector {
         Math.floor(Math.random() * 256),
       ]);
     }
-    this.canvas.updateCanvas();
   }
 }

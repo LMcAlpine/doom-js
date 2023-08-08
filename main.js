@@ -1,3 +1,5 @@
+const gameEngine = new GameEngine("myCanvas", 50);
+
 document
   .getElementById("fileInput")
   .addEventListener("change", async (event) => {
@@ -18,16 +20,24 @@ document
     let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
 
     const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
-    const gameEngine = new GameEngine("myCanvas", 50, levels);
-    gameEngine.init();
+
+    const canvas = new Canvas("myCanvas");
+
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },
-      { scaleX: scaleX, scaleY: scaleY },
-      gameEngine
+      { scaleX: scaleX, scaleY: scaleY }
     );
 
     gameEngine.addEntity(player);
+    gameEngine.player = player;
+
+    gameEngine.canvas = canvas;
+    gameEngine.ctx = canvas.ctx;
+
+    const levelManager = new LevelManager(levels);
+    gameEngine.levelManager = levelManager;
+    gameEngine.init();
 
     gameEngine.start();
   });

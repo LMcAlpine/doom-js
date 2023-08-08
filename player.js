@@ -1,22 +1,35 @@
 class Player {
-  constructor(location, { minX, minY }, { scaleX, scaleY }, game) {
+  constructor(location, { minX, minY }, { scaleX, scaleY }, direction, fov) {
     this.x = remapXToScreen(location.xPosition, minX, scaleX);
     this.y = remapYToScreen(location.yPosition, minY, scaleY);
 
-    this.game = game;
+    this.direction = direction;
+    this.fov = fov;
   }
+
+  checkIfSegInFOV(seg) {
+    const angleToV1 = this.angleTowardsVertex(seg.vertex1);
+    const angleToV2 = this.angleTowardsVertex(seg.vertex2);
+  }
+
+  angleTowardsVertex(vertex) {
+    const adjacent = vertex.x - this.x;
+    const opposite = vertex.y - this.y;
+    return Angle.radiansToDegrees(Math.atan2(opposite, adjacent));
+  }
+
   update() {
-    if (this.game.keys["w"] === true) {
-      this.y -= 1;
+    if (gameEngine.keys["w"] === true) {
+      this.y -= 5;
     }
-    if (this.game.keys["s"] === true) {
-      this.y += 1;
+    if (gameEngine.keys["s"] === true) {
+      this.y += 5;
     }
-    if (this.game.keys["d"] === true) {
-      this.x += 1;
+    if (gameEngine.keys["d"] === true) {
+      this.x += 5;
     }
-    if (this.game.keys["a"] === true) {
-      this.x -= 1;
+    if (gameEngine.keys["a"] === true) {
+      this.x -= 5;
     }
   }
   draw(ctx) {

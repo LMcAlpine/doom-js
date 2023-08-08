@@ -1,23 +1,6 @@
 class GameEngine {
-  constructor(canvasId, tickLength, levels) {
-    this.canvas = new Canvas(canvasId);
-    this.ctx = this.canvas.ctx;
-    const subsector = new Subsector(
-      levels.subsectors,
-      levels.segs,
-      levels.vertices,
-      this.canvas
-    );
-    this.bspTraversal = new BSPTraversal(levels, subsector);
-
+  constructor(tickLength) {
     this.logic = new GameLogic(tickLength);
-
-    this.subsector = subsector;
-
-    this.linedefs = levels.linedefs;
-    this.vertices = levels.vertices;
-    this.nodes = levels.nodes;
-    console.log(this.nodes.length);
 
     this.entities = [];
 
@@ -78,14 +61,14 @@ class GameEngine {
     // clear the canvas each frame
     this.canvas.clearCanvas();
 
-    //this.canvas.drawLinedefs(this.linedefs, this.vertices);
-    //  this.canvas.drawSegs(this.subsector.segsToDraw, this.vertices);
-
     // Draw latest things first
     for (let i = this.entities.length - 1; i >= 0; i--) {
       this.entities[i].draw(this.canvas, this);
     }
-    //  this.canvas.updateCanvas();
+
+    this.levelManager.draw();
+
+    this.canvas.updateCanvas();
   }
 
   update() {
@@ -104,8 +87,6 @@ class GameEngine {
         this.entities.splice(i, 1);
       }
     }
-
-    this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 
   loop(tFrame) {
