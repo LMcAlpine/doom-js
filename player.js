@@ -1,7 +1,5 @@
 class Player {
-  constructor(location, { minX, minY }, { scaleX, scaleY }, direction, fov) {
-    // this.x2d = remapXToScreen(location.xPosition, minX, scaleX);
-    // this.y2d = remapYToScreen(location.yPosition, minY, scaleY);
+  constructor(location, { minX, minY }, { scaleX, scaleY }, fov) {
     this.location = location;
     this.x = location.xPosition;
     this.y = location.yPosition;
@@ -22,7 +20,7 @@ class Player {
 
     if (span.angle >= 180) {
       console.log("passing?");
-      return false;
+      return [];
     }
     angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
     angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
@@ -33,7 +31,7 @@ class Player {
       const v1MovedAngle = v1Moved.subtract(halfFOV);
 
       if (v1MovedAngle.angle >= span.angle) {
-        return false;
+        return [];
       }
       angleToV1.angle = halfFOV;
     }
@@ -46,7 +44,7 @@ class Player {
     angleToV1.angle += 90;
     angleToV2.angle += 90;
 
-    return true;
+    return [angleToV1, angleToV2];
   }
 
   angleTowardsVertex(vertex) {
@@ -58,21 +56,15 @@ class Player {
   update() {
     if (gameEngine.keys["w"] === true) {
       this.y += 5;
-
-      //  this.x2d -= 5;
     }
     if (gameEngine.keys["s"] === true) {
       this.y -= 5;
-      //  this.y2d += 5;
     }
     if (gameEngine.keys["d"] === true) {
       this.x += 5;
-
-      //  this.x2d += 5;
     }
     if (gameEngine.keys["a"] === true) {
       this.x -= 5;
-      // this.x2d -= 5;
     }
 
     if (gameEngine.keys["ArrowLeft"] === true) {

@@ -89,11 +89,10 @@ class GameEngine {
     }
   }
 
-  loop(tFrame) {
+  loop() {
     // logic is updated first, then draw
     this.update();
     this.draw();
-    //this.logic.lastRender = tFrame;
     this.stopMain = requestAnimationFrame(this.loop.bind(this));
   }
 }

@@ -15,7 +15,6 @@ class Canvas {
   }
 
   clearCanvas() {
-    //  console.log("Clearing canvas...");
     for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
       this.canvasBuffer.data[i] = 0;
       this.canvasBuffer.data[i + 1] = 0;
@@ -25,8 +24,6 @@ class Canvas {
   }
 
   putPixel(x, y, color) {
-    // x = canvas.width / 2 + x;
-    // y = canvas.height / 2 - y - 1;
     x = Math.round(x); // Round the x-coordinate to the nearest integer
     y = Math.round(y); // Round the y-coordinate to the nearest integer
 
@@ -157,28 +154,6 @@ class Canvas {
       const p1 = vertexPair.v1;
       const p2 = vertexPair.v2;
       this.drawLine(p1, p2);
-    });
-  }
-
-  drawSegs(segs, vertices) {
-    const scaleData = calculateScale(vertices);
-
-    segs.forEach((seg) => {
-      const vertexPair = convertToScreenCoordinates(
-        vertices,
-        seg.startingVertexNumber,
-        seg.endingVertexNumber,
-        scaleData
-      );
-
-      const p1 = vertexPair.v1;
-      const p2 = vertexPair.v2;
-      this.drawLine(p1, p2, [
-        Math.floor(Math.random() * 256),
-        Math.floor(Math.random() * 256),
-        Math.floor(Math.random() * 256),
-      ]);
-      this.updateCanvas();
     });
   }
 }
