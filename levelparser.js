@@ -65,7 +65,16 @@ class LevelParser {
     const things = this.parseThings(thingsLump);
     console.log(things);
 
-    return { vertices, linedefs, sidedefs, nodes, subsectors, segs, things };
+    return {
+      vertices,
+      linedefs,
+      sidedefs,
+      nodes,
+      subsectors,
+      segs,
+      sectors,
+      things,
+    };
   }
 
   /**
@@ -150,7 +159,6 @@ class LevelParser {
    * @param {Object} sidedefsLump - The sidedefs lump data to parse.
    * @returns {Array} An array of sidedef objects, each containing xOffset, yOffset, upperTextureName, lowerTextureName, middleTextureName, and sector properties.
    */
-
   parseSidedefs(sidedefsLump) {
     const dataView = new DataView(sidedefsLump.data);
     const sidedefs = [];
@@ -158,10 +166,21 @@ class LevelParser {
     for (let i = 0; i < sidedefsLump.size; i += 30) {
       const xOffset = dataView.getInt16(i, true);
       const yOffset = dataView.getInt16(i + 2, true);
-      const upperTextureName = dataView.getInt16(i + 4, true);
-      const lowerTextureName = dataView.getInt16(i + 6, true);
-      const middleTextureName = dataView.getInt16(i + 8, true);
-      const sector = dataView.getInt16(i + 10, true);
+
+      // Read and trim texture names
+      const upperTextureName = String.fromCharCode(
+        ...new Uint8Array(sidedefsLump.data.slice(i + 4, i + 12))
+      ).replace(/\u0000/g, ""); // Remove null characters
+
+      const lowerTextureName = String.fromCharCode(
+        ...new Uint8Array(sidedefsLump.data.slice(i + 12, i + 20))
+      ).replace(/\u0000/g, ""); // Remove null characters
+
+      const middleTextureName = String.fromCharCode(
+        ...new Uint8Array(sidedefsLump.data.slice(i + 20, i + 28))
+      ).replace(/\u0000/g, ""); // Remove null characters
+
+      const sector = dataView.getInt16(i + 28, true);
 
       sidedefs.push({
         xOffset,
@@ -174,6 +193,7 @@ class LevelParser {
     }
     return sidedefs;
   }
+
   /**
    * Parses nodes lumps data from a WAD file.
    *

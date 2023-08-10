@@ -36,6 +36,17 @@ document
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
 
+    const sectorObjects = buildSectors(levels.sectors);
+    const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+
+    const linedefObjects = buildLinedefs(
+      levels.linedefs,
+      vertices,
+      sidedefObjects
+    );
+
+    const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
+
     const levelManager = new LevelManager(levels);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
