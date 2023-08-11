@@ -1,9 +1,10 @@
 class LevelManager {
-  constructor(levels) {
+  constructor(levels, data) {
     const subsector = new Subsector(
       levels.subsectors,
-      levels.segs,
-      levels.vertices
+      data.segObjects,
+      levels.vertices,
+      data.sidedefObjects
     );
     this.bspTraversal = new BSPTraversal(levels, subsector);
 
@@ -16,6 +17,9 @@ class LevelManager {
   }
 
   draw() {
+    console.log(gameEngine.player.direction);
+    console.log(this.subsector.solidsegs);
+    this.subsector.clearSolidsegs();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 }

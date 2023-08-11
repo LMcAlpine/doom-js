@@ -8,7 +8,8 @@ class Player {
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    this.direction = location.direction;
+    // this.direction = location.direction;
+    this.direction = -26.25;
     this.fov = fov;
   }
 
@@ -16,33 +17,48 @@ class Player {
     let angleToV1 = this.angleTowardsVertex(seg.vertex1);
     let angleToV2 = this.angleTowardsVertex(seg.vertex2);
 
+    if (angleToV2.angle === 359.684948822922) {
+      console.log("here");
+    }
+
     const span = Angle.subtract(angleToV1.angle, angleToV2.angle);
 
     if (span.angle >= 180) {
-      console.log("passing?");
       return [];
     }
+
+    let temp = angleToV2.angle;
+
     angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
     angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
 
-    const halfFOV = 90 / 2;
-    const v1Moved = angleToV1.add(halfFOV);
+    if (angleToV2.angle === 359.684948822922) {
+      console.log("here");
+    }
+
+    const halfFOV = new Angle(45);
+    const v1Moved = angleToV1.add(halfFOV.angle);
     if (v1Moved.angle > 90) {
-      const v1MovedAngle = v1Moved.subtract(halfFOV);
+      const v1MovedAngle = v1Moved.subtract(90);
 
       if (v1MovedAngle.angle >= span.angle) {
         return [];
       }
-      angleToV1.angle = halfFOV;
+      angleToV1.angle = halfFOV.angle;
     }
 
-    const v2Moved = Angle.subtract(halfFOV - angleToV2.angle);
+    const v2Moved = Angle.subtract(halfFOV.angle, angleToV2.angle);
 
     if (v2Moved > 90) {
-      angleToV2 = angleToV2.negateAngle();
+      angleToV2 = halfFOV.negateAngle();
     }
-    angleToV1.angle += 90;
-    angleToV2.angle += 90;
+
+    angleToV1 = angleToV1.add(90);
+    angleToV2 = angleToV2.add(90);
+
+    if (angleToV2.angle === 359.684948822922) {
+      console.log("here");
+    }
 
     return [angleToV1, angleToV2];
   }
@@ -54,36 +70,47 @@ class Player {
   }
 
   update() {
+    const multiplier = 10;
+    const magRotation = 0.1875 * multiplier;
+
+    const radians = (this.direction * Math.PI) / 180;
+    const dx = Math.sin(radians);
+    const dy = Math.cos(radians);
+
     if (gameEngine.keys["w"] === true) {
-      this.y += 5;
+      this.x += Math.cos((this.direction * Math.PI) / 180) * multiplier;
+      this.y += Math.sin((this.direction * Math.PI) / 180) * multiplier;
     }
     if (gameEngine.keys["s"] === true) {
-      this.y -= 5;
+      this.x -= Math.cos((this.direction * Math.PI) / 180) * multiplier;
+      this.y -= Math.sin((this.direction * Math.PI) / 180) * multiplier;
     }
     if (gameEngine.keys["d"] === true) {
-      this.x += 5;
+      this.x += dx * multiplier;
+      this.y -= dy * multiplier;
     }
     if (gameEngine.keys["a"] === true) {
-      this.x -= 5;
+      this.x -= dx * multiplier;
+      this.y += dy * multiplier;
     }
 
     if (gameEngine.keys["ArrowLeft"] === true) {
-      this.direction += 0.1875 * 4;
+      this.direction += magRotation;
     }
     if (gameEngine.keys["ArrowRight"] === true) {
-      this.direction -= 0.1875 * 4;
+      this.direction -= magRotation;
     }
   }
 
   draw(ctx) {
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        ctx.putPixel(
-          remapXToScreen(this.x, this.minX, this.scaleX) + i,
-          remapYToScreen(this.y, this.minY, this.scaleY) + j,
-          [255, 0, 0]
-        );
-      }
-    }
+    // for (let i = 0; i < 3; i++) {
+    //   for (let j = 0; j < 3; j++) {
+    //     ctx.putPixel(
+    //       remapXToScreen(this.x, this.minX, this.scaleX) + i,
+    //       remapYToScreen(this.y, this.minY, this.scaleY) + j,
+    //       [255, 0, 0]
+    //     );
+    //   }
+    // }
   }
 }

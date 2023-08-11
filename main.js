@@ -45,9 +45,18 @@ document
       sidedefObjects
     );
 
+
+
     const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
 
-    const levelManager = new LevelManager(levels);
+    const dataObjects = {
+      sectorObjects,
+      sidedefObjects,
+      linedefObjects,
+      segObjects,
+    };
+
+    const levelManager = new LevelManager(levels, dataObjects);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 
