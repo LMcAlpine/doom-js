@@ -10,6 +10,8 @@ class LevelManager {
 
     this.subsector = subsector;
 
+    this.segs = data.segObjects;
+    this.subsectors = levels.subsectors;
     this.linedefs = levels.linedefs;
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
@@ -22,5 +24,27 @@ class LevelManager {
     this.subsector.clearSolidsegs();
     this.subsector.initClipHeights();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
+    //gameEngine.player.z = this.getPlayerSubsectorHeight() + 41;
+  }
+
+  getPlayerSubsectorHeight() {
+    let subsectorID = this.nodes.length - 1;
+
+    while (!this.bspTraversal.isSubsector(subsectorID)) {
+      let isOnLeft = this.bspTraversal.isPointOnLeftSide(
+        gameEngine.player.x,
+        gameEngine.player.y,
+        this.nodes[subsectorID]
+      );
+      if (isOnLeft) {
+        subsectorID = this.nodes[subsectorID].leftChild;
+      } else {
+        subsectorID = this.nodes[subsectorID].rightChild;
+      }
+    }
+    let subsector =
+      this.subsectors[this.bspTraversal.getSubsector(subsectorID)];
+    let seg = this.segs[subsector.firstSegNumber];
+    return seg.rightSector.floorHeight;
   }
 }
