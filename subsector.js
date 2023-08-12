@@ -33,10 +33,6 @@ class Subsector {
         vertex1: segStartVertex,
         vertex2: segEndVertex,
       });
-      // const result = gameEngine.player.checkIfSegInFOV({
-      //   vertex1: { x: 1344, y: -3392 },
-      //   vertex2: { x: 1344, y: -3520 },
-      // });
 
       if (result.length !== 0) {
         // not screen coordinates so not being drawn
@@ -55,13 +51,8 @@ class Subsector {
   }
 
   addWall(seg, angleV1, angleV2) {
-    const t = this.angleToX(359.684948822922);
     const xScreenV1 = this.angleToX(angleV1.angle);
     const xScreenV2 = this.angleToX(angleV2.angle);
-
-    if (xScreenV1 < 0 || xScreenV2 < 0) {
-      return;
-    }
 
     if (xScreenV1 === xScreenV2) {
       return;

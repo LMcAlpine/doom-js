@@ -17,24 +17,14 @@ class Player {
     let angleToV1 = this.angleTowardsVertex(seg.vertex1);
     let angleToV2 = this.angleTowardsVertex(seg.vertex2);
 
-    if (angleToV2.angle === 359.684948822922) {
-      console.log("here");
-    }
-
     const span = Angle.subtract(angleToV1.angle, angleToV2.angle);
 
     if (span.angle >= 180) {
       return [];
     }
 
-    let temp = angleToV2.angle;
-
     angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
     angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
-
-    if (angleToV2.angle === 359.684948822922) {
-      console.log("here");
-    }
 
     const halfFOV = new Angle(45);
     const v1Moved = angleToV1.add(halfFOV.angle);
@@ -49,16 +39,12 @@ class Player {
 
     const v2Moved = Angle.subtract(halfFOV.angle, angleToV2.angle);
 
-    if (v2Moved > 90) {
+    if (v2Moved.angle > 90) {
       angleToV2 = halfFOV.negateAngle();
     }
 
     angleToV1 = angleToV1.add(90);
     angleToV2 = angleToV2.add(90);
-
-    if (angleToV2.angle === 359.684948822922) {
-      console.log("here");
-    }
 
     return [angleToV1, angleToV2];
   }
