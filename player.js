@@ -62,7 +62,7 @@ class Player {
   }
 
   update() {
-    const multiplier = 10;
+    const multiplier = 6;
     const magRotation = 0.1875 * multiplier;
 
     const radians = (this.direction * Math.PI) / 180;
@@ -92,6 +92,8 @@ class Player {
     if (gameEngine.keys["ArrowRight"] === true) {
       this.direction -= magRotation;
     }
+
+    this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
   }
 
   draw(ctx) {
