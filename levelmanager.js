@@ -20,6 +20,7 @@ class LevelManager {
     console.log(gameEngine.player.direction);
     console.log(this.subsector.solidsegs);
     this.subsector.clearSolidsegs();
+    this.subsector.initClipHeights();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 }

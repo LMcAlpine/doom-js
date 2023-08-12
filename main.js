@@ -27,7 +27,9 @@ document
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },
-      { scaleX: scaleX, scaleY: scaleY }
+      { scaleX: scaleX, scaleY: scaleY },
+      90,
+      41
     );
 
     gameEngine.addEntity(player);
@@ -44,8 +46,6 @@ document
       vertices,
       sidedefObjects
     );
-
-
 
     const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
 

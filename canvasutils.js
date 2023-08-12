@@ -4,6 +4,17 @@ this.canvasHeight = document.getElementById("myCanvas").height;
 this.margin = 10; // The size of the margin you want to keep
 this.marginsPerSide = 2;
 
+const MAXSCALE = 64.0;
+const MINSCALE = 0.00390625;
+
+const HALFWIDTH = this.canvasWidth / 2;
+const HALFHEIGHT = this.canvasHeight / 2;
+
+const FOV = 90;
+const HALFFOV = FOV / 2;
+
+const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
+
 function calculateScale2D(maxX, minX, maxY, minY) {
   const scaleX =
     (this.canvasWidth - this.marginsPerSide * this.margin) / (maxX - minX);
@@ -81,4 +92,12 @@ function convertToScreenCoordinates(vertices, startIndex, endIndex, data) {
   const drawY2 = remapYToScreen(v2.y, data.min.y, data.scale.scaleY);
 
   return { v1: { x: drawX, y: drawY }, v2: { x: drawX2, y: drawY2 } };
+}
+
+function degreesToRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+function radiansToDegrees(radians) {
+  return radians * (180 / Math.PI);
 }
