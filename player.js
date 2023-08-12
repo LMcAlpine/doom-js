@@ -1,15 +1,52 @@
 class Player {
-  constructor(location, { minX, minY }, { scaleX, scaleY }, direction, fov) {
-    this.x = remapXToScreen(location.xPosition, minX, scaleX);
-    this.y = remapYToScreen(location.yPosition, minY, scaleY);
+  constructor(location, { minX, minY }, { scaleX, scaleY }, fov) {
+    this.location = location;
+    this.x = location.xPosition;
+    this.y = location.yPosition;
 
-    this.direction = direction;
+    this.minX = minX;
+    this.minY = minY;
+    this.scaleX = scaleX;
+    this.scaleY = scaleY;
+    // this.direction = location.direction;
+    this.direction = -26.25;
     this.fov = fov;
   }
 
   checkIfSegInFOV(seg) {
-    const angleToV1 = this.angleTowardsVertex(seg.vertex1);
-    const angleToV2 = this.angleTowardsVertex(seg.vertex2);
+    let angleToV1 = this.angleTowardsVertex(seg.vertex1);
+    let angleToV2 = this.angleTowardsVertex(seg.vertex2);
+
+    const span = Angle.subtract(angleToV1.angle, angleToV2.angle);
+
+    if (span.angle >= 180) {
+      return [];
+    }
+
+    angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
+    angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
+
+    const halfFOV = new Angle(45);
+    const v1Moved = angleToV1.add(halfFOV.angle);
+    if (v1Moved.angle > 90) {
+      const v1MovedAngle = v1Moved.subtract(90);
+
+      if (v1MovedAngle.angle >= span.angle) {
+        return [];
+      }
+      angleToV1.angle = halfFOV.angle;
+    }
+
+    const v2Moved = Angle.subtract(halfFOV.angle, angleToV2.angle);
+
+    if (v2Moved.angle > 90) {
+      angleToV2 = halfFOV.negateAngle();
+    }
+
+    angleToV1 = angleToV1.add(90);
+    angleToV2 = angleToV2.add(90);
+
+    return [angleToV1, angleToV2];
   }
 
   angleTowardsVertex(vertex) {
@@ -19,24 +56,47 @@ class Player {
   }
 
   update() {
+    const multiplier = 10;
+    const magRotation = 0.1875 * multiplier;
+
+    const radians = (this.direction * Math.PI) / 180;
+    const dx = Math.sin(radians);
+    const dy = Math.cos(radians);
+
     if (gameEngine.keys["w"] === true) {
-      this.y -= 5;
+      this.x += Math.cos((this.direction * Math.PI) / 180) * multiplier;
+      this.y += Math.sin((this.direction * Math.PI) / 180) * multiplier;
     }
     if (gameEngine.keys["s"] === true) {
-      this.y += 5;
+      this.x -= Math.cos((this.direction * Math.PI) / 180) * multiplier;
+      this.y -= Math.sin((this.direction * Math.PI) / 180) * multiplier;
     }
     if (gameEngine.keys["d"] === true) {
-      this.x += 5;
+      this.x += dx * multiplier;
+      this.y -= dy * multiplier;
     }
     if (gameEngine.keys["a"] === true) {
-      this.x -= 5;
+      this.x -= dx * multiplier;
+      this.y += dy * multiplier;
+    }
+
+    if (gameEngine.keys["ArrowLeft"] === true) {
+      this.direction += magRotation;
+    }
+    if (gameEngine.keys["ArrowRight"] === true) {
+      this.direction -= magRotation;
     }
   }
+
   draw(ctx) {
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        ctx.putPixel(this.x + i, this.y + j, [255, 0, 0]);
-      }
-    }
+    // for (let i = 0; i < 3; i++) {
+    //   for (let j = 0; j < 3; j++) {
+    //     ctx.putPixel(
+    //       remapXToScreen(this.x, this.minX, this.scaleX) + i,
+    //       remapYToScreen(this.y, this.minY, this.scaleY) + j,
+    //       [255, 0, 0]
+    //     );
+    //   }
+    // }
   }
 }

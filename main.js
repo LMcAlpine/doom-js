@@ -8,6 +8,7 @@ document
       console.error("No file selected.");
       return;
     }
+    gameEngine.entities = [];
 
     const wadFileReader = new WADFileReader(file);
     const arrayBuffer = await wadFileReader.readFile();
@@ -35,7 +36,27 @@ document
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
 
-    const levelManager = new LevelManager(levels);
+    const sectorObjects = buildSectors(levels.sectors);
+    const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+
+    const linedefObjects = buildLinedefs(
+      levels.linedefs,
+      vertices,
+      sidedefObjects
+    );
+
+
+
+    const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
+
+    const dataObjects = {
+      sectorObjects,
+      sidedefObjects,
+      linedefObjects,
+      segObjects,
+    };
+
+    const levelManager = new LevelManager(levels, dataObjects);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 
