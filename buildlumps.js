@@ -53,6 +53,11 @@ function buildSegs(segs, vertices, linedefs) {
     seg.direction = segs[i].direction;
     seg.offset = (segs[i].offset << 16) / (1 << 16);
 
+
+    // if (seg.direction){
+    //   seg.linedef.rightSidedef = 
+    // }
+
     if (seg.linedef.rightSidedef) {
       seg.rightSector = seg.linedef.rightSidedef.sector;
     } else {

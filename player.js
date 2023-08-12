@@ -1,5 +1,5 @@
 class Player {
-  constructor(location, { minX, minY }, { scaleX, scaleY }, fov) {
+  constructor(location, { minX, minY }, { scaleX, scaleY }, fov, height) {
     this.location = location;
     this.x = location.xPosition;
     this.y = location.yPosition;
@@ -8,9 +8,13 @@ class Player {
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    // this.direction = location.direction;
-    this.direction = -26.25;
+    this.direction = location.direction;
+    //  this.direction = -26.25;
     this.fov = fov;
+
+    this.height = height;
+
+    this.realWallAngle1;
   }
 
   checkIfSegInFOV(seg) {
@@ -22,6 +26,8 @@ class Player {
     if (span.angle >= 180) {
       return [];
     }
+
+    this.realWallAngle1 = Object.assign({}, angleToV1);
 
     angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
     angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
