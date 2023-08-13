@@ -24,7 +24,6 @@ class LevelManager {
     this.subsector.clearSolidsegs();
     this.subsector.initClipHeights();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
-    //gameEngine.player.z = this.getPlayerSubsectorHeight() + 41;
   }
 
   getPlayerSubsectorHeight() {

@@ -9,7 +9,7 @@ class Player {
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.direction = location.direction;
-    //  this.direction = -26.25;
+
     this.fov = fov;
 
     this.height = height;
@@ -96,15 +96,5 @@ class Player {
     this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
   }
 
-  draw(ctx) {
-    // for (let i = 0; i < 3; i++) {
-    //   for (let j = 0; j < 3; j++) {
-    //     ctx.putPixel(
-    //       remapXToScreen(this.x, this.minX, this.scaleX) + i,
-    //       remapYToScreen(this.y, this.minY, this.scaleY) + j,
-    //       [255, 0, 0]
-    //     );
-    //   }
-    // }
-  }
+  draw(ctx) {}
 }

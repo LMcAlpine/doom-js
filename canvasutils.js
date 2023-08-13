@@ -1,7 +1,7 @@
 this.canvasWidth = document.getElementById("myCanvas").width;
 this.canvasHeight = document.getElementById("myCanvas").height;
 
-this.margin = 10; // The size of the margin you want to keep
+this.margin = 10; // The size of the margin
 this.marginsPerSide = 2;
 
 const MAXSCALE = 64.0;
