@@ -68,7 +68,7 @@ class Subsector {
       return;
     }
     //left sector == backsector
-    //righ sector == front sector
+    //right sector == front sector
     if (seg.leftSector === null) {
       this.clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2);
       return;
@@ -169,7 +169,6 @@ class Subsector {
   }
 
   distanceToPoint(vertex) {
-    // return Math.sqrt(Math.pow(this.xPos - vertex.x, 2) + Math.pow(this.yPos - vertex.y, 2));
     return Math.sqrt(
       (gameEngine.player.x - vertex.x) ** 2 +
         (gameEngine.player.y - vertex.y) ** 2
@@ -270,11 +269,6 @@ class Subsector {
 
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
-      // this.canvas.drawLine(
-      //   { x: x, y: 0 },
-      //   { x: x, y: this.canvas.canvasHeight },
-      //   color
-      // );
     }
   }
 
@@ -333,8 +327,6 @@ class Subsector {
 
     return this.colors.get(key);
   }
-
-  
 
   initalizeSolidsegs() {
     const solidsegs = [
