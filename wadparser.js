@@ -1,8 +1,24 @@
+/**
+ * A class for parsing raw binary data from the WAD.
+ */
 class WADParser {
+  /**
+   * Creates a new instance of the WADParser class.
+   * @param {ArrayBuffer} arrayBuffer - The ArrayBuffer object representing the raw binary data to be parsed.
+   */
   constructor(arrayBuffer) {
     this.arrayBuffer = arrayBuffer;
   }
 
+  /**
+   * Parses the WAD file to extract its lumps.
+   *
+   * This method first parses the header of the WAD file and then uses the header information
+   * to parse and extract all the lumps present in the WAD file.
+   * @async
+   *
+   * @returns {Array} An array containing all the lumps of the WAD file. Each lump is an object with details specific to the lump type.
+   */
   async parse() {
     try {
       const header = this.parseHeader(this.arrayBuffer);
@@ -16,6 +32,12 @@ class WADParser {
     }
   }
 
+  /**
+   * Parses the header information of a WAD file.
+   *
+   * @param {ArrayBuffer} arrayBuffer - The ArrayBuffer object representing the raw binary data to be parsed.
+   * @returns {Object} An object which represents the header of the WAD file.
+   */
   parseHeader(arrayBuffer) {
     const dataView = new DataView(arrayBuffer);
 
@@ -42,6 +64,13 @@ class WADParser {
     return header;
   }
 
+  /**
+   * Parses the lumps of a WAD file using the header information and arrayBuffer data.
+   *
+   * @param {Object} header - the header object representing the wad type, number of lumps, and data directory for the lumps.
+   * @param {ArrayBuffer} arrayBuffer - The ArrayBuffer object representing the raw binary data to be parsed.
+   * @returns {Array} returns an array containing all the lumps in this WAD file.
+   */
   parseLumps(header, arrayBuffer) {
     const dataView = new DataView(arrayBuffer);
     const lumps = [];
@@ -62,6 +91,14 @@ class WADParser {
     return lumps;
   }
 
+  /**
+   * Reads a string from the specified DataView object.
+   *
+   * @param {DataView} dataView - The DataView object containing the data to read.
+   * @param {number} offset - The offset within the DataView where the string starts.
+   * @param {number} maxLength - The maximum length of the string to read.
+   * @returns {string} The read string.
+   */
   readString(dataView, offset, maxLength) {
     let result = "";
     for (let i = 0; i < maxLength; i++) {
