@@ -1,4 +1,15 @@
+/**
+ * Class representation of the player.
+ */
 class Player {
+  /**
+   * Construct an instance of the player.
+   * @param {Object} location - the initial location of the player in the world.
+   * @param {Object} param1  - minX and minY values for vertices to draw 2D map.
+   * @param {Object} param2  - scaleX and scaleY values to scale vertices for 2D map.
+   * @param {number} fov - the field of view for the player.
+   * @param {number} height - the world height of the player.
+   */
   constructor(location, { minX, minY }, { scaleX, scaleY }, fov, height) {
     this.location = location;
     this.x = location.xPosition;
@@ -17,6 +28,12 @@ class Player {
     this.realWallAngle1;
   }
 
+  /**
+   *
+   * Processing method to determine if this segment is in the field of view of the player.
+   * @param {Object} seg - represents the current segment being processed.
+   * @returns {Array} - containing the two angles to vertex1 and vertex2 of this segment.
+   */
   checkIfSegInFOV(seg) {
     let angleToV1 = this.angleTowardsVertex(seg.vertex1);
     let angleToV2 = this.angleTowardsVertex(seg.vertex2);
@@ -55,12 +72,20 @@ class Player {
     return [angleToV1, angleToV2];
   }
 
+  /**
+   * Method to calculate the angle towards this vertex.
+   * @param {Object} vertex - vertex to process.
+   * @returns {Angle} - angle from the player location to vertex in degrees.
+   */
   angleTowardsVertex(vertex) {
     const adjacent = vertex.x - this.x;
     const opposite = vertex.y - this.y;
     return Angle.radiansToDegrees(Math.atan2(opposite, adjacent));
   }
 
+  /**
+   * Method to update the state of the player for each frame.
+   */
   update() {
     const multiplier = 6;
     const magRotation = 0.1875 * multiplier;
@@ -96,5 +121,9 @@ class Player {
     this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
   }
 
+  /**
+   * Method to draw
+   * @param {Object} ctx - canvas context
+   */
   draw(ctx) {}
 }
