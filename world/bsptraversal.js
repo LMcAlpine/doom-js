@@ -2,8 +2,6 @@ class BSPTraversal {
   constructor(levels, subsector) {
     this.things = levels.things;
 
-    this.player = this.things[0];
-
     this.nodes = levels.nodes;
 
     this.subsector = subsector;
@@ -28,8 +26,8 @@ class BSPTraversal {
     const bsp = this.nodes[nodeID];
 
     const isOnLeft = this.isPointOnLeftSide(
-      this.player.xPosition,
-      this.player.yPosition,
+      gameEngine.player.x,
+      gameEngine.player.y,
       bsp
     );
 
