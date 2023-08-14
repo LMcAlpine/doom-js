@@ -32,38 +32,38 @@ class LevelParser {
     const verticesLump = levelLumps.find((lump) => lump.name === "VERTEXES");
     const vertices = this.parseVertices(verticesLump);
 
-    console.log(vertices);
+
 
     const linedefsLump = levelLumps.find((lump) => lump.name === "LINEDEFS");
     const linedefs = this.parseLinedefs(linedefsLump);
 
-    console.log(linedefs);
+
 
     const sidedefsLump = levelLumps.find((lump) => lump.name === "SIDEDEFS");
     const sidedefs = this.parseSidedefs(sidedefsLump);
 
-    console.log(sidedefs);
+
 
     const nodesLump = levelLumps.find((lump) => lump.name === "NODES");
     const nodes = this.parseNodes(nodesLump);
 
-    console.log(nodes);
+  
 
     const subsectorsLump = levelLumps.find((lump) => lump.name === "SSECTORS");
     const subsectors = this.parseSubsectors(subsectorsLump);
-    console.log(subsectors);
+   
 
     const segsLump = levelLumps.find((lump) => lump.name === "SEGS");
     const segs = this.parseSegs(segsLump);
-    console.log(segs);
+  
 
     const sectorsLump = levelLumps.find((lump) => lump.name === "SECTORS");
     const sectors = this.parseSectors(sectorsLump);
-    console.log(sectors);
+
 
     const thingsLump = levelLumps.find((lump) => lump.name === "THINGS");
     const things = this.parseThings(thingsLump);
-    console.log(things);
+
 
     return {
       vertices,
