@@ -148,7 +148,7 @@ class WallRenderer {
     const color = this.colorGenerator.getColor(wallTexture, lightLevel);
 
     for (let x = xScreenV1; x <= xScreenV2; x++) {
-      const drawWallY1 = wallY1 - 1;
+      const drawWallY1 = wallY1;
       const drawWallY2 = wallY2;
 
       if (drawCeiling) {
