@@ -101,3 +101,38 @@ function degreesToRadians(degrees) {
 function radiansToDegrees(radians) {
   return radians * (180 / Math.PI);
 }
+
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32-bit integer
+  }
+  return hash;
+}
+
+function seededRandom(seed) {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
+
+function getRandomInt(min, max, seed) {
+  return Math.floor(seededRandom(seed) * (max - min + 1)) + min;
+}
+
+function angleToX(angle) {
+  let x = 0;
+  if (angle > 90) {
+    angle = new Angle(angle - 90);
+
+    x =
+      HALFWIDTH -
+      Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+  } else {
+    angle = Angle.subtract(90, angle);
+    x = Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+    x += HALFWIDTH;
+  }
+  return x;
+}
