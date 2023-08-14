@@ -1,4 +1,11 @@
+/** Representing a single Subsector during the traversal of the BSP tree. */
 class Subsector {
+  /**
+   * Creates an instance of this Subsector
+   * @param {Object} levelsData  - contains necessary level data.
+   * @param {Object} segmentData - contains necessary data for the segments.
+   * @param {WallRenderer} wallRenderer - modular component to handle rendering of walls.
+   */
   constructor(levelsData, segmentData, wallRenderer) {
     Object.assign(this, {
       subsectors: levelsData.subsectors,
@@ -10,12 +17,18 @@ class Subsector {
     this.upperclip = [];
     this.lowerclip = [];
   }
-
+/**
+ * initialize the clipp arrays
+ */
   initClipHeights() {
     this.upperclip.fill(-1);
     this.lowerclip.fill(this.canvas.canvasHeight);
   }
 
+  /**
+   * Process the current subsector and process all segments in this subsector.
+   * @param {number} subsectorID - ID of the current subsector.
+   */
   handleSubsector(subsectorID) {
     const subsector = this.subsectors[subsectorID];
 
