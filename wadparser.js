@@ -24,8 +24,6 @@ class WADParser {
       const header = this.parseHeader(this.arrayBuffer);
       const lumps = this.parseLumps(header, this.arrayBuffer);
 
-      console.log(header);
-      console.log(lumps);
       return lumps;
     } catch (error) {
       console.error("Error parsing WAD file:", error);
@@ -46,16 +44,6 @@ class WADParser {
       numLumps: dataView.getInt32(4, true),
       lumpDirectoryOffset: dataView.getInt32(8, true),
     };
-
-    // Print the bytes for numLumps
-    for (let i = 0; i < 4; i++) {
-      console.log("numLumps byte", i, ":", dataView.getUint8(4 + i));
-    }
-
-    // Print the bytes for lumpDirectoryOffset
-    for (let i = 0; i < 4; i++) {
-      console.log("lumpDirectoryOffset byte", i, ":", dataView.getUint8(8 + i));
-    }
 
     if (header.wadType !== "IWAD" && header.wadType !== "PWAD") {
       throw new Error("Invalid WAD file.");
