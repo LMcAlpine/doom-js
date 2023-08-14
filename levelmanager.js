@@ -1,11 +1,30 @@
 class LevelManager {
   constructor(levels, data) {
-    const subsector = new Subsector(
-      levels.subsectors,
-      data.segObjects,
-      levels.vertices,
-      data.sidedefObjects
+    const colorGenerator = new ColorGenerator(data.sidedefObjects);
+
+    const wallRendererDependencies = {
+      solidSegsManager: new SolidSegsManager(),
+      geometry: new Geometry(),
+    };
+
+    this.wallRenderer = new WallRenderer(
+      colorGenerator,
+      wallRendererDependencies
     );
+
+    this.solidSegsManager = wallRendererDependencies.solidSegsManager;
+
+    const levelsData = {
+      subsectors: levels.subsectors,
+      vertices: levels.vertices,
+    };
+
+    const segmentData = {
+      segs: data.segObjects,
+      sidedefs: data.sidedefObjects,
+    };
+
+    const subsector = new Subsector(levelsData, segmentData, this.wallRenderer);
     this.bspTraversal = new BSPTraversal(levels, subsector);
 
     this.subsector = subsector;
@@ -19,10 +38,10 @@ class LevelManager {
   }
 
   draw() {
-    console.log(gameEngine.player.direction);
-    console.log(this.subsector.solidsegs);
-    this.subsector.clearSolidsegs();
-    this.subsector.initClipHeights();
+    this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
+      this.wallRenderer.solidsegs
+    );
+    //this.subsector.initClipHeights();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 
