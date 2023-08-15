@@ -14,16 +14,8 @@ class Subsector {
       wallRenderer: wallRenderer,
     });
 
-    this.upperclip = [];
-    this.lowerclip = [];
   }
-/**
- * initialize the clipp arrays
- */
-  initClipHeights() {
-    this.upperclip.fill(-1);
-    this.lowerclip.fill(this.canvas.canvasHeight);
-  }
+
 
   /**
    * Process the current subsector and process all segments in this subsector.

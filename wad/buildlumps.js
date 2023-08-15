@@ -53,19 +53,26 @@ function buildSegs(segs, vertices, linedefs) {
     seg.direction = segs[i].direction;
     seg.offset = (segs[i].offset << 16) / (1 << 16);
 
+    let rightSidedef;
+    let leftSidedef;
 
-    // if (seg.direction){
-    //   seg.linedef.rightSidedef = 
-    // }
+    if (seg.direction) {
+      rightSidedef = seg.linedef.leftSidedef;
+      leftSidedef = seg.linedef.rightSidedef;
+    } else {
+      rightSidedef = seg.linedef.rightSidedef;
+      leftSidedef = seg.linedef.leftSidedef;
+      //swap
+    }
 
-    if (seg.linedef.rightSidedef) {
-      seg.rightSector = seg.linedef.rightSidedef.sector;
+    if (rightSidedef) {
+      seg.rightSector = rightSidedef.sector;
     } else {
       seg.rightSector = null;
     }
 
     if (seg.linedef.leftSidedef) {
-      seg.leftSector = seg.linedef.leftSidedef.sector;
+      seg.leftSector = leftSidedef.sector;
     } else {
       seg.leftSector = null;
     }
