@@ -15,6 +15,7 @@ class Canvas {
   }
 
   clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
       this.canvasBuffer.data[i] = 0;
       this.canvasBuffer.data[i + 1] = 0;
