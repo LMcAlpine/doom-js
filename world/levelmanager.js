@@ -34,14 +34,13 @@ class LevelManager {
     this.linedefs = levels.linedefs;
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
-
   }
 
   draw() {
     this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
       this.wallRenderer.solidsegs
     );
-    //this.subsector.initClipHeights();
+    this.wallRenderer.initClipHeights();
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 
