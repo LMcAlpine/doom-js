@@ -12,8 +12,11 @@ class Player {
    */
   constructor(location, { minX, minY }, { scaleX, scaleY }, fov, height) {
     this.location = location;
-    this.x = location.xPosition;
-    this.y = location.yPosition;
+    // this.x = location.xPosition;
+    // this.y = location.yPosition;
+
+    this.x = 462;
+    this.y = -3236;
 
     // this.x = 222;
     // this.y = 1660;
@@ -26,10 +29,11 @@ class Player {
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    this.direction = location.direction;
+    //this.direction = location.direction;
     // this.direction = 38.25;
     // this.direction = 75.375;
 
+    this.direction = 178.875;
     this.fov = fov;
 
     this.height = height;
