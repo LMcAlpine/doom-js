@@ -1,4 +1,4 @@
-# Doom JS
+# Doom-JS
 
 **Note: This repository is currently under construction.**
 
