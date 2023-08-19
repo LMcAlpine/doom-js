@@ -15,12 +15,25 @@ class Player {
     this.x = location.xPosition;
     this.y = location.yPosition;
 
+    // this.x = 462;
+    // this.y = -3236;
+
+    // this.x = 222;
+    // this.y = 1660;
+    // this.x = 1432;
+    // this.y = -3170;
+
+    // this.x = 1811;
+    // this.y = -3033;
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.direction = location.direction;
+    // this.direction = 38.25;
+    // this.direction = 75.375;
 
+    // this.direction = 178.875;
     this.fov = fov;
 
     this.height = height;
@@ -87,6 +100,9 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
+    // console.log("x: " + this.x);
+    // console.log("y ;" + this.y);
+    // console.log("angle: " + this.direction);
     const multiplier = 6;
     const magRotation = 0.1875 * multiplier;
 

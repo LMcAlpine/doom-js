@@ -15,7 +15,7 @@ document
     const wadParser = new WADParser(arrayBuffer);
     const lumpData = await wadParser.parse();
     const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse("E1M1");
+    const levels = levelParser.parse("E1M5");
 
     let vertices = levels.vertices;
     let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
