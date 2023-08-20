@@ -15,30 +15,19 @@ class Player {
     this.x = location.xPosition;
     this.y = location.yPosition;
 
-    // this.x = 462;
-    // this.y = -3236;
-
-    // this.x = 222;
-    // this.y = 1660;
-    // this.x = 1432;
-    // this.y = -3170;
-
-    // this.x = 1811;
-    // this.y = -3033;
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.direction = location.direction;
-    // this.direction = 38.25;
-    // this.direction = 75.375;
 
-    // this.direction = 178.875;
     this.fov = fov;
 
     this.height = height;
 
     this.realWallAngle1;
+
+    this.zVel = 0;
   }
 
   /**
@@ -100,41 +89,64 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
-    // console.log("x: " + this.x);
-    // console.log("y ;" + this.y);
-    // console.log("angle: " + this.direction);
-    const multiplier = 6;
+    console.log("x: " + this.x);
+    console.log("y ;" + this.y);
+    console.log("angle: " + this.direction);
+    const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
+
+    const speed = 0.3 * gameEngine.clockTick;
+    const rot = 0.12 * gameEngine.clockTick;
 
     const radians = (this.direction * Math.PI) / 180;
     const dx = Math.sin(radians);
     const dy = Math.cos(radians);
 
     if (gameEngine.keys["w"] === true) {
-      this.x += Math.cos((this.direction * Math.PI) / 180) * multiplier;
-      this.y += Math.sin((this.direction * Math.PI) / 180) * multiplier;
+      this.x +=
+        Math.cos((this.direction * Math.PI) / 180) *
+        multiplier *
+        gameEngine.clockTick;
+      this.y +=
+        Math.sin((this.direction * Math.PI) / 180) *
+        multiplier *
+        gameEngine.clockTick;
     }
     if (gameEngine.keys["s"] === true) {
-      this.x -= Math.cos((this.direction * Math.PI) / 180) * multiplier;
-      this.y -= Math.sin((this.direction * Math.PI) / 180) * multiplier;
+      this.x -=
+        Math.cos((this.direction * Math.PI) / 180) *
+        multiplier *
+        gameEngine.clockTick;
+      this.y -=
+        Math.sin((this.direction * Math.PI) / 180) *
+        multiplier *
+        gameEngine.clockTick;
     }
     if (gameEngine.keys["d"] === true) {
-      this.x += dx * multiplier;
-      this.y -= dy * multiplier;
+      this.x += dx * multiplier * gameEngine.clockTick;
+      this.y -= dy * multiplier * gameEngine.clockTick;
     }
     if (gameEngine.keys["a"] === true) {
-      this.x -= dx * multiplier;
-      this.y += dy * multiplier;
+      this.x -= dx * multiplier * gameEngine.clockTick;
+      this.y += dy * multiplier * gameEngine.clockTick;
     }
 
     if (gameEngine.keys["ArrowLeft"] === true) {
-      this.direction += magRotation;
+      this.direction += magRotation * gameEngine.clockTick;
     }
     if (gameEngine.keys["ArrowRight"] === true) {
-      this.direction -= magRotation;
+      this.direction -= magRotation * gameEngine.clockTick;
     }
 
-    this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    // this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    let floorHeight = gameEngine.levelManager.getPlayerSubsectorHeight();
+    if (this.height < floorHeight + 41) {
+      this.height += 0.4 * (floorHeight + 41 - this.height);
+      this.zVel = 0;
+    } else {
+      this.zVel -= 0.9;
+      this.height += Math.max(-15.0, this.zVel);
+    }
   }
 
   /**

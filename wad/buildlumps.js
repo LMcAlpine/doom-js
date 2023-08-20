@@ -65,16 +65,25 @@ function buildSegs(segs, vertices, linedefs) {
       //swap
     }
 
-    if (rightSidedef) {
-      seg.rightSector = rightSidedef.sector;
-    } else {
-      seg.rightSector = null;
-    }
-
-    if (seg.linedef.leftSidedef) {
+    // let rightSector = rightSidedef.sector;
+    seg.rightSector = rightSidedef.sector;
+    // two sided
+    if (4 & seg.linedef.flag) {
       seg.leftSector = leftSidedef.sector;
     } else {
       seg.leftSector = null;
+    }
+
+    // special case where there is a right and left sector, and the rightSidedef is empty but shares the texture of the left
+    if (seg.rightSector && seg.leftSector) {
+      if (rightSidedef.upperTextureName === "-") {
+        seg.linedef.rightSidedef.upperTextureName =
+          leftSidedef.upperTextureName;
+      }
+      if (rightSidedef.lowerTextureName === "-") {
+        seg.linedef.rightSidedef.lowerTextureName =
+          leftSidedef.lowerTextureName;
+      }
     }
 
     const temp = Object.assign({}, seg);
