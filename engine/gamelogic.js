@@ -5,19 +5,33 @@ class GameLogic {
     this.tickLength = tickLength;
     this.totalTicks = 0;
     this.frameCount = 0;
+
+    this.gameTime = 0;
+    this.maxStep = 0.05;
+    this.lastTimestamp = 0;
   }
 
-  calculateTicks(tFrame) {
-    const nextTick = this.lastTick + this.tickLength;
-    let numTicks = 0;
+  // calculateTicks(tFrame) {
+  //   const nextTick = this.lastTick + this.tickLength;
+  //   let numTicks = 0;
 
-    if (tFrame > nextTick) {
-      const timeSinceTick = tFrame - this.lastTick;
-      numTicks = Math.floor(timeSinceTick / this.tickLength);
-    }
-    this.totalTicks += numTicks;
-    this.frameCount++;
+  //   if (tFrame > nextTick) {
+  //     const timeSinceTick = tFrame - this.lastTick;
+  //     numTicks = Math.floor(timeSinceTick / this.tickLength);
+  //   }
+  //   this.totalTicks += numTicks;
+  //   this.frameCount++;
 
-    return numTicks;
+  //   return numTicks;
+  // }
+
+  tick() {
+    const current = performance.now();
+    const delta = (current - this.lastTimestamp) / 1000;
+    this.lastTimestamp = current;
+
+    const gameDelta = Math.min(delta, this.maxStep);
+    this.gameTime += gameDelta;
+    return gameDelta;
   }
 }

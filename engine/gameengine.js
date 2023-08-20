@@ -68,7 +68,7 @@ class GameEngine {
 
     this.levelManager.draw();
 
-   // this.canvas.updateCanvas();
+    // this.canvas.updateCanvas();
   }
 
   update() {
@@ -90,6 +90,7 @@ class GameEngine {
   }
 
   loop() {
+    this.clockTick = this.logic.tick();
     // logic is updated first, then draw
     this.update();
     this.draw();

@@ -37,6 +37,7 @@ class WallRenderer {
       return;
     }
 
+    // doors
     // if (
     //   seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
     //   seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
@@ -102,15 +103,6 @@ class WallRenderer {
   }
 
   clipPortalWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
-    if (
-      seg.startVertex.x === -640 &&
-      seg.startVertex.y === -3296 &&
-      seg.endVertex.x === -640 &&
-      seg.endVertex.y === -3168
-    ) {
-      console.log("heree");
-    }
-
     let totalSolidSegs = 0;
     while (this.solidsegs[totalSolidSegs].last < xScreenV1 - 1) {
       totalSolidSegs++;
@@ -243,12 +235,14 @@ class WallRenderer {
     const color = this.colorGenerator.getColor(wallTexture, lightLevel);
     // which parts must be rendered
     const drawWall = side.middleTexture !== "-";
-    const drawCeiling = worldFrontZ1 > 0;
+    const drawCeiling =
+      worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
     const drawFloor = worldFrontZ2 < 0;
     for (let x = xScreenV1; x <= xScreenV2; x++) {
       let drawWallY1 = Math.trunc(wallY1);
       let drawWallY2 = Math.trunc(wallY2);
 
+      // draws ceiling above solid walls
       this.drawCeiling(
         drawCeiling,
         ceilingTexture,
@@ -275,6 +269,7 @@ class WallRenderer {
           this.drawLine(floorColor, x, fy1, fy2);
         }
       }
+
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
     }
@@ -377,10 +372,6 @@ class WallRenderer {
   }
 
   drawWall(seg, xScreenV1, xScreenV2, angleV1) {
-    if (seg.rightSector.ceilingTexture === "F_SKY1") {
-      console.log("here");
-    }
-
     const rightSector = seg.rightSector;
     const leftSector = seg.leftSector;
     const line = seg.linedef;
@@ -399,12 +390,13 @@ class WallRenderer {
     const worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;
     const worldBackZ2 = leftSector.floorHeight - gameEngine.player.height;
 
-    // if (
-    //   rightSector.ceilingTexture === "F_SKY1" &&
-    //   leftSector.ceilingTexture === "F_SKY1"
-    // ) {
-    //   worldFrontZ1 = worldBackZ1;
-    // }
+    // sky hack
+    if (
+      rightSector.ceilingTexture === "F_SKY1" &&
+      leftSector.ceilingTexture === "F_SKY1"
+    ) {
+      worldFrontZ1 = worldBackZ1;
+    }
 
     let drawUpperWall;
     let drawCeiling;
@@ -415,7 +407,8 @@ class WallRenderer {
     ) {
       drawUpperWall =
         side.upperTextureName !== "-" && worldBackZ1 < worldFrontZ1;
-      drawCeiling = worldFrontZ1 >= 0;
+      drawCeiling =
+        worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
     } else {
       drawUpperWall = false;
       drawCeiling = false;
@@ -449,7 +442,7 @@ class WallRenderer {
     const realWallDistance =
       hypotenuse * Math.cos(degreesToRadians(offsetAngle));
 
-    const realWallScale1 = this.geometry.scaleFromGlobalAngle(
+    let realWallScale1 = this.geometry.scaleFromGlobalAngle(
       xScreenV1,
       realWallNormalAngle,
       realWallDistance
@@ -534,6 +527,7 @@ class WallRenderer {
         }
         portalY1 += portalY1Step;
       }
+      // draw ceiling for adjoining sector?
       if (drawCeiling) {
         let ceilingColor = this.colorGenerator.getColor(
           ceilingTexture,
@@ -599,6 +593,7 @@ class WallRenderer {
           lowerclip[x] = fy1;
         }
       }
+      realWallScale1 += realWallScaleStep;
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
     }
