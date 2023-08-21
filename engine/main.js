@@ -17,8 +17,9 @@ document
     const levelParser = new LevelParser(lumpData);
     const levels = levelParser.parse("E1M1");
 
-    const patchNames = new PatchNames(lumpData);
-    new ReadPalette(lumpData);
+    const palette = new ReadPalette(lumpData);
+
+    gameEngine.palette = palette;
 
     let vertices = levels.vertices;
     let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
@@ -40,6 +41,8 @@ document
 
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
+
+    const patchNames = new PatchNames(lumpData, palette);
 
     const sectorObjects = buildSectors(levels.sectors);
     const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
