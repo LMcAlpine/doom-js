@@ -41,7 +41,34 @@ class LevelManager {
       this.wallRenderer.solidsegs
     );
     this.wallRenderer.initClipHeights();
-    this.bspTraversal.traverseBSP(this.nodes.length - 1);
+
+    // const header = gameEngine.patchNames.parsePatchHeader(
+    //   gameEngine.patchNames.names[5].toUpperCase()
+    // );
+    // const columns = gameEngine.patchNames.parsePatchColumns(
+    //   header.columnOffsets,
+    //   header,
+    //   gameEngine.patchNames.names[5].toUpperCase()
+    // );
+
+    // this.wallRenderer.drawPatch(columns);
+
+    for (let i = 0; i < gameEngine.patchNames.names.length; i++) {
+      gameEngine.canvas.clearCanvas();
+
+      const header = gameEngine.patchNames.parsePatchHeader(
+        gameEngine.patchNames.names[i].toUpperCase()
+      );
+      const columns = gameEngine.patchNames.parsePatchColumns(
+        header.columnOffsets,
+        header,
+        gameEngine.patchNames.names[i].toUpperCase()
+      );
+      this.wallRenderer.drawPatch(columns);
+      console.log("dfkf;");
+    }
+
+    // this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 
   getPlayerSubsectorHeight() {

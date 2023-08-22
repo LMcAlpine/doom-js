@@ -12,6 +12,8 @@ class WallRenderer {
     this.upperclip = new Array(this.canvas.canvasWidth);
     this.lowerclip = new Array(this.canvas.canvasWidth);
 
+    this.palette = gameEngine.palette.palettes[0];
+
     this.initClipHeights();
   }
 
@@ -719,5 +721,30 @@ class WallRenderer {
     }
 
     return { upperclip, lowerclip, upperWallHeight };
+  }
+
+  drawPatch(columns) {
+    const startX = 400;
+    const startY = 300;
+
+    for (let i = 0; i < columns.length; i++) {
+      this.drawColumn(columns[i], startX + i, startY);
+    }
+  }
+
+  drawColumn(column, x, startY) {
+    for (let j = 0; j < column.length; j++) {
+      this.drawPost(column[j], x, startY);
+    }
+  }
+
+  drawPost(post, x, startY) {
+    let ctx = gameEngine.ctx;
+    for (let k = 0; k < post.length; k++) {
+      let pixel = post.data[k];
+      const pixelDraw = this.palette[pixel];
+      ctx.fillStyle = `rgb(${pixelDraw.red}, ${pixelDraw.green}, ${pixelDraw.blue})`;
+      ctx.fillRect(x, startY + post.topDelta + k, 1, 1);
+    }
   }
 }

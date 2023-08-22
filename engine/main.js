@@ -42,7 +42,8 @@ document
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
 
-    const patchNames = new PatchNames(lumpData, palette);
+    const patchNames = new PatchNames(lumpData);
+    gameEngine.patchNames = patchNames;
 
     const sectorObjects = buildSectors(levels.sectors);
     const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
