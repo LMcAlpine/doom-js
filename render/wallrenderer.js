@@ -723,28 +723,90 @@ class WallRenderer {
     return { upperclip, lowerclip, upperWallHeight };
   }
 
-  drawPatch(columns) {
-    const startX = 400;
-    const startY = 300;
+  // drawPatch(columns) {
+  //   const startX = 400;
+  //   const startY = 300;
 
-    for (let i = 0; i < columns.length; i++) {
-      this.drawColumn(columns[i], startX + i, startY);
+  //   for (let i = 0; i < columns.length; i++) {
+  //     this.drawColumn(columns[i], startX + i, startY);
+  //   }
+  // }
+
+  drawPatch(
+    columns,
+    xStart,
+    yStart,
+    textureWidth,
+    textureHeight,
+    offscreenCtx
+  ) {
+    const maxColumns = Math.min(columns.length, textureWidth - xStart);
+    for (let i = 0; i < maxColumns; i++) {
+      this.drawColumn(
+        columns[i],
+        xStart + i,
+        yStart,
+        textureHeight - yStart,
+        offscreenCtx
+      );
     }
   }
 
-  drawColumn(column, x, startY) {
-    for (let j = 0; j < column.length; j++) {
-      this.drawPost(column[j], x, startY);
+  drawColumn(column, x, startY, maxHeight, offscreenCtx) {
+    const maxPosts = Math.min(column.length, maxHeight);
+    for (let j = 0; j < maxPosts; j++) {
+      this.drawPost(column[j], x, startY, maxHeight, offscreenCtx);
     }
   }
-
-  drawPost(post, x, startY) {
-    let ctx = gameEngine.ctx;
-    for (let k = 0; k < post.length; k++) {
+  drawPost(post, x, startY, maxHeight, offscreenCtx) {
+    let ctx = offscreenCtx;
+    const maxPixels = Math.min(post.length, maxHeight - post.topDelta);
+    for (let k = 0; k < maxPixels; k++) {
       let pixel = post.data[k];
       const pixelDraw = this.palette[pixel];
       ctx.fillStyle = `rgb(${pixelDraw.red}, ${pixelDraw.green}, ${pixelDraw.blue})`;
       ctx.fillRect(x, startY + post.topDelta + k, 1, 1);
+    }
+  }
+
+  drawTexture() {
+    let ctx = gameEngine.ctx;
+    const textures = gameEngine.textures.maptextures;
+
+    let offscreenCanvas = document.createElement("canvas");
+
+    let offscreenCtx = offscreenCanvas.getContext("2d");
+
+    for (let i = 0; i < textures.length; i++) {
+      gameEngine.canvas.clearCanvas();
+      for (let j = 0; j < textures[i].patches.length; j++) {
+        offscreenCanvas.width = textures[i].width;
+        offscreenCanvas.height = textures[i].height;
+
+        const patches = textures[i].patches;
+        const xStart = textures[i].patches[j].originX;
+        const yStart = textures[i].patches[j].originY;
+
+        const header = gameEngine.patchNames.parsePatchHeader(
+          gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
+        );
+
+        const columns = gameEngine.patchNames.parsePatchColumns(
+          header.columnOffsets,
+          header,
+          gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
+        );
+        this.drawPatch(
+          columns,
+          xStart,
+          yStart,
+          textures[i].width,
+          textures[i].height,
+          offscreenCtx
+        );
+        ctx.drawImage(offscreenCanvas, 0, 0);
+      }
+  
     }
   }
 }

@@ -21,6 +21,10 @@ document
 
     gameEngine.palette = palette;
 
+    const texture = new Textures(lumpData);
+
+    gameEngine.textures = texture;
+
     let vertices = levels.vertices;
     let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
 

@@ -53,20 +53,23 @@ class LevelManager {
 
     // this.wallRenderer.drawPatch(columns);
 
-    for (let i = 0; i < gameEngine.patchNames.names.length; i++) {
-      gameEngine.canvas.clearCanvas();
+    // for (let i = 0; i < gameEngine.patchNames.names.length; i++) {
+    //   gameEngine.canvas.clearCanvas();
 
-      const header = gameEngine.patchNames.parsePatchHeader(
-        gameEngine.patchNames.names[i].toUpperCase()
-      );
-      const columns = gameEngine.patchNames.parsePatchColumns(
-        header.columnOffsets,
-        header,
-        gameEngine.patchNames.names[i].toUpperCase()
-      );
-      this.wallRenderer.drawPatch(columns);
-      console.log("dfkf;");
-    }
+    //   const header = gameEngine.patchNames.parsePatchHeader(
+    //     gameEngine.patchNames.names[i].toUpperCase()
+    //   );
+    //   const columns = gameEngine.patchNames.parsePatchColumns(
+    //     header.columnOffsets,
+    //     header,
+    //     gameEngine.patchNames.names[i].toUpperCase()
+    //   );
+    //   this.wallRenderer.drawPatch(columns);
+    //   console.log("dfkf;");
+    // }
+
+    gameEngine.canvas.clearCanvas();
+    this.wallRenderer.drawTexture();
 
     // this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
