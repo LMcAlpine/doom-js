@@ -774,15 +774,14 @@ class WallRenderer {
     const textures = gameEngine.textures.maptextures;
 
     let offscreenCanvas = document.createElement("canvas");
-
     let offscreenCtx = offscreenCanvas.getContext("2d");
 
     for (let i = 0; i < textures.length; i++) {
       gameEngine.canvas.clearCanvas();
-      for (let j = 0; j < textures[i].patches.length; j++) {
-        offscreenCanvas.width = textures[i].width;
-        offscreenCanvas.height = textures[i].height;
+      offscreenCanvas.width = textures[i].width;
+      offscreenCanvas.height = textures[i].height;
 
+      for (let j = 0; j < textures[i].patches.length; j++) {
         const patches = textures[i].patches;
         const xStart = textures[i].patches[j].originX;
         const yStart = textures[i].patches[j].originY;
@@ -804,9 +803,11 @@ class WallRenderer {
           textures[i].height,
           offscreenCtx
         );
-        ctx.drawImage(offscreenCanvas, 0, 0);
       }
-  
+
+      // Once all patches for the current texture are drawn to the offscreen canvas,
+      // draw the entire texture onto the main canvas.
+      ctx.drawImage(offscreenCanvas, 0, 0);
     }
   }
 }
