@@ -116,6 +116,28 @@ class Canvas {
   //   }
   // }
 
+  drawFlat(offscreenCtx, texture, x, y1, y2, lightLevel, worldZ) {
+    if (y1 < y2) {
+      if (texture === "F_SKY1") {
+        let textureColumn =
+          2.2 * (gameEngine.player.direction + getXToAngle(x));
+        let skyAlt = 100;
+        let skyInverseScale = HALFWIDTH / this.canvasWidth;
+        this.drawWallCol(
+          offscreenCtx,
+          texture,
+          textureColumn,
+          x,
+          y1,
+          y2,
+          skyAlt,
+          skyInverseScale,
+          1
+        );
+      }
+    }
+  }
+
   drawWallCol(
     offscreenCtx,
     texture,
@@ -154,6 +176,7 @@ class Canvas {
         textureY += invScale;
       }
 
+     // this.ctx.imageSmoothingEnabled = false;
       this.ctx.putImageData(columnData, x, y1);
     }
   }

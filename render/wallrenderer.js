@@ -510,8 +510,8 @@ class WallRenderer {
     let lowerclip = this.lowerclip;
     const upperWallTexture = side.upperTextureName.toUpperCase();
     const lowerWallTexture = side.lowerTextureName.toUpperCase();
-    const ceilingTexture = rightSector.ceilingTexture;
-    const floorTexture = rightSector.floorTexture;
+    const ceilingTexture = rightSector.ceilingTexture.toUpperCase();
+    const floorTexture = rightSector.floorTexture.toUpperCase();
     const lightLevel = rightSector.lightLevel;
 
     let worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
@@ -626,6 +626,28 @@ class WallRenderer {
       );
       indexOfNameLower = this.texturesMap.get(lowerWallTexture);
     }
+
+    let indexOfFloor;
+    if (this.lookupCache.has(floorTexture) && floorTexture !== "-") {
+      indexOfFloor = this.lookupCache.get(floorTexture);
+    } else if (!this.lookupCache.has(floorTexture) && floorTexture !== "-") {
+      this.lookupCache.set(floorTexture, this.texturesMap.get(floorTexture));
+      indexOfFloor = this.texturesMap.get(floorTexture);
+    }
+
+    // let indexOfCeiling;
+    // if (this.lookupCache.has(ceilingTexture) && ceilingTexture !== "-") {
+    //   indexOfCeiling = this.lookupCache.get(ceilingTexture);
+    // } else if (
+    //   !this.lookupCache.has(ceilingTexture) &&
+    //   ceilingTexture !== "-"
+    // ) {
+    //   this.lookupCache.set(
+    //     ceilingTexture,
+    //     this.texturesMap.get(ceilingTexture)
+    //   );
+    //   indexOfCeiling = this.texturesMap.get(ceilingTexture);
+    // }
 
     let topPoint;
     let upperTextureAlt;
@@ -793,7 +815,35 @@ class WallRenderer {
         let cy1 = upperclip[x];
         let cy2 = Math.min(drawWallY1, lowerclip[x]);
         if (cy1 < cy2) {
+          // let textureImage;
+          // let offscreenCtx;
+          // // cache the texture
+          // if (
+          //   !this.cachedTextures.has(ceilingTexture) &&
+          //   ceilingTexture !== "-"
+          // ) {
+          //   let result = this.drawTexture(indexOfCeiling);
+          //   textureImage = result.offscreenCanvas;
+          //   offscreenCtx = result.offscreenCtx;
+          //   this.cachedTextures.set(ceilingTexture, {
+          //     textureImage,
+          //     offscreenCtx,
+          //   });
+          // } else if (ceilingTexture !== "-") {
+          //   const cachedTexture = this.cachedTextures.get(ceilingTexture);
+          //   offscreenCtx = cachedTexture.offscreenCtx;
+          //   textureImage = cachedTexture.textureImage;
+          // }
+
           this.drawLine(ceilingColor, x, cy1, cy2);
+          // this.canvas.drawFlat(
+          //   ceilingTexture,
+          //   x,
+          //   y1,
+          //   y2,
+          //   lightLevel,
+          //   worldFrontZ1
+          // );
         }
 
         if (upperclip[x] < cy2) {
