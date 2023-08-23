@@ -15,7 +15,15 @@ document
     const wadParser = new WADParser(arrayBuffer);
     const lumpData = await wadParser.parse();
     const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse("MAP01");
+    const levels = levelParser.parse("E1M1");
+
+    const palette = new ReadPalette(lumpData);
+
+    gameEngine.palette = palette;
+
+    const texture = new Textures(lumpData);
+
+    gameEngine.textures = texture;
 
     let vertices = levels.vertices;
     let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
@@ -37,6 +45,9 @@ document
 
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
+
+    const patchNames = new PatchNames(lumpData);
+    gameEngine.patchNames = patchNames;
 
     const sectorObjects = buildSectors(levels.sectors);
     const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);

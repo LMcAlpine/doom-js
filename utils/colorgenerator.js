@@ -1,15 +1,8 @@
 class ColorGenerator {
   constructor(sidedefObjects) {
     this.colors = new Map();
-    for (let i = 0; i < sidedefObjects.length; i++) {
-      if (!this.colors.has(sidedefObjects[i].middleTexture)) {
-        this.colors.set(sidedefObjects[i].middleTexture, [
-          Math.floor(Math.random() * 256),
-          Math.floor(Math.random() * 256),
-          Math.floor(Math.random() * 256),
-        ]);
-      }
-    }
+
+    this.palette = gameEngine.palette.palettes[0];
   }
 
   getColor(tex, lightLevel) {
@@ -18,13 +11,15 @@ class ColorGenerator {
 
     if (!this.colors.has(key)) {
       const texId = simpleHash(tex);
-      const l = lightLevel / 255;
+      const l = lightLevel;
 
-      const rng = [50, 256];
+      const rng = [0, 255];
+
+      const index = getRandomInt(...rng, texId);
       const color = [
-        getRandomInt(...rng, texId) * l,
-        getRandomInt(...rng, texId + 1) * l,
-        getRandomInt(...rng, texId + 2) * l,
+        this.palette[index].red * l,
+        this.palette[index].green * l,
+        this.palette[index].blue * l,
       ];
 
       this.colors.set(key, color);

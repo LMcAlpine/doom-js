@@ -136,3 +136,8 @@ function angleToX(angle) {
   }
   return x;
 }
+
+function getXToAngle(x) {
+  let angleRad = Math.atan((HALFWIDTH - x) / SCREENDISTANCE);
+  return angleRad * (180 / Math.PI); // Convert radians to degrees
+}

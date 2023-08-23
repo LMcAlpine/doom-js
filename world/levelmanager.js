@@ -41,6 +41,10 @@ class LevelManager {
       this.wallRenderer.solidsegs
     );
     this.wallRenderer.initClipHeights();
+
+    //  gameEngine.canvas.clearCanvas();
+    // this.wallRenderer.drawTexture();
+
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
 
