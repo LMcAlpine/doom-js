@@ -1,3 +1,9 @@
+const RIGHT_ANGLE_DEGREES = 90;
+const FULL_ALPHA = 255;
+
+const UPPER_UNPEGGED = 8;
+const LOWER_UNPEGGED = 16;
+
 class WallRenderer {
   constructor(colorGenerator, dependencies) {
     this.colorGenerator = colorGenerator;
@@ -116,10 +122,7 @@ class WallRenderer {
   }
 
   clipPortalWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
-    let totalSolidSegs = 0;
-    while (this.solidsegs[totalSolidSegs].last < xScreenV1 - 1) {
-      totalSolidSegs++;
-    }
+    let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
     if (xScreenV1 < this.solidsegs[totalSolidSegs].first) {
       if (xScreenV2 < this.solidsegs[totalSolidSegs].first - 1) {
@@ -142,6 +145,10 @@ class WallRenderer {
       return;
     }
 
+    this.drawRemainingPortalSegments(seg, xScreenV2, angleV1, totalSolidSegs);
+  }
+
+  drawRemainingPortalSegments(seg, xScreenV2, angleV1, totalSolidSegs) {
     let next = totalSolidSegs;
     while (xScreenV2 >= this.solidsegs[next + 1].first - 1) {
       // draw wall
@@ -157,8 +164,6 @@ class WallRenderer {
         return;
       }
     }
-
-    // draw wall here
     this.drawWall(seg, this.solidsegs[next].last + 1, xScreenV2, angleV1);
   }
 
@@ -167,10 +172,7 @@ class WallRenderer {
       return;
     }
 
-    let totalSolidSegs = 0;
-    while (this.solidsegs[totalSolidSegs].last < xScreenV1 - 1) {
-      totalSolidSegs++;
-    }
+    let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
     if (xScreenV1 < this.solidsegs[totalSolidSegs].first) {
       if (xScreenV2 < this.solidsegs[totalSolidSegs].first - 1) {
@@ -196,10 +198,12 @@ class WallRenderer {
     if (xScreenV2 <= this.solidsegs[totalSolidSegs].last) {
       return;
     }
+    this.drawRemainingWallSegments(seg, xScreenV2, angleV1, totalSolidSegs);
+  }
 
+  drawRemainingWallSegments(seg, xScreenV2, angleV1, totalSolidSegs) {
     let next = totalSolidSegs;
     while (xScreenV2 >= this.solidsegs[next + 1].first - 1) {
-      // draw wall
       this.drawSolidWall(
         seg,
         this.solidsegs[next].last + 1,
@@ -210,8 +214,7 @@ class WallRenderer {
 
       if (xScreenV2 <= this.solidsegs[next].last) {
         this.solidsegs[totalSolidSegs].last = this.solidsegs[next].last;
-
-        if (this.solidsegs[next] != this.solidsegs[totalSolidSegs]) {
+        if (this.solidsegs[next] !== this.solidsegs[totalSolidSegs]) {
           totalSolidSegs++;
           next++;
           this.solidsegs.splice(totalSolidSegs, next - totalSolidSegs);
@@ -219,8 +222,6 @@ class WallRenderer {
         return;
       }
     }
-
-    // draw wall here
     this.drawSolidWall(seg, this.solidsegs[next].last + 1, xScreenV2, angleV1);
     this.solidsegs[totalSolidSegs].last = xScreenV2;
 
@@ -231,84 +232,49 @@ class WallRenderer {
     }
   }
 
-  drawSolidWall(seg, xScreenV1, xScreenV2, angleV1) {
-    // let {
-    //   rightSector,
-    //   line,
-    //   side,
-    //   wallTexture,
-    //   lightLevel,
-    //   upperclip,
-    //   lowerclip,
-    //   ceilingTexture,
-    //   floorTexture,
-    // } = this.initializeWall(seg);
-
-    const rightSector = seg.rightSector;
-    const line = seg.linedef;
-    const side = seg.linedef.rightSidedef;
-
-    let upperclip = this.upperclip;
-    let lowerclip = this.lowerclip;
-    const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
-    const ceilingTexture = rightSector.ceilingTexture;
-    const floorTexture = rightSector.floorTexture;
-    const lightLevel = rightSector.lightLevel;
-    //--------------------------------//
-
-    // relative plane heights of right sector
-    const worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
-    const worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;
-
-    // scaling factor of left and right edges of wall range
-    const realWallNormalAngle = seg.angle + 90;
-    const offsetAngle =
-      realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
-
-    const hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
-    const realWallDistance =
-      hypotenuse * Math.cos(degreesToRadians(offsetAngle));
-
-    let realWallScale1 = this.geometry.scaleFromGlobalAngle(
-      xScreenV1,
-      realWallNormalAngle,
-      realWallDistance
-    );
-    let realWallScaleStep = 0;
-    if (xScreenV1 < xScreenV2) {
-      const scale2 = this.geometry.scaleFromGlobalAngle(
-        xScreenV2,
-        realWallNormalAngle,
-        realWallDistance
-      );
-      realWallScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
+  getInitialSolidSegs(xScreenV1) {
+    let totalSolidSegs = 0;
+    while (this.solidsegs[totalSolidSegs].last < xScreenV1 - 1) {
+      totalSolidSegs++;
     }
+    return totalSolidSegs;
+  }
+
+  drawSolidWall(seg, xScreenV1, xScreenV2, angleV1) {
+    let {
+      rightSector,
+      line,
+      side,
+      wallTexture,
+      lightLevel,
+      upperclip,
+      lowerclip,
+      ceilingTexture,
+      floorTexture,
+    } = this.initializeWall(seg);
+
+    let {
+      worldFrontZ1,
+      worldFrontZ2,
+      realWallScale1,
+      realWallScaleStep,
+      hypotenuse,
+      realWallDistance,
+      realWallNormalAngle,
+      offsetAngle,
+    } = this.calculateWallInformation(rightSector, seg, xScreenV1, xScreenV2);
 
     //-----------------------------------------------------------------//
 
-    // const textures = gameEngine.textures.maptextures;
+    let indexOfName = this.calculateTextureIndex(wallTexture);
 
-    // const indexOfName = this.textures.findIndex(
-    //   (texture) => texture.name === wallTexture
-    // );
-
-    let indexOfName;
-    if (this.lookupCache.has(wallTexture)) {
-      indexOfName = this.lookupCache.get(wallTexture);
-    } else if (!this.lookupCache.has(wallTexture)) {
-      this.lookupCache.set(wallTexture, this.texturesMap.get(wallTexture));
-      indexOfName = this.texturesMap.get(wallTexture);
-    }
-
-    let vTop;
-    let middleTextureAlt;
-    if (line.flag & 16) {
-      vTop = rightSector.floorHeight + this.textures[indexOfName].height;
-      middleTextureAlt = vTop - gameEngine.player.height;
-    } else {
-      middleTextureAlt = worldFrontZ1;
-    }
-    middleTextureAlt += side.yOffset;
+    let middleTextureAlt = this.pegMiddleWall(
+      line,
+      rightSector,
+      indexOfName,
+      worldFrontZ1,
+      side
+    );
 
     //horizontal alignment of textures
     let realWallOffset = hypotenuse * Math.sin(degreesToRadians(offsetAngle));
@@ -323,31 +289,18 @@ class WallRenderer {
     let wallY2 = HALFHEIGHT - worldFrontZ2 * realWallScale1;
     const wallY2Step = -realWallScaleStep * worldFrontZ2;
 
-    // let { worldFrontZ1, worldFrontZ2, wallY1, wallY1Step, wallY2, wallY2Step } =
-    //   this.calculateWallInformation(rightSector, seg, xScreenV1, xScreenV2);
-    // const color = this.colorGenerator.getColor(wallTexture, lightLevel);
     // which parts must be rendered
-    const drawWall = side.middleTexture !== "-";
-    const drawCeiling =
-      worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
-    const drawFloor = worldFrontZ2 < 0;
+    const { drawCeiling, drawWall, drawFloor } = this.checkDraw(
+      side,
+      worldFrontZ1,
+      rightSector,
+      worldFrontZ2
+    );
 
-    let textureImage;
-    let offscreenCtx;
-    // cache the texture
-    if (!this.cachedTextures.has(wallTexture)) {
-      let result = this.drawTexture(indexOfName);
-      textureImage = result.offscreenCanvas;
-      offscreenCtx = result.offscreenCtx;
-      this.cachedTextures.set(wallTexture, {
-        textureImage,
-        offscreenCtx,
-      });
-    } else {
-      const cachedTexture = this.cachedTextures.get(wallTexture);
-      offscreenCtx = cachedTexture.offscreenCtx;
-      textureImage = cachedTexture.textureImage;
-    }
+    let { offscreenCtx, textureImage } = this.cacheTexture(
+      wallTexture,
+      indexOfName
+    );
 
     for (let x = xScreenV1; x <= xScreenV2; x++) {
       let drawWallY1 = Math.trunc(wallY1);
@@ -368,11 +321,15 @@ class WallRenderer {
         const wallY1 = Math.max(drawWallY1, upperclip[x]);
         const wallY2 = Math.min(drawWallY2, lowerclip[x]);
         if (wallY1 < wallY2) {
-          let angle = realWallCenterAngle - getXToAngle(x);
-          let textureColumn =
-            realWallDistance * Math.tan(degreesToRadians(angle)) -
-            realWallOffset;
-          let inverseScale = 1.0 / realWallScale1;
+          let { textureColumn, inverseScale } =
+            this.calculateTextureColAndScale(
+              true,
+              realWallCenterAngle,
+              x,
+              realWallDistance,
+              realWallOffset,
+              realWallScale1
+            );
 
           this.canvas.drawWallCol(
             offscreenCtx,
@@ -385,16 +342,15 @@ class WallRenderer {
             inverseScale,
             lightLevel
           );
-          // this.drawLine(color, x, wallY1, wallY2);
         }
       }
 
       if (drawFloor) {
         let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
-        let fy1 = Math.max(drawWallY2, upperclip[x]);
-        let fy2 = lowerclip[x];
-        if (fy1 < fy2) {
-          this.drawLine(floorColor, x, fy1, fy2);
+        let floorY1 = Math.max(drawWallY2, upperclip[x]);
+        let floorY2 = lowerclip[x];
+        if (floorY1 < floorY2) {
+          this.drawLine(floorColor, x, floorY1, floorY2);
         }
       }
 
@@ -404,13 +360,34 @@ class WallRenderer {
     }
   }
 
+  pegMiddleWall(line, rightSector, indexOfName, worldFrontZ1, side) {
+    let vTop;
+    let middleTextureAlt;
+    if (line.flag & LOWER_UNPEGGED) {
+      vTop = rightSector.floorHeight + this.textures[indexOfName].height;
+      middleTextureAlt = vTop - gameEngine.player.height;
+    } else {
+      middleTextureAlt = worldFrontZ1;
+    }
+    middleTextureAlt += side.yOffset;
+    return middleTextureAlt;
+  }
+
+  checkDraw(side, worldFrontZ1, rightSector, worldFrontZ2) {
+    const drawWall = side.middleTexture !== "-";
+    const drawCeiling =
+      worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
+    const drawFloor = worldFrontZ2 < 0;
+    return { drawCeiling, drawWall, drawFloor };
+  }
+
   calculateWallInformation(rightSector, seg, xScreenV1, xScreenV2) {
     // relative plane heights of right sector
     const worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
     const worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;
 
     // scaling factor of left and right edges of wall range
-    const realWallNormalAngle = seg.angle + 90;
+    const realWallNormalAngle = seg.angle + RIGHT_ANGLE_DEGREES;
     const offsetAngle =
       realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
 
@@ -433,21 +410,15 @@ class WallRenderer {
       realWallScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
     }
 
-    let wallY1 = HALFHEIGHT - worldFrontZ1 * realWallScale1;
-    const wallY1Step = -realWallScaleStep * worldFrontZ1;
-
-    let wallY2 = HALFHEIGHT - worldFrontZ2 * realWallScale1;
-    const wallY2Step = -realWallScaleStep * worldFrontZ2;
-
     return {
       worldFrontZ1,
       worldFrontZ2,
-      wallY1,
-      wallY1Step,
-      wallY2,
-      wallY2Step,
       realWallScale1,
       realWallScaleStep,
+      hypotenuse,
+      realWallDistance,
+      realWallNormalAngle,
+      offsetAngle,
     };
   }
 
@@ -501,175 +472,89 @@ class WallRenderer {
   }
 
   drawWall(seg, xScreenV1, xScreenV2, angleV1) {
-    const rightSector = seg.rightSector;
-    const leftSector = seg.leftSector;
-    const line = seg.linedef;
-    const side = seg.linedef.rightSidedef;
+    let {
+      rightSector,
+      leftSector,
+      side,
+      upperWallTexture,
+      lowerWallTexture,
+      floorTexture,
+      line,
+      ceilingTexture,
+      lightLevel,
+      upperclip,
+      lowerclip,
+    } = this.portalWallProperties(seg);
 
-    let upperclip = this.upperclip;
-    let lowerclip = this.lowerclip;
-    const upperWallTexture = side.upperTextureName.toUpperCase();
-    const lowerWallTexture = side.lowerTextureName.toUpperCase();
-    const ceilingTexture = rightSector.ceilingTexture.toUpperCase();
-    const floorTexture = rightSector.floorTexture.toUpperCase();
-    const lightLevel = rightSector.lightLevel;
+    let {
+      worldFrontZ1,
+      worldFrontZ2,
+      realWallScale1,
+      realWallScaleStep,
+      hypotenuse,
+      realWallDistance,
+      realWallNormalAngle,
+      offsetAngle,
+    } = this.calculateWallInformation(rightSector, seg, xScreenV1, xScreenV2);
 
-    let worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
-    const worldBackZ1 = leftSector.ceilingHeight - gameEngine.player.height;
-    const worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;
-    const worldBackZ2 = leftSector.floorHeight - gameEngine.player.height;
+    let { worldBackZ1, worldBackZ2 } = this.calculateLeftSectorZ(leftSector);
 
     // sky hack
-    if (
-      rightSector.ceilingTexture === "F_SKY1" &&
-      leftSector.ceilingTexture === "F_SKY1"
-    ) {
-      worldFrontZ1 = worldBackZ1;
-    }
+    worldFrontZ1 = this.handleSkyHack(
+      rightSector,
+      leftSector,
+      worldFrontZ1,
+      worldBackZ1
+    );
 
-    let drawUpperWall;
-    let drawCeiling;
-    if (
-      worldFrontZ1 !== worldBackZ1 ||
-      rightSector.lightLevel !== leftSector.lightLevel ||
-      rightSector.ceilingTexture !== leftSector.ceilingTexture
-    ) {
-      drawUpperWall =
-        side.upperTextureName !== "-" && worldBackZ1 < worldFrontZ1;
-      drawCeiling =
-        worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
-    } else {
-      drawUpperWall = false;
-      drawCeiling = false;
-    }
+    let { drawUpperWall, drawCeiling } = this.checkDrawCeilingUpperWall(
+      worldFrontZ1,
+      worldBackZ1,
+      rightSector,
+      leftSector,
+      side
+    );
 
-    let drawLowerWall;
-    let drawFloor;
-    if (
-      worldFrontZ2 !== worldBackZ2 ||
-      rightSector.floorTexture !== leftSector.floorTexture ||
-      rightSector.lightLevel !== leftSector.lightLevel
-    ) {
-      drawLowerWall =
-        side.lowerTextureName !== "-" && worldBackZ2 > worldFrontZ2;
-      drawFloor = worldFrontZ2 <= 0;
-    } else {
-      drawLowerWall = false;
-      drawFloor = false;
-    }
+    let { drawLowerWall, drawFloor } = this.checkDrawFloorLowerWall(
+      worldFrontZ2,
+      worldBackZ2,
+      rightSector,
+      leftSector,
+      side
+    );
 
+    // Nothing to draw
     if (!drawUpperWall && !drawCeiling && !drawLowerWall && !drawFloor) {
       return;
     }
 
-    // scaling factor of left and right edges of wall range
-    const realWallNormalAngle = seg.angle + 90;
-    const offsetAngle =
-      realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
-
-    const hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
-    const realWallDistance =
-      hypotenuse * Math.cos(degreesToRadians(offsetAngle));
-
-    let realWallScale1 = this.geometry.scaleFromGlobalAngle(
-      xScreenV1,
-      realWallNormalAngle,
-      realWallDistance
-    );
-    let realWallScaleStep = 0;
-    if (xScreenV1 < xScreenV2) {
-      const scale2 = this.geometry.scaleFromGlobalAngle(
-        xScreenV2,
-        realWallNormalAngle,
-        realWallDistance
-      );
-      realWallScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
-    } else {
-      realWallScaleStep = 0;
-    }
-
-    // i need to get the texture information for the upper and lower wall
-
-    // start with upper
-    // so i have an array of the textures this.textures
-    // i have the map of textures this.texturesMap which has the texture name and index of it in this.textures
-    // so I can search the mapfor the texture name and then use the index to go into this.textures to get the texture info
-
-    // I need to check the peg attributes for the upper texture
-    // ie... is the upper texture unpegged?
-    // if the upper unpegged flag is set on the linedef, then the upper texture begins at the higher ceiling and is drawn downwards
-
-    let indexOfName;
-    if (this.lookupCache.has(upperWallTexture) && upperWallTexture !== "-") {
-      indexOfName = this.lookupCache.get(upperWallTexture);
-    } else if (
-      !this.lookupCache.has(upperWallTexture) &&
-      upperWallTexture !== "-"
-    ) {
-      this.lookupCache.set(
-        upperWallTexture,
-        this.texturesMap.get(upperWallTexture)
-      );
-      indexOfName = this.texturesMap.get(upperWallTexture);
-    }
-
-    let indexOfNameLower;
-    if (this.lookupCache.has(lowerWallTexture) && lowerWallTexture !== "-") {
-      indexOfNameLower = this.lookupCache.get(lowerWallTexture);
-    } else if (
-      !this.lookupCache.has(lowerWallTexture) &&
-      lowerWallTexture !== "-"
-    ) {
-      this.lookupCache.set(
-        lowerWallTexture,
-        this.texturesMap.get(lowerWallTexture)
-      );
-      indexOfNameLower = this.texturesMap.get(lowerWallTexture);
-    }
-
-    let indexOfFloor;
-    if (this.lookupCache.has(floorTexture) && floorTexture !== "-") {
-      indexOfFloor = this.lookupCache.get(floorTexture);
-    } else if (!this.lookupCache.has(floorTexture) && floorTexture !== "-") {
-      this.lookupCache.set(floorTexture, this.texturesMap.get(floorTexture));
-      indexOfFloor = this.texturesMap.get(floorTexture);
-    }
-
-    // let indexOfCeiling;
-    // if (this.lookupCache.has(ceilingTexture) && ceilingTexture !== "-") {
-    //   indexOfCeiling = this.lookupCache.get(ceilingTexture);
-    // } else if (
-    //   !this.lookupCache.has(ceilingTexture) &&
-    //   ceilingTexture !== "-"
-    // ) {
-    //   this.lookupCache.set(
-    //     ceilingTexture,
-    //     this.texturesMap.get(ceilingTexture)
-    //   );
-    //   indexOfCeiling = this.texturesMap.get(ceilingTexture);
-    // }
+    let upperTextureIndex = this.calculateTextureIndex(upperWallTexture);
+    let lowerTextureIndex = this.calculateTextureIndex(lowerWallTexture);
 
     let topPoint;
     let upperTextureAlt;
     if (drawUpperWall) {
       // upper unpegged. want to start at top of ceiling
-      if (line.flag & 8) {
-        upperTextureAlt = worldFrontZ1;
-      } else {
-        topPoint = leftSector.ceilingHeight + this.textures[indexOfName].height;
-        upperTextureAlt = topPoint - gameEngine.player.height;
-      }
-      upperTextureAlt += side.yOffset;
+      ({ upperTextureAlt, topPoint } = this.pegUpperWall(
+        line,
+        upperTextureAlt,
+        worldFrontZ1,
+        topPoint,
+        leftSector,
+        upperTextureIndex,
+        side
+      ));
     }
 
     let lowerTextureAlt;
     if (drawLowerWall) {
-      if (line.flag & 16) {
-        lowerTextureAlt = worldFrontZ1;
-      } else {
-        lowerTextureAlt = worldBackZ2;
-      }
-      lowerTextureAlt += side.yOffset;
+      lowerTextureAlt = this.pegLowerWall(
+        line,
+        lowerTextureAlt,
+        worldFrontZ1,
+        worldBackZ2,
+        side
+      );
     }
 
     let segTextured = drawUpperWall || drawLowerWall;
@@ -688,23 +573,199 @@ class WallRenderer {
     let wallY2 = Math.trunc(HALFHEIGHT - worldFrontZ2 * realWallScale1);
     const wallY2Step = -realWallScaleStep * worldFrontZ2;
 
-    //const color = this.colorGenerator.getColor(wallTexture, lightLevel);
+    let { portalY1, portalY1Step } = this.calculateUpperPortal(
+      drawUpperWall,
+      worldBackZ1,
+      worldFrontZ2,
+      realWallScale1,
+      realWallScaleStep,
+      wallY2,
+      wallY2Step
+    );
 
-    let portalY1;
-    let portalY1Step;
+    let { portalY2, portalY2Step } = this.calculateLowerPortal(
+      drawLowerWall,
+      worldBackZ2,
+      worldFrontZ1,
+      realWallScale1,
+      realWallScaleStep,
+      wallY1,
+      wallY1Step
+    );
 
+    let { offscreenCtx, textureImage } = this.cacheTexture(
+      upperWallTexture,
+      upperTextureIndex
+    );
+
+    for (let x = xScreenV1; x <= xScreenV2; x++) {
+      let drawWallY1 = Math.trunc(wallY1);
+      let drawWallY2 = Math.trunc(wallY2);
+
+      let { textureColumn, inverseScale } = this.calculateTextureColAndScale(
+        segTextured,
+        realWallCenterAngle,
+        x,
+        realWallDistance,
+        realWallOffset,
+        realWallScale1
+      );
+
+      if (drawUpperWall) {
+        let drawUpperWallY1 = Math.trunc(wallY1 - 1);
+        let drawUpperWallY2 = Math.trunc(portalY1);
+        if (drawCeiling) {
+          let ceilingColor = this.colorGenerator.getColor(
+            ceilingTexture,
+            lightLevel
+          );
+          let ceilingY1 = upperclip[x];
+          let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
+
+          if (ceilingY1 < ceilingY2) {
+            this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          }
+        }
+
+        let upperWallY1 = Math.max(drawUpperWallY1, upperclip[x]);
+        let upperWallY2 = Math.min(drawUpperWallY2, lowerclip[x]);
+        if (upperWallY1 < upperWallY2) {
+          this.canvas.drawWallCol(
+            offscreenCtx,
+            textureImage,
+            textureColumn,
+            x,
+            upperWallY1,
+            upperWallY2,
+            upperTextureAlt,
+            inverseScale,
+            lightLevel
+          );
+        }
+
+        if (upperclip[x] < upperWallY2) {
+          upperclip[x] = upperWallY2;
+        }
+        portalY1 += portalY1Step;
+      }
+      // draw ceiling for adjoining sector?
+      if (drawCeiling) {
+        let ceilingColor = this.colorGenerator.getColor(
+          ceilingTexture,
+          lightLevel
+        );
+        let ceilingY1 = upperclip[x];
+        let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
+        if (ceilingY1 < ceilingY2) {
+          this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          // this.canvas.drawFlat(
+          //   ceilingTexture,
+          //   x,
+          //   y1,
+          //   y2,
+          //   lightLevel,
+          //   worldFrontZ1
+          // );
+        }
+
+        if (upperclip[x] < ceilingY2) {
+          upperclip[x] = ceilingY2;
+        }
+      }
+
+      if (drawLowerWall) {
+        if (drawFloor) {
+          let floorColor = this.colorGenerator.getColor(
+            floorTexture,
+            lightLevel
+          );
+          let floorY1 = Math.max(drawWallY2, upperclip[x]);
+          let floorY2 = lowerclip[x];
+
+          if (floorY1 < floorY2) {
+            this.drawLine(floorColor, x, floorY1, floorY2);
+          }
+        }
+        let drawLowerWallY1 = Math.trunc(portalY2 - 1);
+        let drawLowerWallY2 = Math.trunc(wallY2);
+
+        let lowerWallY1 = Math.max(drawLowerWallY1, upperclip[x]);
+        let lowerWallY2 = Math.min(drawLowerWallY2, lowerclip[x]);
+        if (lowerWallY1 < lowerWallY2) {
+          // cache texture
+          let { offscreenCtx, textureImage } = this.cacheTexture(
+            lowerWallTexture,
+            lowerTextureIndex
+          );
+
+          this.canvas.drawWallCol(
+            offscreenCtx,
+            textureImage,
+            textureColumn,
+            x,
+            lowerWallY1,
+            lowerWallY2,
+            lowerTextureAlt,
+            inverseScale,
+            lightLevel
+          );
+        }
+
+        if (lowerclip[x] > lowerWallY1) {
+          lowerclip[x] = lowerWallY1;
+        }
+        portalY2 += portalY2Step;
+      }
+      if (drawFloor) {
+        let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
+        let floorY1 = Math.max(drawWallY2, upperclip[x]);
+        let floorY2 = lowerclip[x];
+
+        if (floorY1 < floorY2) {
+          this.drawLine(floorColor, x, floorY1, floorY2);
+        }
+
+        if (lowerclip[x] > drawWallY2) {
+          lowerclip[x] = floorY1;
+        }
+      }
+      realWallScale1 += realWallScaleStep;
+      wallY1 += wallY1Step;
+      wallY2 += wallY2Step;
+    }
+  }
+
+  calculateTextureColAndScale(
+    segTextured,
+    realWallCenterAngle,
+    x,
+    realWallDistance,
+    realWallOffset,
+    realWallScale1
+  ) {
+    let angle;
+    let textureColumn;
+    let inverseScale;
+    if (segTextured) {
+      angle = realWallCenterAngle - getXToAngle(x);
+      textureColumn =
+        realWallDistance * Math.tan(degreesToRadians(angle)) - realWallOffset;
+      inverseScale = 1 / realWallScale1;
+    }
+    return { textureColumn, inverseScale };
+  }
+
+  calculateLowerPortal(
+    drawLowerWall,
+    worldBackZ2,
+    worldFrontZ1,
+    realWallScale1,
+    realWallScaleStep,
+    wallY1,
+    wallY1Step
+  ) {
     let portalY2;
     let portalY2Step;
-    if (drawUpperWall) {
-      if (worldBackZ1 > worldFrontZ2) {
-        portalY1 = Math.trunc(HALFHEIGHT - worldBackZ1 * realWallScale1);
-        portalY1Step = -realWallScaleStep * worldBackZ1;
-      } else {
-        portalY1 = wallY2;
-        portalY1Step = wallY2Step;
-      }
-    }
-
     if (drawLowerWall) {
       if (worldBackZ2 < worldFrontZ1) {
         portalY2 = Math.trunc(HALFHEIGHT - worldBackZ2 * realWallScale1);
@@ -714,7 +775,64 @@ class WallRenderer {
         portalY2Step = wallY1Step;
       }
     }
+    return { portalY2, portalY2Step };
+  }
 
+  calculateUpperPortal(
+    drawUpperWall,
+    worldBackZ1,
+    worldFrontZ2,
+    realWallScale1,
+    realWallScaleStep,
+    wallY2,
+    wallY2Step
+  ) {
+    let portalY1;
+    let portalY1Step;
+
+    if (drawUpperWall) {
+      if (worldBackZ1 > worldFrontZ2) {
+        portalY1 = Math.trunc(HALFHEIGHT - worldBackZ1 * realWallScale1);
+        portalY1Step = -realWallScaleStep * worldBackZ1;
+      } else {
+        portalY1 = wallY2;
+        portalY1Step = wallY2Step;
+      }
+    }
+    return { portalY1, portalY1Step };
+  }
+
+  pegLowerWall(line, lowerTextureAlt, worldFrontZ1, worldBackZ2, side) {
+    if (line.flag & LOWER_UNPEGGED) {
+      lowerTextureAlt = worldFrontZ1;
+    } else {
+      lowerTextureAlt = worldBackZ2;
+    }
+    lowerTextureAlt += side.yOffset;
+    return lowerTextureAlt;
+  }
+
+  pegUpperWall(
+    line,
+    upperTextureAlt,
+    worldFrontZ1,
+    topPoint,
+    leftSector,
+    upperTextureIndex,
+    side
+  ) {
+    if (line.flag & UPPER_UNPEGGED) {
+      upperTextureAlt = worldFrontZ1;
+    } else {
+      topPoint =
+        leftSector.ceilingHeight + this.textures[upperTextureIndex].height;
+      upperTextureAlt = topPoint - gameEngine.player.height;
+    }
+    upperTextureAlt += side.yOffset;
+    return { upperTextureAlt, topPoint };
+  }
+
+  cacheTexture(upperWallTexture, upperTextureIndex) {
     let textureImage;
     let offscreenCtx;
     // cache the texture
@@ -722,7 +840,7 @@ class WallRenderer {
       !this.cachedTextures.has(upperWallTexture) &&
       upperWallTexture !== "-"
     ) {
-      let result = this.drawTexture(indexOfName);
+      let result = this.drawTexture(upperTextureIndex);
       textureImage = result.offscreenCanvas;
       offscreenCtx = result.offscreenCtx;
       this.cachedTextures.set(upperWallTexture, {
@@ -734,208 +852,112 @@ class WallRenderer {
       offscreenCtx = cachedTexture.offscreenCtx;
       textureImage = cachedTexture.textureImage;
     }
+    return { offscreenCtx, textureImage };
+  }
 
-    // let indexOfNameLower;
-    // if (this.lookupCache.has(lowerWallTexture) && lowerWallTexture !== "-") {
-    //   indexOfNameLower = this.lookupCache.get(lowerWallTexture);
-    // } else if (
-    //   !this.lookupCache.has(lowerWallTexture) &&
-    //   lowerWallTexture !== "-"
-    // ) {
-    //   this.lookupCache.set(
-    //     lowerWallTexture,
-    //     this.texturesMap.get(lowerWallTexture)
-    //   );
-    //   indexOfNameLower = this.texturesMap.get(lowerWallTexture);
-    // }
-
-    for (let x = xScreenV1; x <= xScreenV2; x++) {
-      let drawWallY1 = Math.trunc(wallY1);
-      let drawWallY2 = Math.trunc(wallY2);
-
-      let angle;
-      let textureColumn;
-      let inverseScale;
-      if (segTextured) {
-        angle = realWallCenterAngle - getXToAngle(x);
-        textureColumn =
-          realWallDistance * Math.tan(degreesToRadians(angle)) - realWallOffset;
-        inverseScale = 1 / realWallScale1;
-      }
-
-      if (drawUpperWall) {
-        let drawUpperWallY1 = Math.trunc(wallY1 - 1);
-        let drawUpperWallY2 = Math.trunc(portalY1);
-        if (drawCeiling) {
-          let ceilingColor = this.colorGenerator.getColor(
-            ceilingTexture,
-            lightLevel
-          );
-          let cy1 = upperclip[x];
-          let cy2 = Math.min(drawWallY1, lowerclip[x]);
-
-          if (cy1 < cy2) {
-            this.drawLine(ceilingColor, x, cy1, cy2);
-          }
-        }
-
-        let upperWallTextureColor = this.colorGenerator.getColor(
-          upperWallTexture,
-          lightLevel
-        );
-        let wy1 = Math.max(drawUpperWallY1, upperclip[x]);
-        let wy2 = Math.min(drawUpperWallY2, lowerclip[x]);
-        if (wy1 < wy2) {
-          //this.drawLine(upperWallTextureColor, x, wy1, wy2);
-
-          this.canvas.drawWallCol(
-            offscreenCtx,
-            textureImage,
-            textureColumn,
-            x,
-            wy1,
-            wy2,
-            upperTextureAlt,
-            inverseScale,
-            lightLevel
-          );
-        }
-
-        if (upperclip[x] < wy2) {
-          upperclip[x] = wy2;
-        }
-        portalY1 += portalY1Step;
-      }
-      // draw ceiling for adjoining sector?
-      if (drawCeiling) {
-        let ceilingColor = this.colorGenerator.getColor(
-          ceilingTexture,
-          lightLevel
-        );
-        let cy1 = upperclip[x];
-        let cy2 = Math.min(drawWallY1, lowerclip[x]);
-        if (cy1 < cy2) {
-          // let textureImage;
-          // let offscreenCtx;
-          // // cache the texture
-          // if (
-          //   !this.cachedTextures.has(ceilingTexture) &&
-          //   ceilingTexture !== "-"
-          // ) {
-          //   let result = this.drawTexture(indexOfCeiling);
-          //   textureImage = result.offscreenCanvas;
-          //   offscreenCtx = result.offscreenCtx;
-          //   this.cachedTextures.set(ceilingTexture, {
-          //     textureImage,
-          //     offscreenCtx,
-          //   });
-          // } else if (ceilingTexture !== "-") {
-          //   const cachedTexture = this.cachedTextures.get(ceilingTexture);
-          //   offscreenCtx = cachedTexture.offscreenCtx;
-          //   textureImage = cachedTexture.textureImage;
-          // }
-
-          this.drawLine(ceilingColor, x, cy1, cy2);
-          // this.canvas.drawFlat(
-          //   ceilingTexture,
-          //   x,
-          //   y1,
-          //   y2,
-          //   lightLevel,
-          //   worldFrontZ1
-          // );
-        }
-
-        if (upperclip[x] < cy2) {
-          upperclip[x] = cy2;
-        }
-      }
-
-      if (drawLowerWall) {
-        if (drawFloor) {
-          let floorColor = this.colorGenerator.getColor(
-            floorTexture,
-            lightLevel
-          );
-          let fy1 = Math.max(drawWallY2, upperclip[x]);
-          let fy2 = lowerclip[x];
-
-          if (fy1 < fy2) {
-            this.drawLine(floorColor, x, fy1, fy2);
-          }
-        }
-        let drawLowerWallY1 = Math.trunc(portalY2 - 1);
-        let drawLowerWallY2 = Math.trunc(wallY2);
-
-        let lowerWallTextureColor = this.colorGenerator.getColor(
-          lowerWallTexture,
-          lightLevel
-        );
-        let wy1 = Math.max(drawLowerWallY1, upperclip[x]);
-        let wy2 = Math.min(drawLowerWallY2, lowerclip[x]);
-        if (wy1 < wy2) {
-          let textureImage;
-          let offscreenCtx;
-          // cache the texture
-          if (
-            !this.cachedTextures.has(lowerWallTexture) &&
-            lowerWallTexture !== "-"
-          ) {
-            let result = this.drawTexture(indexOfNameLower);
-            textureImage = result.offscreenCanvas;
-            offscreenCtx = result.offscreenCtx;
-            this.cachedTextures.set(lowerWallTexture, {
-              textureImage,
-              offscreenCtx,
-            });
-          } else if (lowerWallTexture !== "-") {
-            const cachedTexture = this.cachedTextures.get(lowerWallTexture);
-            offscreenCtx = cachedTexture.offscreenCtx;
-            textureImage = cachedTexture.textureImage;
-          }
-
-          // this.drawLine(
-          //   lowerWallTextureColor,
-          //   x,
-          //   Math.trunc(wy1),
-          //   Math.trunc(wy2)
-          // );
-
-          this.canvas.drawWallCol(
-            offscreenCtx,
-            textureImage,
-            textureColumn,
-            x,
-            wy1,
-            wy2,
-            lowerTextureAlt,
-            inverseScale,
-            lightLevel
-          );
-        }
-
-        if (lowerclip[x] > wy1) {
-          lowerclip[x] = wy1;
-        }
-        portalY2 += portalY2Step;
-      }
-      if (drawFloor) {
-        let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
-        let fy1 = Math.max(drawWallY2, upperclip[x]);
-        let fy2 = lowerclip[x];
-
-        if (fy1 < fy2) {
-          this.drawLine(floorColor, x, fy1, fy2);
-        }
-
-        if (lowerclip[x] > drawWallY2) {
-          lowerclip[x] = fy1;
-        }
-      }
-      realWallScale1 += realWallScaleStep;
-      wallY1 += wallY1Step;
-      wallY2 += wallY2Step;
+  calculateTextureIndex(textureName) {
+    let index;
+    if (this.lookupCache.has(textureName) && textureName !== "-") {
+      index = this.lookupCache.get(textureName);
+    } else if (!this.lookupCache.has(textureName) && textureName !== "-") {
+      this.lookupCache.set(textureName, this.texturesMap.get(textureName));
+      index = this.texturesMap.get(textureName);
     }
+    return index;
+  }
+
+  checkDrawFloorLowerWall(
+    worldFrontZ2,
+    worldBackZ2,
+    rightSector,
+    leftSector,
+    side
+  ) {
+    let drawLowerWall;
+    let drawFloor;
+    if (
+      worldFrontZ2 !== worldBackZ2 ||
+      rightSector.floorTexture !== leftSector.floorTexture ||
+      rightSector.lightLevel !== leftSector.lightLevel
+    ) {
+      drawLowerWall =
+        side.lowerTextureName !== "-" && worldBackZ2 > worldFrontZ2;
+      drawFloor = worldFrontZ2 <= 0;
+    } else {
+      drawLowerWall = false;
+      drawFloor = false;
+    }
+    return { drawLowerWall, drawFloor };
+  }
+
+  checkDrawCeilingUpperWall(
+    worldFrontZ1,
+    worldBackZ1,
+    rightSector,
+    leftSector,
+    side
+  ) {
+    let drawUpperWall;
+    let drawCeiling;
+    if (
+      worldFrontZ1 !== worldBackZ1 ||
+      rightSector.lightLevel !== leftSector.lightLevel ||
+      rightSector.ceilingTexture !== leftSector.ceilingTexture
+    ) {
+      drawUpperWall =
+        side.upperTextureName !== "-" && worldBackZ1 < worldFrontZ1;
+      drawCeiling =
+        worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
+    } else {
+      drawUpperWall = false;
+      drawCeiling = false;
+    }
+    return { drawUpperWall, drawCeiling };
+  }
+
+  handleSkyHack(rightSector, leftSector, worldFrontZ1, worldBackZ1) {
+    if (
+      rightSector.ceilingTexture === "F_SKY1" &&
+      leftSector.ceilingTexture === "F_SKY1"
+    ) {
+      worldFrontZ1 = worldBackZ1;
+    }
+    return worldFrontZ1;
+  }
+
+  calculateLeftSectorZ(leftSector) {
+    const worldBackZ1 = leftSector.ceilingHeight - gameEngine.player.height;
+
+    const worldBackZ2 = leftSector.floorHeight - gameEngine.player.height;
+    return { worldBackZ1, worldBackZ2 };
+  }
+
+  portalWallProperties(seg) {
+    const rightSector = seg.rightSector;
+    const leftSector = seg.leftSector;
+    const line = seg.linedef;
+    const side = seg.linedef.rightSidedef;
+
+    let upperclip = this.upperclip;
+    let lowerclip = this.lowerclip;
+    const upperWallTexture = side.upperTextureName.toUpperCase();
+    const lowerWallTexture = side.lowerTextureName.toUpperCase();
+    const ceilingTexture = rightSector.ceilingTexture.toUpperCase();
+    const floorTexture = rightSector.floorTexture.toUpperCase();
+    const lightLevel = rightSector.lightLevel;
+    return {
+      rightSector,
+      leftSector,
+      side,
+      upperWallTexture,
+      lowerWallTexture,
+      floorTexture,
+      line,
+      ceilingTexture,
+      lightLevel,
+      upperclip,
+      lowerclip,
+    };
   }
 
   initializeWall(seg) {
@@ -945,7 +967,7 @@ class WallRenderer {
 
     let upperclip = this.upperclip;
     let lowerclip = this.lowerclip;
-    const wallTexture = seg.linedef.rightSidedef.middleTexture;
+    const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
     const ceilingTexture = rightSector.ceilingTexture;
     const floorTexture = rightSector.floorTexture;
     const lightLevel = rightSector.lightLevel;
@@ -1009,20 +1031,16 @@ class WallRenderer {
       columnData.data[pos] = pixelDraw.red;
       columnData.data[pos + 1] = pixelDraw.green;
       columnData.data[pos + 2] = pixelDraw.blue;
-      columnData.data[pos + 3] = 255; // Assuming full alpha
+      columnData.data[pos + 3] = FULL_ALPHA; // Assuming full alpha
     }
 
     offscreenCtx.putImageData(columnData, x, startY);
   }
 
   drawTexture(indexOfName) {
-    let offscreenCanvas = document.createElement("canvas");
-    offscreenCanvas.getContext("2d", { willReadFrequently: true });
-    let offscreenCtx = offscreenCanvas.getContext("2d");
-
-    offscreenCanvas.width = this.textures[indexOfName].width;
-    offscreenCanvas.height = this.textures[indexOfName].height;
-    let offscreenBuffer = offscreenCtx.createImageData(
+    const { offscreenCanvas, offscreenCtx } =
+      this.createOffscreenCanvas(indexOfName);
+    const offscreenBuffer = offscreenCtx.createImageData(
       offscreenCanvas.width,
       offscreenCanvas.height
     );
@@ -1052,6 +1070,15 @@ class WallRenderer {
       );
     }
 
+    return { offscreenCanvas, offscreenCtx };
+  }
+
+  createOffscreenCanvas(indexOfName) {
+    let offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.getContext("2d", { willReadFrequently: true });
+    let offscreenCtx = offscreenCanvas.getContext("2d");
+    offscreenCanvas.width = this.textures[indexOfName].width;
+    offscreenCanvas.height = this.textures[indexOfName].height;
     return { offscreenCanvas, offscreenCtx };
   }
 }
