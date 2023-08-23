@@ -131,28 +131,33 @@ class Canvas {
       const textureWidth = texture.width;
       const textureHeight = texture.height;
       textureColumn = Math.trunc(textureColumn) % textureWidth;
-  
-      const entireTextureData = offscreenCtx.getImageData(0, 0, textureWidth, textureHeight).data;
+
+      const entireTextureData = offscreenCtx.getImageData(
+        0,
+        0,
+        textureWidth,
+        textureHeight
+      ).data;
       const columnData = offscreenCtx.getImageData(x, y1, 1, y2 - y1);
-      
+
       let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
-  
+
       for (let i = 0; i < columnData.data.length; i += 4) {
         const texY = Math.trunc(textureY) % textureHeight;
         const texPos = (texY * textureWidth + textureColumn) * 4;
-  
-        columnData.data[i] = entireTextureData[texPos];
-        columnData.data[i + 1] = entireTextureData[texPos + 1];
-        columnData.data[i + 2] = entireTextureData[texPos + 2];
+
+        columnData.data[i] = entireTextureData[texPos] * lightLevel;
+        columnData.data[i + 1] = entireTextureData[texPos + 1] * lightLevel;
+        columnData.data[i + 2] = entireTextureData[texPos + 2] * lightLevel;
         columnData.data[i + 3] = 255; // Assuming full alpha
-  
+
         textureY += invScale;
       }
-  
+
       this.ctx.putImageData(columnData, x, y1);
     }
   }
-  
+
   updateCanvas() {
     this.ctx.putImageData(this.canvasBuffer, 0, 0);
   }

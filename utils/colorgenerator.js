@@ -3,8 +3,6 @@ class ColorGenerator {
     this.colors = new Map();
 
     this.palette = gameEngine.palette.palettes[0];
-
-
   }
 
   getColor(tex, lightLevel) {
@@ -13,10 +11,9 @@ class ColorGenerator {
 
     if (!this.colors.has(key)) {
       const texId = simpleHash(tex);
-      const l = lightLevel / 255;
+      const l = lightLevel;
 
       const rng = [0, 255];
-
 
       const index = getRandomInt(...rng, texId);
       const color = [

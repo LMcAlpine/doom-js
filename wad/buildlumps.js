@@ -6,7 +6,7 @@ function buildSectors(sectors) {
     sector.ceilingHeight = sectors[i].ceilingHeight;
     sector.floorTexture = sectors[i].floorTexture;
     sector.ceilingTexture = sectors[i].ceilingTexture;
-    sector.lightLevel = sectors[i].lightLevel;
+    sector.lightLevel = sectors[i].lightLevel / 255;
     sector.specialType = sectors[i].specialType;
     sector.tag = sectors[i].tag;
     const temp = Object.assign({}, sector);
