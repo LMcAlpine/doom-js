@@ -16,12 +16,12 @@ class Canvas {
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
-      this.canvasBuffer.data[i] = 0;
-      this.canvasBuffer.data[i + 1] = 0;
-      this.canvasBuffer.data[i + 2] = 0;
-      this.canvasBuffer.data[i + 3] = 0;
-    }
+    // for (let i = 0; i < this.canvasBuffer.data.length; i += 4) {
+    //   this.canvasBuffer.data[i] = 0;
+    //   this.canvasBuffer.data[i + 1] = 0;
+    //   this.canvasBuffer.data[i + 2] = 0;
+    //   this.canvasBuffer.data[i + 3] = 0;
+    // }
   }
 
   putPixel(x, y, color, targetBuffer = null) {
@@ -131,30 +131,28 @@ class Canvas {
       const textureWidth = texture.width;
       const textureHeight = texture.height;
       textureColumn = Math.trunc(textureColumn) % textureWidth;
-      let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
-
+  
+      const entireTextureData = offscreenCtx.getImageData(0, 0, textureWidth, textureHeight).data;
       const columnData = offscreenCtx.getImageData(x, y1, 1, y2 - y1);
-
+      
+      let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
+  
       for (let i = 0; i < columnData.data.length; i += 4) {
-        let texPixel = offscreenCtx.getImageData(
-          textureColumn,
-          Math.trunc(textureY) % textureHeight,
-          1,
-          1
-        ).data;
-
-        columnData.data[i] = texPixel[0];
-        columnData.data[i + 1] = texPixel[1];
-        columnData.data[i + 2] = texPixel[2];
+        const texY = Math.trunc(textureY) % textureHeight;
+        const texPos = (texY * textureWidth + textureColumn) * 4;
+  
+        columnData.data[i] = entireTextureData[texPos];
+        columnData.data[i + 1] = entireTextureData[texPos + 1];
+        columnData.data[i + 2] = entireTextureData[texPos + 2];
         columnData.data[i + 3] = 255; // Assuming full alpha
-
+  
         textureY += invScale;
       }
-
+  
       this.ctx.putImageData(columnData, x, y1);
     }
   }
-
+  
   updateCanvas() {
     this.ctx.putImageData(this.canvasBuffer, 0, 0);
   }

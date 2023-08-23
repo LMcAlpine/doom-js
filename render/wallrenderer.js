@@ -14,6 +14,17 @@ class WallRenderer {
 
     this.palette = gameEngine.palette.palettes[0];
 
+    this.cachedTextures = new Map();
+
+    this.textures = gameEngine.textures.maptextures;
+
+    this.texturesMap = new Map();
+    this.textures.forEach((texture, index) => {
+      this.texturesMap.set(texture.name, index);
+    });
+
+    this.lookupCache = new Map();
+
     this.initClipHeights();
   }
 
@@ -275,16 +286,24 @@ class WallRenderer {
 
     //-----------------------------------------------------------------//
 
-    const textures = gameEngine.textures.maptextures;
+    // const textures = gameEngine.textures.maptextures;
 
-    const indexOfName = textures.findIndex(
-      (texture) => texture.name === wallTexture
-    );
+    // const indexOfName = this.textures.findIndex(
+    //   (texture) => texture.name === wallTexture
+    // );
+
+    let indexOfName;
+    if (this.lookupCache.has(wallTexture)) {
+      indexOfName = this.lookupCache.get(wallTexture);
+    } else if (!this.lookupCache.has(wallTexture)) {
+      this.lookupCache.set(wallTexture, this.texturesMap.get(wallTexture));
+      indexOfName = this.texturesMap.get(wallTexture);
+    }
 
     let vTop;
     let middleTextureAlt;
     if (line.flag & 16) {
-      vTop = rightSector.floorHeight + textures[indexOfName].height;
+      vTop = rightSector.floorHeight + this.textures[indexOfName].height;
       middleTextureAlt = vTop - gameEngine.player.height;
     } else {
       middleTextureAlt = worldFrontZ1;
@@ -306,12 +325,30 @@ class WallRenderer {
 
     // let { worldFrontZ1, worldFrontZ2, wallY1, wallY1Step, wallY2, wallY2Step } =
     //   this.calculateWallInformation(rightSector, seg, xScreenV1, xScreenV2);
-    const color = this.colorGenerator.getColor(wallTexture, lightLevel);
+    // const color = this.colorGenerator.getColor(wallTexture, lightLevel);
     // which parts must be rendered
     const drawWall = side.middleTexture !== "-";
     const drawCeiling =
       worldFrontZ1 >= 0 || rightSector.ceilingTexture === "F_SKY1";
     const drawFloor = worldFrontZ2 < 0;
+
+    let textureImage;
+    let offscreenCtx;
+    // cache the texture
+    if (!this.cachedTextures.has(wallTexture)) {
+      let result = this.drawTexture(wallTexture, indexOfName);
+      textureImage = result.offscreenCanvas;
+      offscreenCtx = result.offscreenCtx;
+      this.cachedTextures.set(wallTexture, {
+        textureImage,
+        offscreenCtx,
+      });
+    } else {
+      const cachedTexture = this.cachedTextures.get(wallTexture);
+      offscreenCtx = cachedTexture.offscreenCtx;
+      textureImage = cachedTexture.textureImage;
+    }
+
     for (let x = xScreenV1; x <= xScreenV2; x++) {
       let drawWallY1 = Math.trunc(wallY1);
       let drawWallY2 = Math.trunc(wallY2);
@@ -336,9 +373,10 @@ class WallRenderer {
             realWallDistance * Math.tan(degreesToRadians(angle)) -
             realWallOffset;
           let inverseScale = 1.0 / realWallScale1;
-          let result = this.drawTexture(wallTexture);
-          let textureImage = result.offscreenCanvas;
-          let offscreenCtx = result.offscreenCtx;
+
+          // let result = this.drawTexture(wallTexture);
+          // let textureImage = result.offscreenCanvas;
+          // let offscreenCtx = result.offscreenCtx;
           // textureColumn =
           //   Math.trunc(textureColumn) % textures[indexOfName].width;
 
@@ -784,30 +822,30 @@ class WallRenderer {
     }
   }
 
-  drawTexture(textureName) {
-    let ctx = gameEngine.ctx;
-    const textures = gameEngine.textures.maptextures;
+  drawTexture(textureName, indexOfName) {
+    // let ctx = gameEngine.ctx;
 
-    const indexOfName = textures.findIndex(
-      (texture) => texture.name === textureName
-    );
+    // const indexOfName = this.textures.findIndex(
+    //   (texture) => texture.name === textureName
+    // );
 
     let offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.getContext("2d", { willReadFrequently: true });
     let offscreenCtx = offscreenCanvas.getContext("2d");
 
     //   for (let i = 0; i < textures.length; i++) {
     // gameEngine.canvas.clearCanvas();
-    offscreenCanvas.width = textures[indexOfName].width;
-    offscreenCanvas.height = textures[indexOfName].height;
+    offscreenCanvas.width = this.textures[indexOfName].width;
+    offscreenCanvas.height = this.textures[indexOfName].height;
     let offscreenBuffer = offscreenCtx.createImageData(
       offscreenCanvas.width,
       offscreenCanvas.height
     );
 
-    for (let j = 0; j < textures[indexOfName].patches.length; j++) {
-      const patches = textures[indexOfName].patches;
-      const xStart = textures[indexOfName].patches[j].originX;
-      const yStart = textures[indexOfName].patches[j].originY;
+    for (let j = 0; j < this.textures[indexOfName].patches.length; j++) {
+      const patches = this.textures[indexOfName].patches;
+      const xStart = this.textures[indexOfName].patches[j].originX;
+      const yStart = this.textures[indexOfName].patches[j].originY;
 
       const header = gameEngine.patchNames.parsePatchHeader(
         gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
@@ -822,8 +860,8 @@ class WallRenderer {
         columns,
         xStart,
         yStart,
-        textures[indexOfName].width,
-        textures[indexOfName].height,
+        this.textures[indexOfName].width,
+        this.textures[indexOfName].height,
         offscreenCtx,
         offscreenBuffer
       );
@@ -841,7 +879,7 @@ class WallRenderer {
     //   offscreenCanvas.height
     // );
 
-   // ctx.drawImage(offscreenCanvas, 0, 0);
+    // ctx.drawImage(offscreenCanvas, 0, 0);
 
     return { offscreenCanvas, offscreenCtx };
   }
