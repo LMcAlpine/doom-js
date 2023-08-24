@@ -116,26 +116,71 @@ class Canvas {
   //   }
   // }
 
-  drawFlat(offscreenCtx, texture, x, y1, y2, lightLevel, worldZ) {
+  drawFlatToScreen(offscreenCtx, texture, x, y1, y2, lightLevel, worldZ) {
     if (y1 < y2) {
       if (texture === "F_SKY1") {
-        let textureColumn =
-          2.2 * (gameEngine.player.direction + getXToAngle(x));
-        let skyAlt = 100;
-        let skyInverseScale = HALFWIDTH / this.canvasWidth;
-        this.drawWallCol(
-          offscreenCtx,
-          texture,
-          textureColumn,
-          x,
-          y1,
-          y2,
-          skyAlt,
-          skyInverseScale,
-          1
-        );
+        // let textureColumn = gameEngine.player.direction + getXToAngle(x);
+        // let skyAlt = 50;
+        // let skyInverseScale = HALFWIDTH / this.canvasWidth;
+        // this.drawWallCol(
+        //   offscreenCtx,
+        //   { width: 64, height: 64 },
+        //   textureColumn,
+        //   x,
+        //   y1,
+        //   y2,
+        //   skyAlt,
+        //   skyInverseScale,
+        //   1
+        // );
+      } else {
+        // Assuming 64x64 texture, fetching entire texture's data.
+        //let flatTex = offscreenCtx.getImageData(0, 0, 64, 64);
+
+        // Call the drawFlatColumn method to process the column data.
+        this.drawFlatColumn(offscreenCtx, x, y1, y2, lightLevel, worldZ);
       }
     }
+  }
+
+  drawFlatColumn(offscreenCtx, x, y1, y2, lightLevel, worldZ) {
+    let playerDirectionX = Math.cos(
+      degreesToRadians(gameEngine.player.direction)
+    );
+    let playerDirectionY = Math.sin(
+      degreesToRadians(gameEngine.player.direction)
+    );
+
+    const columnData = offscreenCtx.getImageData(x, y1, 1, y2 - y1);
+    const entireTextureData = offscreenCtx.getImageData(0, 0, 64, 64).data;
+
+    for (let i = y1; i <= y2; i++) {
+      let z = (HALFWIDTH * worldZ) / (HALFHEIGHT - i);
+
+      let px = playerDirectionX * z + gameEngine.player.x;
+      let py = playerDirectionY * z + gameEngine.player.y;
+
+      let leftX = -playerDirectionY * z + px;
+      let leftY = playerDirectionX * z + py;
+      let rightX = playerDirectionY * z + px;
+      let rightY = -playerDirectionX * z + py;
+
+      let dx = (rightX - leftX) / this.canvasWidth;
+      let dy = (rightY - leftY) / this.canvasWidth;
+
+      let tx = Math.trunc(leftX + dx * x) & 63;
+      let ty = Math.trunc(leftY + dy * x) & 63;
+
+      const texPos = (ty * 64 + tx) * 4;
+
+      columnData.data[(i - y1) * 4] = entireTextureData[texPos] * lightLevel;
+      columnData.data[(i - y1) * 4 + 1] =
+        entireTextureData[texPos + 1] * lightLevel;
+      columnData.data[(i - y1) * 4 + 2] =
+        entireTextureData[texPos + 2] * lightLevel;
+      columnData.data[(i - y1) * 4 + 3] = 255; // Assuming full alpha
+    }
+    this.ctx.putImageData(columnData, x, y1);
   }
 
   drawWallCol(
@@ -176,7 +221,7 @@ class Canvas {
         textureY += invScale;
       }
 
-     // this.ctx.imageSmoothingEnabled = false;
+      // this.ctx.imageSmoothingEnabled = false;
       this.ctx.putImageData(columnData, x, y1);
     }
   }

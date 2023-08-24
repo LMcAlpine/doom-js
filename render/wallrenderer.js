@@ -32,6 +32,10 @@ class WallRenderer {
     this.lookupCache = new Map();
 
     this.initClipHeights();
+
+    this.flatManager = new Flats(gameEngine.lumpData);
+
+    this.flatCache = new Map();
   }
 
   /**
@@ -314,7 +318,8 @@ class WallRenderer {
         upperclip,
         x,
         drawWallY1,
-        lowerclip
+        lowerclip,
+        worldFrontZ1
       );
 
       if (drawWall) {
@@ -350,7 +355,17 @@ class WallRenderer {
         let floorY1 = Math.max(drawWallY2, upperclip[x]);
         let floorY2 = lowerclip[x];
         if (floorY1 < floorY2) {
-          this.drawLine(floorColor, x, floorY1, floorY2);
+          let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
+          gameEngine.canvas.drawFlatToScreen(
+            offscreenCtx,
+            floorTexture,
+            x,
+            floorY1,
+            floorY2,
+            lightLevel,
+            worldFrontZ1
+          );
+          //  this.drawLine(floorColor, x, floorY1, floorY2);
         }
       }
 
@@ -448,17 +463,30 @@ class WallRenderer {
     upperclip,
     x,
     drawWallY1,
-    lowerclip
+    lowerclip,
+    worldFrontZ1
   ) {
     if (drawCeiling) {
-      let ceilingColor = this.colorGenerator.getColor(
-        ceilingTexture,
-        lightLevel
-      );
+      //let flat = new Flats(gameEngine.lumpData, ceilingTexture);
+      // let flat = this.flatManager.findLump(ceilingTexture);
+      // let offscreenCtx = this.drawFlat(flat);
+      // let ceilingColor = this.colorGenerator.getColor(
+      //   ceilingTexture,
+      //   lightLevel
+      // );
       let cy1 = upperclip[x];
       let cy2 = Math.min(drawWallY1, lowerclip[x]);
       if (cy1 < cy2) {
-        this.drawLine(ceilingColor, x, cy1, cy2);
+        let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
+        gameEngine.canvas.drawFlatToScreen(
+          offscreenCtx,
+          ceilingTexture,
+          x,
+          cy1,
+          cy2,
+          lightLevel,
+          worldFrontZ1
+        );
       }
     }
   }
@@ -615,15 +643,27 @@ class WallRenderer {
         let drawUpperWallY1 = Math.trunc(wallY1 - 1);
         let drawUpperWallY2 = Math.trunc(portalY1);
         if (drawCeiling) {
-          let ceilingColor = this.colorGenerator.getColor(
-            ceilingTexture,
-            lightLevel
-          );
+          // let flat = this.flatManager.findLump(ceilingTexture);
+          // let offscreenCtx = this.drawFlat(flat);
+          // let ceilingColor = this.colorGenerator.getColor(
+          //   ceilingTexture,
+          //   lightLevel
+          // );
           let ceilingY1 = upperclip[x];
           let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
 
           if (ceilingY1 < ceilingY2) {
-            this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+            let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
+            //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+            gameEngine.canvas.drawFlatToScreen(
+              offscreenCtx,
+              ceilingTexture,
+              x,
+              ceilingY1,
+              ceilingY2,
+              lightLevel,
+              worldFrontZ1
+            );
           }
         }
 
@@ -650,14 +690,24 @@ class WallRenderer {
       }
       // draw ceiling for adjoining sector?
       if (drawCeiling) {
-        let ceilingColor = this.colorGenerator.getColor(
-          ceilingTexture,
-          lightLevel
-        );
+        // let ceilingColor = this.colorGenerator.getColor(
+        //   ceilingTexture,
+        //   lightLevel
+        // );
         let ceilingY1 = upperclip[x];
         let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
         if (ceilingY1 < ceilingY2) {
-          this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
+          //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          gameEngine.canvas.drawFlatToScreen(
+            offscreenCtx,
+            ceilingTexture,
+            x,
+            ceilingY1,
+            ceilingY2,
+            lightLevel,
+            worldFrontZ1
+          );
           // this.canvas.drawFlat(
           //   ceilingTexture,
           //   x,
@@ -683,7 +733,17 @@ class WallRenderer {
           let floorY2 = lowerclip[x];
 
           if (floorY1 < floorY2) {
-            this.drawLine(floorColor, x, floorY1, floorY2);
+            let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
+            gameEngine.canvas.drawFlatToScreen(
+              offscreenCtx,
+              floorTexture,
+              x,
+              floorY1,
+              floorY2,
+              lightLevel,
+              worldFrontZ1
+            );
+            // this.drawLine(floorColor, x, floorY1, floorY2);
           }
         }
         let drawLowerWallY1 = Math.trunc(portalY2 - 1);
@@ -722,7 +782,17 @@ class WallRenderer {
         let floorY2 = lowerclip[x];
 
         if (floorY1 < floorY2) {
-          this.drawLine(floorColor, x, floorY1, floorY2);
+          let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
+          gameEngine.canvas.drawFlatToScreen(
+            offscreenCtx,
+            floorTexture,
+            x,
+            floorY1,
+            floorY2,
+            lightLevel,
+            worldFrontZ1
+          );
+          // this.drawLine(floorColor, x, floorY1, floorY2);
         }
 
         if (lowerclip[x] > drawWallY2) {
@@ -830,6 +900,21 @@ class WallRenderer {
     }
     upperTextureAlt += side.yOffset;
     return { upperTextureAlt, topPoint };
+  }
+
+  cacheFlat(name) {
+    let flat;
+    let offscreenCtx;
+    if (!this.flatCache.has(name) && name !== "-") {
+      flat = this.flatManager.findLump(name);
+      offscreenCtx = this.drawFlat(flat);
+      this.flatCache.set(name, { flat, offscreenCtx });
+    } else if (name !== "-") {
+      const cachedFlat = this.flatCache.get(name);
+      offscreenCtx = cachedFlat.offscreenCtx;
+      flat = cachedFlat.flat;
+    }
+    return { offscreenCtx, flat };
   }
 
   cacheTexture(upperWallTexture, upperTextureIndex) {
@@ -1038,8 +1123,10 @@ class WallRenderer {
   }
 
   drawTexture(indexOfName) {
-    const { offscreenCanvas, offscreenCtx } =
-      this.createOffscreenCanvas(indexOfName);
+    const { offscreenCanvas, offscreenCtx } = this.createOffscreenCanvas(
+      this.textures[indexOfName].width,
+      this.textures[indexOfName].height
+    );
     const offscreenBuffer = offscreenCtx.createImageData(
       offscreenCanvas.width,
       offscreenCanvas.height
@@ -1072,13 +1159,40 @@ class WallRenderer {
 
     return { offscreenCanvas, offscreenCtx };
   }
+  drawFlat(flat, ctx = gameEngine.canvas.ctx, palette = this.palette) {
+    const { offscreenCanvas, offscreenCtx } = this.createOffscreenCanvas();
 
-  createOffscreenCanvas(indexOfName) {
+    const dataView = new DataView(flat.data);
+    const offscreenData = offscreenCtx.getImageData(0, 0, 64, 64);
+
+    this.processPixels(dataView, offscreenData.data, palette);
+
+    offscreenCtx.putImageData(offscreenData, 0, 0);
+
+    return offscreenCtx;
+  }
+
+  processPixels(dataView, pixelData, palette) {
+    const FULL_ALPHA = 255; // Assuming FULL_ALPHA is a constant you've defined elsewhere
+
+    for (let i = 0; i < 4096; i++) {
+      const index = dataView.getUint8(i);
+      const pixelColor = palette[index];
+
+      const pixelIdx = i * 4;
+      pixelData[pixelIdx] = pixelColor.red;
+      pixelData[pixelIdx + 1] = pixelColor.green;
+      pixelData[pixelIdx + 2] = pixelColor.blue;
+      pixelData[pixelIdx + 3] = FULL_ALPHA;
+    }
+  }
+
+  createOffscreenCanvas(width = 64, height = 64) {
     let offscreenCanvas = document.createElement("canvas");
     offscreenCanvas.getContext("2d", { willReadFrequently: true });
     let offscreenCtx = offscreenCanvas.getContext("2d");
-    offscreenCanvas.width = this.textures[indexOfName].width;
-    offscreenCanvas.height = this.textures[indexOfName].height;
+    offscreenCanvas.width = width;
+    offscreenCanvas.height = height;
     return { offscreenCanvas, offscreenCtx };
   }
 }

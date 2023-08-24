@@ -17,6 +17,10 @@ document
     const levelParser = new LevelParser(lumpData);
     const levels = levelParser.parse("E1M1");
 
+    gameEngine.lumpData = lumpData;
+    // const flats = new Flats();
+    // gameEngine.flat = flats;
+
     const palette = new ReadPalette(lumpData);
 
     gameEngine.palette = palette;

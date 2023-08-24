@@ -44,6 +44,7 @@ class LevelManager {
 
     //  gameEngine.canvas.clearCanvas();
     // this.wallRenderer.drawTexture();
+    // this.wallRenderer.drawFlat();
 
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
   }
