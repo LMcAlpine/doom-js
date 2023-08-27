@@ -13,6 +13,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 const FOV = 90;
 const HALFFOV = FOV / 2;
 
+let traverseBSP;
+let traverseCount = 0;
+
 const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 
 function calculateScale2D(maxX, minX, maxY, minY) {
@@ -141,3 +144,8 @@ function getXToAngle(x) {
   let angleRad = Math.atan((HALFWIDTH - x) / SCREENDISTANCE);
   return angleRad * (180 / Math.PI); // Convert radians to degrees
 }
+
+function areCloseEnough(a, b, epsilon = 1e-6) {
+  return Math.abs(a - b) < epsilon;
+}
+

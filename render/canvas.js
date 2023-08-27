@@ -209,7 +209,8 @@ class Canvas {
 
       let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
 
-      for (let i = 0; i < columnData.data.length; i += 4) {
+      const length = columnData.data.length;
+      for (let i = 0; i < length; i += 4) {
         const texY = Math.trunc(textureY) % textureHeight;
         const texPos = (texY * textureWidth + textureColumn) * 4;
 

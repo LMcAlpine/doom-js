@@ -172,7 +172,9 @@ class WallRenderer {
   }
 
   clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
+   // console.log(this.solidsegs);
     if (this.solidsegs.length < 2) {
+      traverseBSP = false;
       return;
     }
 
