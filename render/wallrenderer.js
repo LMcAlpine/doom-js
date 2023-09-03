@@ -132,18 +132,13 @@ class WallRenderer {
     if (xScreenV1 < this.solidsegs[totalSolidSegs].first) {
       if (xScreenV2 < this.solidsegs[totalSolidSegs].first - 1) {
         // draw wall
-        this.drawWall(seg, xScreenV1, xScreenV2, angleV1);
+        this.drawWall(seg, xScreenV1, xScreenV2);
 
         return;
       }
 
       //draw some other wall
-      this.drawWall(
-        seg,
-        xScreenV1,
-        this.solidsegs[totalSolidSegs].first - 1,
-        angleV1
-      );
+      this.drawWall(seg, xScreenV1, this.solidsegs[totalSolidSegs].first - 1);
     }
 
     if (xScreenV2 <= this.solidsegs[totalSolidSegs].last) {
@@ -160,8 +155,7 @@ class WallRenderer {
       this.drawWall(
         seg,
         this.solidsegs[next].last + 1,
-        this.solidsegs[next + 1].first - 1,
-        angleV1
+        this.solidsegs[next + 1].first - 1
       );
       next++;
 
@@ -169,7 +163,7 @@ class WallRenderer {
         return;
       }
     }
-    this.drawWall(seg, this.solidsegs[next].last + 1, xScreenV2, angleV1);
+    this.drawWall(seg, this.solidsegs[next].last + 1, xScreenV2);
   }
 
   clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
@@ -249,7 +243,7 @@ class WallRenderer {
 
   drawSolidWall(seg, xScreenV1, xScreenV2, angleV1) {
     if (seg.leftSector !== null) {
-      this.drawWall(seg, xScreenV1, xScreenV2);
+      this.drawWall(seg, xScreenV1, xScreenV2, true);
       return;
     }
 
@@ -475,13 +469,6 @@ class WallRenderer {
     worldFrontZ1
   ) {
     if (drawCeiling) {
-      //let flat = new Flats(gameEngine.lumpData, ceilingTexture);
-      // let flat = this.flatManager.findLump(ceilingTexture);
-      // let offscreenCtx = this.drawFlat(flat);
-      // let ceilingColor = this.colorGenerator.getColor(
-      //   ceilingTexture,
-      //   lightLevel
-      // );
       let cy1 = upperclip[x];
       let cy2 = Math.min(drawWallY1, lowerclip[x]);
       if (cy1 < cy2) {
@@ -507,7 +494,7 @@ class WallRenderer {
     this.canvas.ctx.stroke();
   }
 
-  drawWall(seg, xScreenV1, xScreenV2, angleV1) {
+  drawWall(seg, xScreenV1, xScreenV2, drawSolidWall = false) {
     let {
       rightSector,
       leftSector,
@@ -548,7 +535,8 @@ class WallRenderer {
       worldBackZ1,
       rightSector,
       leftSector,
-      side
+      side,
+      drawSolidWall
     );
 
     let { drawLowerWall, drawFloor } = this.checkDrawFloorLowerWall(
@@ -556,8 +544,23 @@ class WallRenderer {
       worldBackZ2,
       rightSector,
       leftSector,
-      side
+      side,
+      drawSolidWall
     );
+
+    // if (
+    //   drawSolidWall ||
+    //   worldFrontZ2 !== worldBackZ2 ||
+    //   rightSector.floorTexture !== leftSector.floorTexture ||
+    //   rightSector.lightLevel !== leftSector.lightLevel
+    // ) {
+    //   drawLowerWall =
+    //     side.lowerTextureName !== "-" && worldBackZ2 > worldFrontZ1;
+    //   drawFloor = worldFrontZ2 <= 0;
+    // } else {
+    //   drawLowerWall = false;
+    //   drawFloor = false;
+    // }
 
     // Nothing to draw
     if (!drawUpperWall && !drawCeiling && !drawLowerWall && !drawFloor) {
@@ -651,12 +654,6 @@ class WallRenderer {
         let drawUpperWallY1 = Math.trunc(wallY1 - 1);
         let drawUpperWallY2 = Math.trunc(portalY1);
         if (drawCeiling) {
-          // let flat = this.flatManager.findLump(ceilingTexture);
-          // let offscreenCtx = this.drawFlat(flat);
-          // let ceilingColor = this.colorGenerator.getColor(
-          //   ceilingTexture,
-          //   lightLevel
-          // );
           let ceilingY1 = upperclip[x];
           let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
 
@@ -956,11 +953,13 @@ class WallRenderer {
     worldBackZ2,
     rightSector,
     leftSector,
-    side
+    side,
+    drawSolidWall
   ) {
     let drawLowerWall;
     let drawFloor;
     if (
+      drawSolidWall ||
       worldFrontZ2 !== worldBackZ2 ||
       rightSector.floorTexture !== leftSector.floorTexture ||
       rightSector.lightLevel !== leftSector.lightLevel
@@ -980,11 +979,13 @@ class WallRenderer {
     worldBackZ1,
     rightSector,
     leftSector,
-    side
+    side,
+    drawSolidWall
   ) {
     let drawUpperWall;
     let drawCeiling;
     if (
+      drawSolidWall ||
       worldFrontZ1 !== worldBackZ1 ||
       rightSector.lightLevel !== leftSector.lightLevel ||
       rightSector.ceilingTexture !== leftSector.ceilingTexture
