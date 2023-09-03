@@ -14,10 +14,12 @@ class BSPTraversal {
   draw(ctx) {}
 
   traverseBSP(nodeID) {
-
-    traverseCount++;
     // check for is this node a leaf node.
+    if (traverseCount === 31) {
+      console.log("stop");
+    }
     if (this.isSubsector(nodeID)) {
+      traverseCount++;
       // getSubsector gives the number of subsector
       // this ID is passed into the renderSubsector method
       this.subsector.handleSubsector(this.getSubsector(nodeID));

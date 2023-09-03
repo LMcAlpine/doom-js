@@ -125,19 +125,19 @@ function getRandomInt(min, max, seed) {
 }
 
 function angleToX(angle) {
+  let SCREENDISTANCE = 640 / 2.0 + 1.0;
   let x = 0;
   if (angle > 90) {
     angle = new Angle(angle - 90);
 
     x =
-      HALFWIDTH -
-      Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+      SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
   } else {
     angle = Angle.subtract(90, angle);
-    x = Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
-    x += HALFWIDTH;
+    x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+    x += SCREENDISTANCE;
   }
-  return x;
+  return Math.floor(x);
 }
 
 function getXToAngle(x) {
@@ -148,4 +148,3 @@ function getXToAngle(x) {
 function areCloseEnough(a, b, epsilon = 1e-6) {
   return Math.abs(a - b) < epsilon;
 }
-

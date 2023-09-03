@@ -15,11 +15,15 @@ class Player {
     this.x = location.xPosition;
     this.y = location.yPosition;
 
+    // this.x = 1391.0860290527344;
+    // this.y = -2502.269790649414;
+
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.direction = location.direction;
+    // this.direction = 0.26;
 
     this.fov = fov;
 
@@ -89,9 +93,9 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
-    console.log("x: " + this.x);
-    console.log("y ;" + this.y);
-    console.log("angle: " + this.direction);
+    // console.log("x: " + this.x);
+    // console.log("y ;" + this.y);
+    // console.log("angle: " + this.direction);
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 
@@ -138,15 +142,15 @@ class Player {
       this.direction -= magRotation * gameEngine.clockTick;
     }
 
-    // this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
-    let floorHeight = gameEngine.levelManager.getPlayerSubsectorHeight();
-    if (this.height < floorHeight + 41) {
-      this.height += 0.4 * (floorHeight + 41 - this.height);
-      this.zVel = 0;
-    } else {
-      this.zVel -= 0.9;
-      this.height += Math.max(-15.0, this.zVel);
-    }
+    this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    //   let floorHeight = gameEngine.levelManager.getPlayerSubsectorHeight();
+    //   if (this.height < floorHeight + 41) {
+    //     this.height += 0.4 * (floorHeight + 41 - this.height);
+    //     this.zVel = 0;
+    //   } else {
+    //     this.zVel -= 0.9;
+    //     this.height += Math.max(-15.0, this.zVel);
+    //   }
   }
 
   /**

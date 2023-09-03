@@ -56,24 +56,25 @@ class WallRenderer {
     //left sector == backsector
     //right sector == front sector
     if (seg.leftSector === null) {
-      this.clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2);
+      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
       return;
     }
 
     // doors
-    // if (
-    //   seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
-    //   seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
-    // ) {
-    //   this.clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2);
-    // }
+    if (
+      seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
+      seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
+    ) {
+      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+      return;
+    }
 
     // portal because there are height differences
     if (
       seg.rightSector.ceilingHeight !== seg.leftSector.ceilingHeight ||
       seg.rightSector.floorHeight !== seg.leftSector.floorHeight
     ) {
-      this.clipPortalWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2);
+      this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
       return;
     }
 
@@ -86,7 +87,7 @@ class WallRenderer {
       return;
     }
 
-    this.clipPortalWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2);
+    this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
   }
 
   updateCeilingFloor(
@@ -172,11 +173,11 @@ class WallRenderer {
   }
 
   clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
-   // console.log(this.solidsegs);
-    if (this.solidsegs.length < 2) {
-      traverseBSP = false;
-      return;
-    }
+    // console.log(this.solidsegs);
+    // if (this.solidsegs.length < 2) {
+    //   traverseBSP = false;
+    //   return;
+    // }
 
     let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
@@ -247,6 +248,11 @@ class WallRenderer {
   }
 
   drawSolidWall(seg, xScreenV1, xScreenV2, angleV1) {
+    if (seg.leftSector !== null) {
+      this.drawWall(seg, xScreenV1, xScreenV2);
+      return;
+    }
+
     let {
       rightSector,
       line,
@@ -367,7 +373,7 @@ class WallRenderer {
             lightLevel,
             worldFrontZ1
           );
-          //  this.drawLine(floorColor, x, floorY1, floorY2);
+          // this.drawLine(floorColor, x, floorY1, floorY2);
         }
       }
 
@@ -710,14 +716,6 @@ class WallRenderer {
             lightLevel,
             worldFrontZ1
           );
-          // this.canvas.drawFlat(
-          //   ceilingTexture,
-          //   x,
-          //   y1,
-          //   y2,
-          //   lightLevel,
-          //   worldFrontZ1
-          // );
         }
 
         if (upperclip[x] < ceilingY2) {
