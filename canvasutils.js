@@ -125,7 +125,7 @@ function getRandomInt(min, max, seed) {
 }
 
 function angleToX(angle) {
-  let SCREENDISTANCE = 640 / 2.0 + 1.0;
+  let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
   let x = 0;
   if (angle > 90) {
     angle = new Angle(angle - 90);
