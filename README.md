@@ -2,7 +2,13 @@
 
 **Note: This repository is currently under construction.**
 
-Doom-JS is a personal project to recreate the iconic first-person shooter Doom, using JavaScript. The original Doom Engine inspires this project, but where possible, modifications to support modern JavaScript development practices. 
+Doom-JS is a personal project to render Doom levels using JavaScript. The original Doom Engine inspires this project, but where possible, modifications to support modern JavaScript development practices. 
+
+## Requirements
+Doom shareware WAD
+
+Download link listed under external links at the bottom:
+https://doomwiki.org/wiki/DOOM1.WAD
 
 ## Project Status
 
@@ -10,7 +16,17 @@ This project is still in progress, and development is ongoing.
 
 ## Project Goals
 
-The primary goal of Doom-JS is to reproduce the gameplay and aesthetics of the classic Doom Game while utilizing modern web technologies.
+The primary goal of Doom-JS is to reproduce the aesthetics of the classic Doom Game while utilizing modern web technologies.
+
+## Screenshots
+
+![image](https://github.com/LMcAlpine/doom-js/assets/66102230/16839fa1-0af0-4d46-9dfe-3647ebe0f67b)
+
+![image](https://github.com/LMcAlpine/doom-js/assets/66102230/f78d36e6-e59a-43b5-ac31-fe0a2f8c68a9)
+
+![image](https://github.com/LMcAlpine/doom-js/assets/66102230/88ea1815-42f9-484e-b2e5-c15cf4093ffe)
+
+
 
 ## Technologies Used
 
