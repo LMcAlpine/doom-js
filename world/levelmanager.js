@@ -44,8 +44,12 @@ class LevelManager {
 
     //  gameEngine.canvas.clearCanvas();
     // this.wallRenderer.drawTexture();
+    // this.wallRenderer.drawFlat();
 
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
+    traverseBSP = true;
+    console.log(traverseCount);
+    traverseCount = 0;
   }
 
   getPlayerSubsectorHeight() {

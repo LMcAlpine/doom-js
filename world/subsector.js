@@ -13,9 +13,7 @@ class Subsector {
       vertices: levelsData.vertices,
       wallRenderer: wallRenderer,
     });
-
   }
-
 
   /**
    * Process the current subsector and process all segments in this subsector.

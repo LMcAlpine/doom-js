@@ -13,6 +13,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 const FOV = 90;
 const HALFFOV = FOV / 2;
 
+let traverseBSP;
+let traverseCount = 0;
+
 const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 
 function calculateScale2D(maxX, minX, maxY, minY) {
@@ -122,22 +125,26 @@ function getRandomInt(min, max, seed) {
 }
 
 function angleToX(angle) {
+  let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
   let x = 0;
   if (angle > 90) {
     angle = new Angle(angle - 90);
 
     x =
-      HALFWIDTH -
-      Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+      SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
   } else {
     angle = Angle.subtract(90, angle);
-    x = Math.trunc(Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
-    x += HALFWIDTH;
+    x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+    x += SCREENDISTANCE;
   }
-  return x;
+  return Math.floor(x);
 }
 
 function getXToAngle(x) {
   let angleRad = Math.atan((HALFWIDTH - x) / SCREENDISTANCE);
   return angleRad * (180 / Math.PI); // Convert radians to degrees
+}
+
+function areCloseEnough(a, b, epsilon = 1e-6) {
+  return Math.abs(a - b) < epsilon;
 }
