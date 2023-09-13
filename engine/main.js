@@ -1,5 +1,13 @@
 const gameEngine = new GameEngine("myCanvas", 50);
 
+let levelSelect = document.getElementById("levels");
+
+let selectedValue = "E1M1";
+levelSelect.addEventListener("change", function () {
+  selectedValue = this.value;
+  console.log("Selected level:", selectedValue);
+});
+
 document
   .getElementById("fileInput")
   .addEventListener("change", async (event) => {
@@ -8,6 +16,7 @@ document
       console.error("No file selected.");
       return;
     }
+
     gameEngine.entities = [];
 
     const wadFileReader = new WADFileReader(file);
@@ -15,7 +24,7 @@ document
     const wadParser = new WADParser(arrayBuffer);
     const lumpData = await wadParser.parse();
     const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse("E1M1");
+    const levels = levelParser.parse(selectedValue);
 
     gameEngine.lumpData = lumpData;
     // const flats = new Flats();

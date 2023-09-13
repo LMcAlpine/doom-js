@@ -15,9 +15,7 @@ class BSPTraversal {
 
   traverseBSP(nodeID) {
     // check for is this node a leaf node.
-    if (traverseCount === 31) {
-      console.log("stop");
-    }
+
     if (this.isSubsector(nodeID)) {
       traverseCount++;
       // getSubsector gives the number of subsector
