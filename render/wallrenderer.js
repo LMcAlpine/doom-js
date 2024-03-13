@@ -135,11 +135,7 @@ class WallRenderer {
   }
 
   clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
-    // console.log(this.solidsegs);
-    // if (this.solidsegs.length < 2) {
-    //   traverseBSP = false;
-    //   return;
-    // }
+
 
     let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
@@ -247,11 +243,6 @@ class WallRenderer {
       worldFrontZ1,
       side
     );
-
-
-
-
-
     //horizontal alignment of textures
     let realWallOffset = hypotenuse * Math.sin(degreesToRadians(offsetAngle));
     realWallOffset += seg.offset + side.xOffset;
@@ -274,16 +265,13 @@ class WallRenderer {
       worldFrontZ2
     );
 
-    let { textureImage, textureImageData } = this.cacheTexture(
+
+
+    let { textureWidth, textureHeight, textureImageData } = this.cacheTexture(
       wallTexture,
       indexOfName
     );
     const textureData = textureImageData;
-
-
-    //Instead of putting each column to the offScreenCanvas, I want to save all the columns and then put them on the canvas after the loop
-    // I need to save each column data.....
-
 
     let columnsData = [];
     // wall segment 
@@ -307,18 +295,6 @@ class WallRenderer {
               realWallScale1
             );
 
-          // this.canvas.drawWallCol(
-          //   offscreenCtx,
-          //   entireTextureData,
-          //   textureColumn,
-          //   x,
-          //   wallY1,
-          //   wallY2,
-          //   middleTextureAlt,
-          //   inverseScale,
-          //   lightLevel, textureImage.width, textureImage.height, xScreenV2 - xScreenV1, largeImageData, xScreenV1
-          // );
-
           columnsData.push({
             textureColumn,
             x,
@@ -330,7 +306,7 @@ class WallRenderer {
             startX: xScreenV1 // Store the starting X to calculate relative position
           });
 
-          //this.drawLine(wallColor, x, wallY1, wallY2);
+
         }
       }
 
@@ -339,12 +315,8 @@ class WallRenderer {
       wallY2 += wallY2Step;
       realWallScale1 += realWallScaleStep;
     }
-    // Want to draw all the columns at once here instead of individually. 
-    //gameEngine.canvas.offScreenCtx.putImageData(largeImageData, xScreenV1, wallY1);
 
 
-    const textureWidth = textureImage.width;
-    const textureHeight = textureImage.height;
     let minColumnX = Infinity;
     let maxColumnX = -Infinity;
     let minY = Infinity;
@@ -939,29 +911,35 @@ class WallRenderer {
     };
   }
 
-  cacheTexture(upperWallTexture, upperTextureIndex) {
-    let textureImage;
+  cacheTexture(wallTexture, textureIndex) {
 
     let textureImageData;
+
+    let textureWidth;
+    let textureHeight;
     // cache the texture
     if (
-      !this.cachedTextures.has(upperWallTexture) &&
-      upperWallTexture !== "-"
+      !this.cachedTextures.has(wallTexture) &&
+      wallTexture !== "-"
     ) {
-      let result = this.drawTexture(upperTextureIndex);
-      textureImage = result.offscreenCanvas;
+      let result = this.drawTexture(textureIndex);
+      // textureImage = result.offscreenCanvas;
       textureImageData = result.textureImageData;
-      this.cachedTextures.set(upperWallTexture, {
-        textureImage, textureImageData
+      textureWidth = result.textureWidth;
+      textureHeight = result.textureHeight;
+      this.cachedTextures.set(wallTexture, {
+        textureWidth, textureHeight, textureImageData
       });
-    } else if (upperWallTexture !== "-") {
-      const cachedTexture = this.cachedTextures.get(upperWallTexture);
-      textureImage = cachedTexture.textureImage;
+    } else if (wallTexture !== "-") {
+      const cachedTexture = this.cachedTextures.get(wallTexture);
+      //  textureImage = cachedTexture.textureImage;
+      textureWidth = cachedTexture.textureWidth;
+      textureHeight = cachedTexture.textureHeight;
 
       textureImageData = cachedTexture.textureImageData;
 
     }
-    return { textureImage, textureImageData };
+    return { textureWidth, textureHeight, textureImageData };
   }
 
   calculateTextureIndex(textureName) {
@@ -1006,17 +984,9 @@ class WallRenderer {
 
     let textureWidth = this.textures[indexOfName].width;
     let textureHeight = this.textures[indexOfName].height;
-    const { offscreenCanvas, offscreenCtx } = this.createOffscreenCanvas(
-      textureWidth,
-      textureHeight
-    );
-
-
 
     let textureImageObj = new ImageData(textureWidth, textureHeight);
     let textureImageData = textureImageObj.data;
-
-
 
     for (let j = 0; j < this.textures[indexOfName].patches.length; j++) {
       const patches = this.textures[indexOfName].patches;
@@ -1034,9 +1004,8 @@ class WallRenderer {
       );
       this.drawPatch(columns, xStart, yStart, textureWidth, textureImageData);
     }
-    offscreenCtx.putImageData(textureImageObj, 0, 0);
 
-    return { offscreenCanvas, offscreenCtx, textureImageData };
+    return { textureWidth, textureHeight, textureImageData };
   }
 
 
@@ -1098,20 +1067,6 @@ class WallRenderer {
     this.canvas.offScreenCtx.lineTo(x, y2);
     this.canvas.offScreenCtx.stroke();
   }
-
-  createOffscreenCanvas(width = 64, height = 64) {
-    let offscreenCanvas = document.createElement("canvas");
-    offscreenCanvas.getContext("2d", { willReadFrequently: true });
-    let offscreenCtx = offscreenCanvas.getContext("2d");
-    offscreenCanvas.width = width;
-    offscreenCanvas.height = height;
-    return { offscreenCanvas, offscreenCtx };
-  }
-
-
-
-
-
 
 
   initializeWall(seg) {

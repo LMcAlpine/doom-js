@@ -13,19 +13,7 @@ class GameLogic {
     this.ticks = [];
   }
 
-  // calculateTicks(tFrame) {
-  //   const nextTick = this.lastTick + this.tickLength;
-  //   let numTicks = 0;
 
-  //   if (tFrame > nextTick) {
-  //     const timeSinceTick = tFrame - this.lastTick;
-  //     numTicks = Math.floor(timeSinceTick / this.tickLength);
-  //   }
-  //   this.totalTicks += numTicks;
-  //   this.frameCount++;
-
-  //   return numTicks;
-  // }
 
   tick() {
     const current = performance.now();

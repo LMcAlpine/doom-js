@@ -75,55 +75,6 @@ class Canvas {
     }
   }
 
-  // drawWallCol(
-  //   offscreenCtx,
-  //   entireTextureData,
-  //   textureColumn,
-  //   x,
-  //   y1,
-  //   y2,
-  //   textureAlt,
-  //   invScale,
-  //   lightLevel, textureWidth, textureHeight
-  // ) {
-  //   if (y1 < y2) {
-  //     // const textureWidth = texture.width;
-  //     // const textureHeight = texture.height;
-  //     textureColumn = Math.trunc(textureColumn) % textureWidth;
-
-  //     // So, this really didnt need to be in the tight loop. Wow
-  //     // const entireTextureData = offscreenCtx.getImageData(
-  //     //   0,
-  //     //   0,
-  //     //   textureWidth,
-  //     //   textureHeight
-  //     // ).data;
-  //     const columnData = offscreenCtx.getImageData(x, y1, 1, y2 - y1);
-
-  //     let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
-
-  //     const length = columnData.data.length;
-  //     for (let i = 0; i < length; i += 4) {
-  //       const texY = Math.trunc(textureY) % textureHeight;
-  //       const texPos = (texY * textureWidth + textureColumn) * 4;
-
-  //       columnData.data[i] = entireTextureData[texPos] * lightLevel;
-  //       columnData.data[i + 1] = entireTextureData[texPos + 1] * lightLevel;
-  //       columnData.data[i + 2] = entireTextureData[texPos + 2] * lightLevel;
-  //       columnData.data[i + 3] = 255; // Assuming full alpha
-
-  //       textureY += invScale;
-  //     }
-
-  //     // this.ctx.imageSmoothingEnabled = false;
-  //     this.offScreenCtx.putImageData(columnData, x, y1);
-  //   }
-  // }
-
-
-
-
-
 
   updateCanvas() {
 

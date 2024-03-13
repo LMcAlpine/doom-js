@@ -27,8 +27,7 @@ document
     const levels = levelParser.parse(selectedValue);
 
     gameEngine.lumpData = lumpData;
-    // const flats = new Flats();
-    // gameEngine.flat = flats;
+ 
 
     const palette = new ReadPalette(lumpData);
 
