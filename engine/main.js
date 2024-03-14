@@ -55,6 +55,8 @@ document
     gameEngine.addEntity(player);
     gameEngine.player = player;
 
+
+
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
 

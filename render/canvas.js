@@ -26,7 +26,8 @@ class Canvas {
     // I was making a wrong assumption that it somehow was setting the width to the offscreen canvas.
     this.offScreenWidth = 640;
     this.offScreenHeight = 400;
-    this.offScreenCtx = this.offScreenCanvas.getContext("2d");
+    // this.offScreenCtx = this.offScreenCanvas.getContext("2d");
+    this.offScreenCtx = this.ctx;
 
     // this.offScreenBuffer = this.offscreenCtx.getImageData(0, 0, this.offscreenWidth, this.offScreenHeight);
 
