@@ -20,9 +20,6 @@ class WallRenderer {
     this.lowerclip = new Array(this.canvas.offScreenWidth);
 
 
-
-
-
     this.textures = gameEngine.textures.maptextures;
 
     this.initClipHeights();
@@ -259,8 +256,8 @@ class WallRenderer {
     let r = this.textureManager.texturePool.get(wallTexture);
     let textureWidth = r.textureWidth;
     let textureHeight = r.textureHeight;
-    let textureImageData = r.textureImageData;
-    const textureData = textureImageData;
+    let textureData = r.textureImageData;
+
 
     let columnsData = [];
     // wall segment 
