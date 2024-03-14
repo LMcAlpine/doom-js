@@ -5,7 +5,7 @@ const UPPER_UNPEGGED = 8;
 const LOWER_UNPEGGED = 16;
 
 class WallRenderer {
-  constructor(colorGenerator, dependencies) {
+  constructor(colorGenerator, dependencies, textureManager) {
     this.colorGenerator = colorGenerator;
     this.dependencies = dependencies;
 
@@ -19,24 +19,16 @@ class WallRenderer {
     this.upperclip = new Array(this.canvas.offScreenWidth);
     this.lowerclip = new Array(this.canvas.offScreenWidth);
 
-    this.palette = gameEngine.palette.palettes[0];
 
-    this.cachedTextures = new Map();
+
+
 
     this.textures = gameEngine.textures.maptextures;
 
-    this.texturesMap = new Map();
-    this.textures.forEach((texture, index) => {
-      this.texturesMap.set(texture.name, index);
-    });
-
-    this.lookupCache = new Map();
-
     this.initClipHeights();
 
-    this.flatManager = new Flats(gameEngine.lumpData);
 
-    this.flatCache = new Map();
+    this.textureManager = textureManager;
 
   }
 
@@ -233,8 +225,7 @@ class WallRenderer {
 
     //-----------------------------------------------------------------//
 
-
-    let indexOfName = this.calculateTextureIndex(wallTexture);
+    let indexOfName = this.textureManager.texturePool.get(wallTexture).textureIndex;
 
     let middleTextureAlt = this.pegMiddleWall(
       line,
@@ -265,12 +256,10 @@ class WallRenderer {
       worldFrontZ2
     );
 
-
-
-    let { textureWidth, textureHeight, textureImageData } = this.cacheTexture(
-      wallTexture,
-      indexOfName
-    );
+    let r = this.textureManager.texturePool.get(wallTexture);
+    let textureWidth = r.textureWidth;
+    let textureHeight = r.textureHeight;
+    let textureImageData = r.textureImageData;
     const textureData = textureImageData;
 
     let columnsData = [];
@@ -910,105 +899,6 @@ class WallRenderer {
       lowerclip,
     };
   }
-
-  cacheTexture(wallTexture, textureIndex) {
-
-    let textureImageData;
-
-    let textureWidth;
-    let textureHeight;
-    // cache the texture
-    if (
-      !this.cachedTextures.has(wallTexture) &&
-      wallTexture !== "-"
-    ) {
-      let result = this.drawTexture(textureIndex);
-      // textureImage = result.offscreenCanvas;
-      textureImageData = result.textureImageData;
-      textureWidth = result.textureWidth;
-      textureHeight = result.textureHeight;
-      this.cachedTextures.set(wallTexture, {
-        textureWidth, textureHeight, textureImageData
-      });
-    } else if (wallTexture !== "-") {
-      const cachedTexture = this.cachedTextures.get(wallTexture);
-      //  textureImage = cachedTexture.textureImage;
-      textureWidth = cachedTexture.textureWidth;
-      textureHeight = cachedTexture.textureHeight;
-
-      textureImageData = cachedTexture.textureImageData;
-
-    }
-    return { textureWidth, textureHeight, textureImageData };
-  }
-
-  calculateTextureIndex(textureName) {
-    let index;
-    if (this.lookupCache.has(textureName) && textureName !== "-") {
-      index = this.lookupCache.get(textureName);
-    } else if (!this.lookupCache.has(textureName) && textureName !== "-") {
-      this.lookupCache.set(textureName, this.texturesMap.get(textureName));
-      index = this.texturesMap.get(textureName);
-    }
-    return index;
-  }
-
-
-  drawPatch(columns, xStart, yStart, textureWidth, textureImageData) {
-    const maxColumns = Math.min(columns.length, textureWidth - xStart);
-
-    for (let i = 0; i < maxColumns; i++) {
-      const column = columns[i];
-      for (let j = 0; j < column.length; j++) {
-        const post = column[j];
-        for (let k = 0; k < post.data.length; k++) {
-          const pixel = post.data[k];
-          const pixelDraw = this.palette[pixel];
-          const x = xStart + i;
-          const y = yStart + post.topDelta + k;
-          const pos = (y * textureWidth + x) * 4;
-
-
-          textureImageData[pos] = pixelDraw.red;
-          textureImageData[pos + 1] = pixelDraw.green;
-          textureImageData[pos + 2] = pixelDraw.blue;
-          textureImageData[pos + 3] = FULL_ALPHA; // Assuming full alpha
-
-        }
-      }
-    }
-  }
-
-  drawTexture(indexOfName) {
-
-
-    let textureWidth = this.textures[indexOfName].width;
-    let textureHeight = this.textures[indexOfName].height;
-
-    let textureImageObj = new ImageData(textureWidth, textureHeight);
-    let textureImageData = textureImageObj.data;
-
-    for (let j = 0; j < this.textures[indexOfName].patches.length; j++) {
-      const patches = this.textures[indexOfName].patches;
-      const xStart = this.textures[indexOfName].patches[j].originX;
-      const yStart = this.textures[indexOfName].patches[j].originY;
-
-      const header = gameEngine.patchNames.parsePatchHeader(
-        gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
-      );
-
-      const columns = gameEngine.patchNames.parsePatchColumns(
-        header.columnOffsets,
-        header,
-        gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
-      );
-      this.drawPatch(columns, xStart, yStart, textureWidth, textureImageData);
-    }
-
-    return { textureWidth, textureHeight, textureImageData };
-  }
-
-
 
   checkDraw(side, worldFrontZ1, rightSector, worldFrontZ2) {
     const drawWall = side.middleTexture !== "-";

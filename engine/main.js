@@ -27,7 +27,7 @@ document
     const levels = levelParser.parse(selectedValue);
 
     gameEngine.lumpData = lumpData;
- 
+
 
     const palette = new ReadPalette(lumpData);
 
@@ -79,7 +79,10 @@ document
       segObjects,
     };
 
-    const levelManager = new LevelManager(levels, dataObjects);
+    const textureManager = new TextureManager(texture.maptextures, palette.palettes[0]);
+
+
+    const levelManager = new LevelManager(levels, dataObjects, textureManager);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 

@@ -1,5 +1,5 @@
 class LevelManager {
-  constructor(levels, data) {
+  constructor(levels, data, textureManager) {
     const colorGenerator = new ColorGenerator(data.sidedefObjects);
 
     const wallRendererDependencies = {
@@ -9,7 +9,7 @@ class LevelManager {
 
     this.wallRenderer = new WallRenderer(
       colorGenerator,
-      wallRendererDependencies
+      wallRendererDependencies, textureManager
     );
 
     this.solidSegsManager = wallRendererDependencies.solidSegsManager;
