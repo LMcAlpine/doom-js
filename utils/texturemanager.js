@@ -62,9 +62,34 @@ class TextureManager {
         return { textureWidth, textureHeight, textureImageData, textureIndex };
     }
 
-    drawPatch(columns, xStart, yStart, textureWidth, textureImageData) {
-        const maxColumns = Math.min(columns.length, textureWidth - xStart);
+    // drawPatch(columns, xStart, yStart, textureWidth, textureImageData) {
+    //     const maxColumns = Math.min(columns.length, textureWidth - xStart);
 
+    //     for (let i = 0; i < maxColumns; i++) {
+    //         const column = columns[i];
+    //         for (let j = 0; j < column.length; j++) {
+    //             const post = column[j];
+    //             for (let k = 0; k < post.data.length; k++) {
+    //                 const pixel = post.data[k];
+    //                 const pixelDraw = this.palette[pixel];
+    //                 const x = xStart + i;
+    //                 const y = yStart + post.topDelta + k;
+    //                 const pos = (y * textureWidth + x) * 4;
+
+
+    //                 textureImageData[pos] = pixelDraw.red;
+    //                 textureImageData[pos + 1] = pixelDraw.green;
+    //                 textureImageData[pos + 2] = pixelDraw.blue;
+    //                 textureImageData[pos + 3] = FULL_ALPHA; // Assuming full alpha
+
+    //             }
+    //         }
+    //     }
+    // }
+
+    drawPatch(columns, xStart, yStart, textureWidth, textureUint32Array) {
+        const maxColumns = Math.min(columns.length, textureWidth - xStart);
+    
         for (let i = 0; i < maxColumns; i++) {
             const column = columns[i];
             for (let j = 0; j < column.length; j++) {
@@ -74,18 +99,17 @@ class TextureManager {
                     const pixelDraw = this.palette[pixel];
                     const x = xStart + i;
                     const y = yStart + post.topDelta + k;
-                    const pos = (y * textureWidth + x) * 4;
-
-
-                    textureImageData[pos] = pixelDraw.red;
-                    textureImageData[pos + 1] = pixelDraw.green;
-                    textureImageData[pos + 2] = pixelDraw.blue;
-                    textureImageData[pos + 3] = FULL_ALPHA; // Assuming full alpha
-
+                    const pos = y * textureWidth + x;
+    
+                    // Correctly pack RGBA into a single Uint32 value for little-endian systems
+                    // ABGR (little-endian)
+                    const packedPixel = (FULL_ALPHA << 24) | (pixelDraw.blue << 16) | (pixelDraw.green << 8) | pixelDraw.red;
+                    textureUint32Array[pos] = packedPixel;
                 }
             }
         }
     }
+    
 
     drawTexture(indexOfName) {
 
@@ -94,7 +118,8 @@ class TextureManager {
         let textureHeight = this.textures[indexOfName].height;
 
         let textureImageObj = new ImageData(textureWidth, textureHeight);
-        let textureImageData = textureImageObj.data;
+        // let textureImageData = textureImageObj.data;
+        let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
 
         for (let j = 0; j < this.textures[indexOfName].patches.length; j++) {
             const patches = this.textures[indexOfName].patches;
@@ -110,10 +135,10 @@ class TextureManager {
                 header,
                 gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
             );
-            this.drawPatch(columns, xStart, yStart, textureWidth, textureImageData);
+            this.drawPatch(columns, xStart, yStart, textureWidth, textureUint32Array);
         }
 
-        return { textureWidth, textureHeight, textureImageData };
+        return { textureWidth, textureHeight, textureImageData: textureUint32Array };
     }
 
 
