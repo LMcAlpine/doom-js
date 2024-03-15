@@ -89,7 +89,7 @@ class TextureManager {
 
     drawPatch(columns, xStart, yStart, textureWidth, textureUint32Array) {
         const maxColumns = Math.min(columns.length, textureWidth - xStart);
-    
+
         for (let i = 0; i < maxColumns; i++) {
             const column = columns[i];
             for (let j = 0; j < column.length; j++) {
@@ -100,7 +100,7 @@ class TextureManager {
                     const x = xStart + i;
                     const y = yStart + post.topDelta + k;
                     const pos = y * textureWidth + x;
-    
+
                     // Correctly pack RGBA into a single Uint32 value for little-endian systems
                     // ABGR (little-endian)
                     const packedPixel = (FULL_ALPHA << 24) | (pixelDraw.blue << 16) | (pixelDraw.green << 8) | pixelDraw.red;
@@ -109,7 +109,7 @@ class TextureManager {
             }
         }
     }
-    
+
 
     drawTexture(indexOfName) {
 
@@ -139,6 +139,20 @@ class TextureManager {
         }
 
         return { textureWidth, textureHeight, textureImageData: textureUint32Array };
+    }
+
+    getTextureInfo(textureName) {
+        if (textureName !== "-" && this.texturePool.has(textureName)) {
+            let textureInfo = this.texturePool.get(textureName);
+            return {
+                textureWidth: textureInfo.textureWidth,
+                textureHeight: textureInfo.textureHeight,
+                textureData: textureInfo.textureImageData,
+            };
+        } else {
+            // Return default values or null if the texture doesn't exist
+            return { textureWidth: null, textureHeight: null, textureData: null };
+        }
     }
 
 

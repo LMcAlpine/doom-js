@@ -335,94 +335,56 @@ class WallRenderer {
       realWallScale1 += realWallScaleStep;
     }
 
-
-    // let minColumnX = Infinity;
-    // let maxColumnX = -Infinity;
-    // let minY = Infinity;
-    // let maxY = -Infinity;
-
-    // Determine bounds
-    // columnsData.forEach(({ x, wallY1, wallY2 }) => {
-    //   minColumnX = Math.min(minColumnX, x);
-    //   maxColumnX = Math.max(maxColumnX, x);
-    //   minY = Math.min(minY, wallY1);
-    //   maxY = Math.max(maxY, wallY2);
-    // });
-
-    // if (maxColumnX - minColumnX <= 0 || maxY - minY <= 0) {
-    //   // No valid drawing area, so skip drawing operations.
-    //   return;
-    // }
-
-    let texY;
-    // const fillColor = { r: 255, g: 0, b: 255, a: 127 }; // RGBA
-    // const edgeColor = { r: 255, g: 0, b: 0, a: 255 }; // Solid red
-
     this.drawSegmentWithTexture(columnsData, textureWidth, textureHeight, textureData, lightLevel);
-
-    // this.drawWallEdges(gameEngine.canvas.offScreenCtx, minColumnX, maxColumnX, minY, maxY);
-
-
-
-
-
-    // gameEngine.canvas.offScreenCtx.strokeStyle = 'red';
-
-    // gameEngine.canvas.offScreenCtx.strokeRect(minColumnX, minY, maxColumnX - minColumnX + 1, maxY - minY + 1);
 
   }
 
 
   drawSegmentWithTexture(columnsData, textureWidth, textureHeight, textureData, lightLevel) {
-    let imageData;
-    let texY;
-    const isPowerOfTwo = (textureHeight & (textureHeight - 1)) === 0 && textureHeight !== 0;
     columnsData.forEach(({ x, wallY1, wallY2, textureColumn, textureAlt, inverseScale }) => {
-      imageData = new ImageData(1, wallY2 - wallY1 + 1);
-      // const accumulatedImageData = imageData.data;
+      let imageData = new ImageData(1, wallY2 - wallY1 + 1);
       const accumulatedImageData = new Uint32Array(imageData.data.buffer);
       let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
-      // textureColumn = Math.trunc(textureColumn) % textureWidth;
-      //wow this improved performance a lot
       textureColumn = Math.trunc(textureColumn) & (textureWidth - 1);
 
-      for (let y = 0; y <= wallY2 - wallY1; y++) {
-        // Determine texY based on textureHeight
-        // const texY = ((textureHeight & (textureHeight - 1)) === 0 && textureHeight !== 0)
-        //   ? Math.trunc(textureY) & (textureHeight - 1)
-        //   : Math.trunc(textureY) % textureHeight;
-        if (isPowerOfTwo) {
-          texY = Math.trunc(textureY) & (textureHeight - 1);
-        } else {
-          texY = Math.trunc(textureY) % textureHeight;
-        }
+      for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
+        let texY = isPowerOfTwo(textureHeight)
+          ? Math.trunc(textureY) & (textureHeight - 1)
+          : Math.trunc(textureY) % textureHeight;
 
-        // Calculate the position in the textureData Uint32Array
         const texPos = texY * textureWidth + textureColumn;
-
-        // Directly use the color from textureData
-        //accumulatedImageData[y] = textureData[texPos];
         let pixelValue = textureData[texPos];
-        // Unpack RGBA components. Assuming little-endian: ABGR
-        let alpha = (pixelValue >> 24) & 0xFF;
+
+        // Assuming textureData is a Uint32Array of packed ABGR values (common for little-endian architectures)
+        // Unpack ABGR components
+        let alpha = pixelValue >>> 24;
         let blue = (pixelValue >> 16) & 0xFF;
         let green = (pixelValue >> 8) & 0xFF;
         let red = pixelValue & 0xFF;
 
         // Apply light level to RGB components
-        red = Math.min(255, Math.floor(red * lightLevel));
-        green = Math.min(255, Math.floor(green * lightLevel));
-        blue = Math.min(255, Math.floor(blue * lightLevel));
+        red = adjustColorComponent(red, lightLevel);
+        green = adjustColorComponent(green, lightLevel);
+        blue = adjustColorComponent(blue, lightLevel);
 
-        // Repack the RGBA components back into a Uint32 value
+        // Repack the ABGR components into a Uint32 value
         accumulatedImageData[y] = (alpha << 24) | (blue << 16) | (green << 8) | red;
 
-        // Increment textureY for next pixel
         textureY += inverseScale;
       }
 
       gameEngine.canvas.offScreenCtx.putImageData(imageData, x, wallY1);
     });
+
+    function isPowerOfTwo(number) {
+      return (number & (number - 1)) === 0;
+    }
+
+    function adjustColorComponent(component, lightLevel) {
+      return Math.min(255, Math.max(0, Math.floor(component * lightLevel)));
+
+    }
+
   }
 
   pegMiddleWall(line, rightSector, indexOfName, worldFrontZ1, side) {
@@ -604,46 +566,8 @@ class WallRenderer {
       wallY1Step
     );
 
-    // let { offscreenCtx, textureImage } = this.cacheTexture(
-    //   upperWallTexture,
-    //   upperTextureIndex
-    // );
-
-    // let entireTextureData;
-    // if (upperWallTexture !== "-") {
-    //   entireTextureData = offscreenCtx.getImageData(
-    //     0,
-    //     0,
-    //     textureImage.width,
-    //     textureImage.height
-    //   ).data;
-    // }
-    let textureWidth;
-    let textureHeight;
-    let textureData;
-    if (upperWallTexture !== "-") {
-      let r = this.textureManager.texturePool.get(upperWallTexture);
-      textureWidth = r.textureWidth;
-      textureHeight = r.textureHeight;
-      textureData = r.textureImageData;
-    }
-
-
-    let textureWidthLower;
-    let textureHeightLower;
-    let textureDataLower;
-    if (lowerWallTexture !== "-") {
-      let r = this.textureManager.texturePool.get(lowerWallTexture);
-      textureWidthLower = r.textureWidth;
-      textureHeightLower = r.textureHeight;
-      textureDataLower = r.textureImageData;
-    }
-
-    // let r2 = this.textureManager.texturePool.get(lowerWallTexture);
-    // let lowerWallTextureWidth = r.textureWidth;
-    // let lowerWallTextureHeight = r.textureHeight;
-    // let lowerWallTextureData = r.textureImageData;
-
+    let { textureWidth, textureHeight, textureData } = this.textureManager.getTextureInfo(upperWallTexture);
+    let { textureWidth: textureWidthLower, textureHeight: textureHeightLower, textureData: textureDataLower } = this.textureManager.getTextureInfo(lowerWallTexture);
 
     let columnsData = [];
     let lowerColumns = [];
@@ -735,10 +659,10 @@ class WallRenderer {
 
       if (drawLowerWall) {
         if (drawFloor) {
-          let floorColor = this.colorGenerator.getColor(
-            floorTexture,
-            lightLevel
-          );
+          // let floorColor = this.colorGenerator.getColor(
+          //   floorTexture,
+          //   lightLevel
+          // );
           let floorY1 = Math.max(drawWallY2, this.upperclip[x]);
           let floorY2 = this.lowerclip[x];
 
@@ -799,7 +723,7 @@ class WallRenderer {
         portalY2 += portalY2Step;
       }
       if (drawFloor) {
-        let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
+        // let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
         let floorY1 = Math.max(drawWallY2, this.upperclip[x]);
         let floorY2 = this.lowerclip[x];
 
@@ -827,199 +751,10 @@ class WallRenderer {
     }
     if (drawUpperWall) {
 
-
-      let texY;
-      let imageData;
-
-
-      //   imageData = new ImageData(1, wallY2 - wallY1 + 1);
-      //   // const accumulatedImageData = imageData.data;
-      //   const accumulatedImageData = new Uint32Array(imageData.data.buffer);
-      //   let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
-      //   // textureColumn = Math.trunc(textureColumn) % textureWidth;
-      //   //wow this improved performance a lot
-      //   textureColumn = Math.trunc(textureColumn) & (textureWidth - 1);
-
-      //   for (let y = 0; y <= wallY2 - wallY1; y++) {
-      //     // Determine texY based on textureHeight
-      //     const texY = ((textureHeight & (textureHeight - 1)) === 0 && textureHeight !== 0)
-      //       ? Math.trunc(textureY) & (textureHeight - 1)
-      //       : Math.trunc(textureY) % textureHeight;
-
-      //     // Calculate the position in the textureData Uint32Array
-      //     const texPos = texY * textureWidth + textureColumn;
-
-      //     // Directly use the color from textureData
-      //     accumulatedImageData[y] = textureData[texPos];
-
-      //     // Increment textureY for next pixel
-      //     textureY += inverseScale;
-      //   }
-
-      //   gameEngine.canvas.offScreenCtx.putImageData(imageData, x, wallY1);
-      // });
-
       this.drawSegmentWithTexture(columnsData, textureWidth, textureHeight, textureData, lightLevel);
-      // columnsData.forEach(({ x, upperWallY1, upperWallY2, textureColumn, textureAlt, inverseScale }) => {
-
-      //   console.log(" w2 " + upperWallY2);
-      //   console.log(upperWallY1);
-      //   let accumulatedImageData;
-      //   if (upperWallY1 < upperWallY2) {
-      //     imageData = new ImageData(1, upperWallY2 - upperWallY1);
-      //     // accumulatedImageData = imageData.data;
-      //     accumulatedImageData = new Uint32Array(imageData.data.buffer);
-      //   }
-      //   else { return; }
-
-
-
-      //   let textureY = textureAlt + (upperWallY1 - HALFHEIGHT) * inverseScale;
-      //   // textureColumn = Math.trunc(textureColumn) % textureWidth;
-      //   //wow this improved performance a lot
-      //   textureColumn = Math.trunc(textureColumn) & (textureWidth - 1);
-
-      //   for (let y = 0; y <= upperWallY2 - upperWallY1 + 1; y++) {
-
-
-      //     if ((textureHeight & (textureHeight - 1)) === 0 && textureHeight !== 0) {
-      //       texY = Math.trunc(textureY) & (textureHeight - 1);
-      //     }
-      //     else {
-      //       texY = Math.trunc(textureY) % textureHeight;
-      //     }
-
-
-
-      //     const texPos = (texY * textureWidth + textureColumn);
-
-      //     // const idx = ((y - minY) * imageWidth + (x - minColumnX)) * 4;
-      //     // const idx = y * 4;
-      //     // accumulatedImageData[idx] = textureData[texPos] * lightLevel;
-      //     // accumulatedImageData[idx + 1] = textureData[texPos + 1] * lightLevel;
-      //     // accumulatedImageData[idx + 2] = textureData[texPos + 2] * lightLevel;
-      //     // accumulatedImageData[idx + 3] = 255; // Full opacity
-
-
-      //     // accumulatedImageData[y] = textureData[texPos];
-      //     let pixelValue = textureData[texPos];
-      //     // Unpack RGBA components. Assuming little-endian: ABGR
-      //     let alpha = (pixelValue >> 24) & 0xFF;
-      //     let blue = (pixelValue >> 16) & 0xFF;
-      //     let green = (pixelValue >> 8) & 0xFF;
-      //     let red = pixelValue & 0xFF;
-
-      //     // Apply light level to RGB components
-      //     red = Math.min(255, Math.floor(red * lightLevel));
-      //     green = Math.min(255, Math.floor(green * lightLevel));
-      //     blue = Math.min(255, Math.floor(blue * lightLevel));
-
-      //     // Repack the RGBA components back into a Uint32 value
-      //     accumulatedImageData[y] = (alpha << 24) | (blue << 16) | (green << 8) | red;
-
-
-
-      //     // accumulatedImageData[idx] = fillColor.r;
-      //     // accumulatedImageData[idx + 1] = fillColor.g;
-      //     // accumulatedImageData[idx + 2] = fillColor.b;
-      //     // accumulatedImageData[idx + 3] = fillColor.a;
-
-      //     // gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
-      //     // gameEngine.canvas.offScreenCtx.fillRect(minColumnX,minY,maxColumnX - minColumnX,maxY - minY);
-
-      //     textureY += inverseScale;
-      //   }
-      //   gameEngine.canvas.offScreenCtx.putImageData(imageData, x, upperWallY1);
-      // });
-
-
-
     }
     if (drawLowerWall) {
-
-
-      // let texY;
-      // // let imageData;
-
       this.drawSegmentWithTexture(lowerColumns, textureWidthLower, textureHeightLower, textureDataLower, lightLevel);
-
-      // lowerColumns.forEach(({ x, lowerWallY1, lowerWallY2, textureColumn, textureAlt, inverseScale }) => {
-
-      //   let texY;
-      //   let imageData;
-
-      //   console.log(" w2 " + lowerWallY1);
-      //   console.log(lowerWallY1);
-      //   let accumulatedImageData;
-      //   if (lowerWallY1 < lowerWallY2) {
-      //     imageData = new ImageData(1, lowerWallY2 - lowerWallY1);
-      //     //accumulatedImageData = imageData.data;
-      //     accumulatedImageData = new Uint32Array(imageData.data.buffer);
-      //   }
-      //   else { return; }
-
-
-
-      //   let textureY = textureAlt + (lowerWallY1 - HALFHEIGHT) * inverseScale;
-      //   // textureColumn = Math.trunc(textureColumn) % textureWidth;
-      //   //wow this improved performance a lot
-      //   textureColumn = Math.trunc(textureColumn) & (textureWidthLower - 1);
-
-      //   for (let y = 0; y <= lowerWallY2 - lowerWallY1 + 1; y++) {
-
-
-      //     if ((textureHeightLower & (textureHeightLower - 1)) === 0 && textureHeightLower !== 0) {
-      //       texY = Math.trunc(textureY) & (textureHeightLower - 1);
-      //     }
-      //     else {
-      //       texY = Math.trunc(textureY) % textureHeightLower;
-      //     }
-
-
-
-      //     // const texPos = (texY * textureWidthLower + textureColumn) * 4;
-      //     const texPos = (texY * textureWidthLower + textureColumn);
-
-      //     // const idx = ((y - minY) * imageWidth + (x - minColumnX)) * 4;
-      //     //  const idx = y * 4;
-      //     // accumulatedImageData[idx] = textureDataLower[texPos] * lightLevel;
-      //     // accumulatedImageData[idx + 1] = textureDataLower[texPos + 1] * lightLevel;
-      //     // accumulatedImageData[idx + 2] = textureDataLower[texPos + 2] * lightLevel;
-      //     // accumulatedImageData[idx + 3] = 255; // Full opacity
-
-      //     // accumulatedImageData[y] = textureDataLower[texPos];
-      //     let pixelValue = textureDataLower[texPos];
-      //     // Unpack RGBA components. Assuming little-endian: ABGR
-      //     let alpha = (pixelValue >> 24) & 0xFF;
-      //     let blue = (pixelValue >> 16) & 0xFF;
-      //     let green = (pixelValue >> 8) & 0xFF;
-      //     let red = pixelValue & 0xFF;
-
-      //     // Apply light level to RGB components
-      //     red = Math.min(255, Math.floor(red * lightLevel));
-      //     green = Math.min(255, Math.floor(green * lightLevel));
-      //     blue = Math.min(255, Math.floor(blue * lightLevel));
-
-      //     // Repack the RGBA components back into a Uint32 value
-      //     accumulatedImageData[y] = (alpha << 24) | (blue << 16) | (green << 8) | red;
-
-
-
-
-      //     // accumulatedImageData[idx] = fillColor.r;
-      //     // accumulatedImageData[idx + 1] = fillColor.g;
-      //     // accumulatedImageData[idx + 2] = fillColor.b;
-      //     // accumulatedImageData[idx + 3] = fillColor.a;
-
-      //     // gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
-      //     // gameEngine.canvas.offScreenCtx.fillRect(minColumnX,minY,maxColumnX - minColumnX,maxY - minY);
-
-      //     textureY += inverseScale;
-      //   }
-      //   gameEngine.canvas.offScreenCtx.putImageData(imageData, x, lowerWallY1);
-      // });
-
-
 
     }
 
