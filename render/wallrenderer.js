@@ -294,9 +294,92 @@ class WallRenderer {
 
     let columnsData = [];
     // wall segment 
+
+
+
     for (let x = xScreenV1; x <= xScreenV2; x++) {
       let drawWallY1 = Math.trunc(wallY1);
       let drawWallY2 = Math.trunc(wallY2);
+
+      if (drawCeiling) {
+
+        const textureWidth = 64; // Ensure this matches your actual texture size.
+        const textureHeight = 64; // Assuming square texture for simplicity.
+        function adjustColorComponent(color, lightLevel) {
+          return Math.min(255, Math.floor(color * lightLevel));
+        }
+
+
+        // let c = this.textureManager.texturePool.get(ceilingTexture);
+        const textureLump = gameEngine.lumpData.find(lump => lump.name === ceilingTexture);
+
+        const dataView = new DataView(textureLump.data);
+        let textureImageObj = new ImageData(64, 64);
+
+        for (let i = 0; i < 4096; i++) {
+          const index = dataView.getUint8(i);
+          const pixelColor = this.textureManager.palette[index];
+
+          const pixelIdx = i * 4;
+          textureImageObj.data[pixelIdx] = pixelColor.red;
+          textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+          textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+          textureImageObj.data[pixelIdx + 3] = 255;
+        }
+        // // let textureImageData = textureImageObj.data;
+        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+        // let textureWidth = c.textureWidth;
+        // let textureHeight = c.textureHeight;
+        // let textureData = c.textureImageData;
+        let cy1 = this.upperclip[x] + 1;
+        let cy2 = Math.min(drawWallY1, this.lowerclip[x]);
+
+
+        // let imageData = new ImageData(1, cy2 - cy1 + 1);
+        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+        let imageData
+        if (cy1 < cy2 && ceilingTexture !== "F_SKY1") {
+          imageData = new ImageData(1, cy2 - cy1 + 1);
+          const accumulatedImageData = imageData.data;
+
+          let playerDirectionX = Math.cos(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          let playerDirectionY = Math.sin(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          for (let i = cy1; i <= cy2; i++) {
+            let z = (HALFWIDTH * worldFrontZ1) / (HALFHEIGHT - i);
+            let px = playerDirectionX * z + gameEngine.player.x;
+            let py = playerDirectionY * z + gameEngine.player.y;
+
+            let leftX = -playerDirectionY * z + px;
+            let leftY = playerDirectionX * z + py;
+            let rightX = playerDirectionY * z + px;
+            let rightY = -playerDirectionX * z + py;
+
+            let dx = (rightX - leftX) / this.canvas.canvasWidth;
+            let dy = (rightY - leftY) / this.canvas.canvasWidth;
+            let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+            let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+            // tx = (tx + textureWidth) % textureWidth;
+            // ty = (ty + textureHeight) % textureHeight;
+
+            const texPos = (ty * textureWidth + tx) * 4;
+
+
+            // Apply light level adjustment using the adjustColorComponent function
+            accumulatedImageData[(i - cy1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 3] = 255; // Alpha channel
+          }
+
+          gameEngine.canvas.offScreenCtx.putImageData(imageData, x, cy1);
+
+        }
+
+      }
 
       if (drawWall) {
 
@@ -326,6 +409,83 @@ class WallRenderer {
           });
 
 
+        }
+      }
+
+      if (drawFloor) {
+        const textureWidth = 64; // Ensure this matches your actual texture size.
+        const textureHeight = 64; // Assuming square texture for simplicity.
+        function adjustColorComponent(color, lightLevel) {
+          return Math.min(255, Math.floor(color * lightLevel));
+        }
+
+
+        // let c = this.textureManager.texturePool.get(ceilingTexture);
+        const textureLump = gameEngine.lumpData.find(lump => lump.name === floorTexture);
+
+        const dataView = new DataView(textureLump.data);
+        let textureImageObj = new ImageData(64, 64);
+
+        for (let i = 0; i < 4096; i++) {
+          const index = dataView.getUint8(i);
+          const pixelColor = this.textureManager.palette[index];
+
+          const pixelIdx = i * 4;
+          textureImageObj.data[pixelIdx] = pixelColor.red;
+          textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+          textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+          textureImageObj.data[pixelIdx + 3] = 255;
+        }
+        // // let textureImageData = textureImageObj.data;
+        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+        // let textureWidth = c.textureWidth;
+        // let textureHeight = c.textureHeight;
+        // let textureData = c.textureImageData;
+        let floorY1 = Math.max(drawWallY2 + 1, this.upperclip[x] + 1);
+        let floorY2 = this.lowerclip[x] - 1;
+
+
+        // let imageData = new ImageData(1, cy2 - cy1 + 1);
+        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+        let imageData
+        if (floorY1 < floorY2) {
+          imageData = new ImageData(1, floorY2 - floorY1 + 1);
+          const accumulatedImageData = imageData.data;
+
+          let playerDirectionX = Math.cos(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          let playerDirectionY = Math.sin(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          for (let i = floorY1; i <= floorY2; i++) {
+            let z = (HALFWIDTH * worldFrontZ2) / (HALFHEIGHT - i);
+            let px = playerDirectionX * z + gameEngine.player.x;
+            let py = playerDirectionY * z + gameEngine.player.y;
+
+            let leftX = -playerDirectionY * z + px;
+            let leftY = playerDirectionX * z + py;
+            let rightX = playerDirectionY * z + px;
+            let rightY = -playerDirectionX * z + py;
+
+            let dx = (rightX - leftX) / this.canvas.canvasWidth;
+            let dy = (rightY - leftY) / this.canvas.canvasWidth;
+            let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+            let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+            // tx = (tx + textureWidth) % textureWidth;
+            // ty = (ty + textureHeight) % textureHeight;
+
+            const texPos = (ty * textureWidth + tx) * 4;
+
+
+            // Apply light level adjustment using the adjustColorComponent function
+            accumulatedImageData[(i - floorY1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 3] = 255; // Alpha channel
+          }
+
+          gameEngine.canvas.offScreenCtx.putImageData(imageData, x, floorY1);
         }
       }
 
@@ -589,24 +749,102 @@ class WallRenderer {
       if (drawUpperWall) {
         let drawUpperWallY1 = Math.trunc(wallY1 - 1);
         let drawUpperWallY2 = Math.trunc(portalY1);
-        // if (drawCeiling) {
-        //   let ceilingY1 = upperclip[x];
-        //   let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
+        if (drawCeiling) {
 
-        //   if (ceilingY1 < ceilingY2) {
-        //     let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
-        //     //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
-        //     gameEngine.canvas.drawFlatToScreen(
-        //       offscreenCtx,
-        //       ceilingTexture,
-        //       x,
-        //       ceilingY1,
-        //       ceilingY2,
-        //       lightLevel,
-        //       worldFrontZ1
-        //     );
-        //   }
-        // }
+
+          const textureWidth = 64; // Ensure this matches your actual texture size.
+          const textureHeight = 64; // Assuming square texture for simplicity.
+          function adjustColorComponent(color, lightLevel) {
+            return Math.min(255, Math.floor(color * lightLevel));
+          }
+
+
+          // let c = this.textureManager.texturePool.get(ceilingTexture);
+          const textureLump = gameEngine.lumpData.find(lump => lump.name === ceilingTexture);
+
+          const dataView = new DataView(textureLump.data);
+          let textureImageObj = new ImageData(64, 64);
+
+          for (let i = 0; i < 4096; i++) {
+            const index = dataView.getUint8(i);
+            const pixelColor = this.textureManager.palette[index];
+
+            const pixelIdx = i * 4;
+            textureImageObj.data[pixelIdx] = pixelColor.red;
+            textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+            textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+            textureImageObj.data[pixelIdx + 3] = 255;
+          }
+          // // let textureImageData = textureImageObj.data;
+          // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+          // let textureWidth = c.textureWidth;
+          // let textureHeight = c.textureHeight;
+          // let textureData = c.textureImageData;
+          let cy1 = this.upperclip[x] + 1;
+          let cy2 = Math.min(drawWallY1, this.lowerclip[x]);
+
+
+          // let imageData = new ImageData(1, cy2 - cy1 + 1);
+          // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+          let imageData
+          if (cy1 < cy2 && ceilingTexture !== "F_SKY1") {
+            imageData = new ImageData(1, cy2 - cy1 + 1);
+            const accumulatedImageData = imageData.data;
+
+            let playerDirectionX = Math.cos(
+              degreesToRadians(gameEngine.player.direction)
+            );
+            let playerDirectionY = Math.sin(
+              degreesToRadians(gameEngine.player.direction)
+            );
+            for (let i = cy1; i <= cy2; i++) {
+              let z = (HALFWIDTH * worldFrontZ1) / (HALFHEIGHT - i);
+              let px = playerDirectionX * z + gameEngine.player.x;
+              let py = playerDirectionY * z + gameEngine.player.y;
+
+              let leftX = -playerDirectionY * z + px;
+              let leftY = playerDirectionX * z + py;
+              let rightX = playerDirectionY * z + px;
+              let rightY = -playerDirectionX * z + py;
+
+              let dx = (rightX - leftX) / this.canvas.canvasWidth;
+              let dy = (rightY - leftY) / this.canvas.canvasWidth;
+              let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+              let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+              // tx = (tx + textureWidth) % textureWidth;
+              // ty = (ty + textureHeight) % textureHeight;
+
+              const texPos = (ty * textureWidth + tx) * 4;
+
+
+              // Apply light level adjustment using the adjustColorComponent function
+              accumulatedImageData[(i - cy1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+              accumulatedImageData[(i - cy1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+              accumulatedImageData[(i - cy1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+              accumulatedImageData[(i - cy1) * 4 + 3] = 255; // Alpha channel
+            }
+
+            gameEngine.canvas.offScreenCtx.putImageData(imageData, x, cy1);
+
+          }
+
+          // let ceilingY1 = upperclip[x];
+          // let ceilingY2 = Math.min(drawWallY1, lowerclip[x]);
+
+          // if (ceilingY1 < ceilingY2) {
+          //   let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
+          //   //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          //   gameEngine.canvas.drawFlatToScreen(
+          //     offscreenCtx,
+          //     ceilingTexture,
+          //     x,
+          //     ceilingY1,
+          //     ceilingY2,
+          //     lightLevel,
+          //     worldFrontZ1
+          //   );
+          // }
+        }
 
         let upperWallY1 = Math.max(drawUpperWallY1, this.upperclip[x] + 1);
         let upperWallY2 = Math.min(drawUpperWallY2, this.lowerclip[x]);
@@ -632,53 +870,208 @@ class WallRenderer {
       }
       // draw ceiling for adjoining sector?
       if (drawCeiling) {
-        // let ceilingColor = this.colorGenerator.getColor(
-        //   ceilingTexture,
-        //   lightLevel
-        // );
-        let ceilingY1 = this.upperclip[x];
-        let ceilingY2 = Math.min(drawWallY1, this.lowerclip[x]);
-        if (ceilingY1 < ceilingY2) {
-          //let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
-          //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
-          // gameEngine.canvas.drawFlatToScreen(
-          //   offscreenCtx,
-          //   ceilingTexture,
-          //   x,
-          //   ceilingY1,
-          //   ceilingY2,
-          //   lightLevel,
-          //   worldFrontZ1
-          // );
+
+
+
+        const textureWidth = 64; // Ensure this matches your actual texture size.
+        const textureHeight = 64; // Assuming square texture for simplicity.
+        function adjustColorComponent(color, lightLevel) {
+          return Math.min(255, Math.floor(color * lightLevel));
         }
 
-        if (this.upperclip[x] < ceilingY2) {
-          this.upperclip[x] = ceilingY2;
+
+        // let c = this.textureManager.texturePool.get(ceilingTexture);
+        const textureLump = gameEngine.lumpData.find(lump => lump.name === ceilingTexture);
+
+        const dataView = new DataView(textureLump.data);
+        let textureImageObj = new ImageData(64, 64);
+
+        for (let i = 0; i < 4096; i++) {
+          const index = dataView.getUint8(i);
+          const pixelColor = this.textureManager.palette[index];
+
+          const pixelIdx = i * 4;
+          textureImageObj.data[pixelIdx] = pixelColor.red;
+          textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+          textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+          textureImageObj.data[pixelIdx + 3] = 255;
+        }
+        // // let textureImageData = textureImageObj.data;
+        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+        // let textureWidth = c.textureWidth;
+        // let textureHeight = c.textureHeight;
+        // let textureData = c.textureImageData;
+        let cy1 = this.upperclip[x] + 1;
+        let cy2 = Math.min(drawWallY1, this.lowerclip[x]);
+
+
+        // let imageData = new ImageData(1, cy2 - cy1 + 1);
+        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+        let imageData
+        if (cy1 < cy2 && ceilingTexture !== "F_SKY1") {
+          imageData = new ImageData(1, cy2 - cy1 + 1);
+          const accumulatedImageData = imageData.data;
+
+          let playerDirectionX = Math.cos(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          let playerDirectionY = Math.sin(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          for (let i = cy1; i <= cy2; i++) {
+            let z = (HALFWIDTH * worldFrontZ1) / (HALFHEIGHT - i);
+            let px = playerDirectionX * z + gameEngine.player.x;
+            let py = playerDirectionY * z + gameEngine.player.y;
+
+            let leftX = -playerDirectionY * z + px;
+            let leftY = playerDirectionX * z + py;
+            let rightX = playerDirectionY * z + px;
+            let rightY = -playerDirectionX * z + py;
+
+            let dx = (rightX - leftX) / this.canvas.canvasWidth;
+            let dy = (rightY - leftY) / this.canvas.canvasWidth;
+            let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+            let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+            // tx = (tx + textureWidth) % textureWidth;
+            // ty = (ty + textureHeight) % textureHeight;
+
+            const texPos = (ty * textureWidth + tx) * 4;
+
+
+            // Apply light level adjustment using the adjustColorComponent function
+            accumulatedImageData[(i - cy1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+            accumulatedImageData[(i - cy1) * 4 + 3] = 255; // Alpha channel
+          }
+
+          gameEngine.canvas.offScreenCtx.putImageData(imageData, x, cy1);
+
+          // let ceilingColor = this.colorGenerator.getColor(
+          //   ceilingTexture,
+          //   lightLevel
+          // );
+          // let ceilingY1 = this.upperclip[x];
+          // let ceilingY2 = Math.min(drawWallY1, this.lowerclip[x]);
+          // if (ceilingY1 < ceilingY2) {
+          //   //let { offscreenCtx, flat } = this.cacheFlat(ceilingTexture);
+          //   //this.drawLine(ceilingColor, x, ceilingY1, ceilingY2);
+          //   // gameEngine.canvas.drawFlatToScreen(
+          //   //   offscreenCtx,
+          //   //   ceilingTexture,
+          //   //   x,
+          //   //   ceilingY1,
+          //   //   ceilingY2,
+          //   //   lightLevel,
+          //   //   worldFrontZ1
+          //   // );
+          // }
+
+          if (this.upperclip[x] < cy2) {
+            this.upperclip[x] = cy2;
+          }
         }
       }
 
       if (drawLowerWall) {
         if (drawFloor) {
+
+
+
+          const textureWidth = 64; // Ensure this matches your actual texture size.
+          const textureHeight = 64; // Assuming square texture for simplicity.
+          function adjustColorComponent(color, lightLevel) {
+            return Math.min(255, Math.floor(color * lightLevel));
+          }
+
+
+          // let c = this.textureManager.texturePool.get(ceilingTexture);
+          const textureLump = gameEngine.lumpData.find(lump => lump.name === floorTexture);
+
+          const dataView = new DataView(textureLump.data);
+          let textureImageObj = new ImageData(64, 64);
+
+          for (let i = 0; i < 4096; i++) {
+            const index = dataView.getUint8(i);
+            const pixelColor = this.textureManager.palette[index];
+
+            const pixelIdx = i * 4;
+            textureImageObj.data[pixelIdx] = pixelColor.red;
+            textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+            textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+            textureImageObj.data[pixelIdx + 3] = 255;
+          }
+          // // let textureImageData = textureImageObj.data;
+          // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+          // let textureWidth = c.textureWidth;
+          // let textureHeight = c.textureHeight;
+          // let textureData = c.textureImageData;
+          let floorY1 = Math.max(drawWallY2 + 1, this.upperclip[x] + 1);
+          let floorY2 = this.lowerclip[x] - 1;
+
+
+          // let imageData = new ImageData(1, cy2 - cy1 + 1);
+          // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+          let imageData
+          if (floorY1 < floorY2) {
+            imageData = new ImageData(1, floorY2 - floorY1 + 1);
+            const accumulatedImageData = imageData.data;
+
+            let playerDirectionX = Math.cos(
+              degreesToRadians(gameEngine.player.direction)
+            );
+            let playerDirectionY = Math.sin(
+              degreesToRadians(gameEngine.player.direction)
+            );
+            for (let i = floorY1; i <= floorY2; i++) {
+              let z = (HALFWIDTH * worldFrontZ2) / (HALFHEIGHT - i);
+              let px = playerDirectionX * z + gameEngine.player.x;
+              let py = playerDirectionY * z + gameEngine.player.y;
+
+              let leftX = -playerDirectionY * z + px;
+              let leftY = playerDirectionX * z + py;
+              let rightX = playerDirectionY * z + px;
+              let rightY = -playerDirectionX * z + py;
+
+              let dx = (rightX - leftX) / this.canvas.canvasWidth;
+              let dy = (rightY - leftY) / this.canvas.canvasWidth;
+              let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+              let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+              // tx = (tx + textureWidth) % textureWidth;
+              // ty = (ty + textureHeight) % textureHeight;
+
+              const texPos = (ty * textureWidth + tx) * 4;
+
+
+              // Apply light level adjustment using the adjustColorComponent function
+              accumulatedImageData[(i - floorY1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+              accumulatedImageData[(i - floorY1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+              accumulatedImageData[(i - floorY1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+              accumulatedImageData[(i - floorY1) * 4 + 3] = 255; // Alpha channel
+            }
+
+            gameEngine.canvas.offScreenCtx.putImageData(imageData, x, floorY1);
+          }
           // let floorColor = this.colorGenerator.getColor(
           //   floorTexture,
           //   lightLevel
           // );
-          let floorY1 = Math.max(drawWallY2, this.upperclip[x]);
-          let floorY2 = this.lowerclip[x];
+          // let floorY1 = Math.max(drawWallY2, this.upperclip[x]);
+          // let floorY2 = this.lowerclip[x];
 
-          if (floorY1 < floorY2) {
-            // let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
-            // gameEngine.canvas.drawFlatToScreen(
-            //   offscreenCtx,
-            //   floorTexture,
-            //   x,
-            //   floorY1,
-            //   floorY2,
-            //   lightLevel,
-            //   worldFrontZ1
-            // );
-            // this.drawLine(floorColor, x, floorY1, floorY2);
-          }
+          // if (floorY1 < floorY2) {
+          // let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
+          // gameEngine.canvas.drawFlatToScreen(
+          //   offscreenCtx,
+          //   floorTexture,
+          //   x,
+          //   floorY1,
+          //   floorY2,
+          //   lightLevel,
+          //   worldFrontZ1
+          // );
+          // this.drawLine(floorColor, x, floorY1, floorY2);
+          //  }
         }
         let drawLowerWallY1 = Math.trunc(portalY2 - 1);
         let drawLowerWallY2 = Math.trunc(wallY2);
@@ -724,22 +1117,83 @@ class WallRenderer {
       }
       if (drawFloor) {
         // let floorColor = this.colorGenerator.getColor(floorTexture, lightLevel);
-        let floorY1 = Math.max(drawWallY2, this.upperclip[x]);
-        let floorY2 = this.lowerclip[x];
 
-        if (floorY1 < floorY2) {
-          // let { offscreenCtx, flat } = this.cacheFlat(floorTexture);
-          // gameEngine.canvas.drawFlatToScreen(
-          //   offscreenCtx,
-          //   floorTexture,
-          //   x,
-          //   floorY1,
-          //   floorY2,
-          //   lightLevel,
-          //   worldFrontZ1
-          // );
-          //this.drawLine(floorColor, x, floorY1, floorY2);
+
+        const textureWidth = 64; // Ensure this matches your actual texture size.
+        const textureHeight = 64; // Assuming square texture for simplicity.
+        function adjustColorComponent(color, lightLevel) {
+          return Math.min(255, Math.floor(color * lightLevel));
         }
+
+
+        // let c = this.textureManager.texturePool.get(ceilingTexture);
+        const textureLump = gameEngine.lumpData.find(lump => lump.name === floorTexture);
+
+        const dataView = new DataView(textureLump.data);
+        let textureImageObj = new ImageData(64, 64);
+
+        for (let i = 0; i < 4096; i++) {
+          const index = dataView.getUint8(i);
+          const pixelColor = this.textureManager.palette[index];
+
+          const pixelIdx = i * 4;
+          textureImageObj.data[pixelIdx] = pixelColor.red;
+          textureImageObj.data[pixelIdx + 1] = pixelColor.green;
+          textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
+          textureImageObj.data[pixelIdx + 3] = 255;
+        }
+        // // let textureImageData = textureImageObj.data;
+        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+        // let textureWidth = c.textureWidth;
+        // let textureHeight = c.textureHeight;
+        // let textureData = c.textureImageData;
+        let floorY1 = Math.max(drawWallY2 + 1, this.upperclip[x] + 1);
+        let floorY2 = this.lowerclip[x] - 1;
+
+
+        // let imageData = new ImageData(1, cy2 - cy1 + 1);
+        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+        let imageData
+        if (floorY1 < floorY2) {
+          imageData = new ImageData(1, floorY2 - floorY1 + 1);
+          const accumulatedImageData = imageData.data;
+
+          let playerDirectionX = Math.cos(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          let playerDirectionY = Math.sin(
+            degreesToRadians(gameEngine.player.direction)
+          );
+          for (let i = floorY1; i <= floorY2; i++) {
+            let z = (HALFWIDTH * worldFrontZ2) / (HALFHEIGHT - i);
+            let px = playerDirectionX * z + gameEngine.player.x;
+            let py = playerDirectionY * z + gameEngine.player.y;
+
+            let leftX = -playerDirectionY * z + px;
+            let leftY = playerDirectionX * z + py;
+            let rightX = playerDirectionY * z + px;
+            let rightY = -playerDirectionX * z + py;
+
+            let dx = (rightX - leftX) / this.canvas.canvasWidth;
+            let dy = (rightY - leftY) / this.canvas.canvasWidth;
+            let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
+            let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+            // tx = (tx + textureWidth) % textureWidth;
+            // ty = (ty + textureHeight) % textureHeight;
+
+            const texPos = (ty * textureWidth + tx) * 4;
+
+
+            // Apply light level adjustment using the adjustColorComponent function
+            accumulatedImageData[(i - floorY1) * 4] = adjustColorComponent(textureImageObj.data[texPos], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 1] = adjustColorComponent(textureImageObj.data[texPos + 1], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 2] = adjustColorComponent(textureImageObj.data[texPos + 2], lightLevel);
+            accumulatedImageData[(i - floorY1) * 4 + 3] = 255; // Alpha channel
+          }
+
+          gameEngine.canvas.offScreenCtx.putImageData(imageData, x, floorY1);
+        }
+
 
         if (this.lowerclip[x] > drawWallY2) {
           this.lowerclip[x] = floorY1;
