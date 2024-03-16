@@ -52,13 +52,13 @@ class WallRenderer {
     }
 
     // // doors
-    // if (
-    //   seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
-    //   seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
-    // ) {
-    //   this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
-    //   return;
-    // }
+    if (
+      seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
+      seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
+    ) {
+      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+      return;
+    }
 
     // // portal because there are height differences
     if (
@@ -69,16 +69,16 @@ class WallRenderer {
       return;
     }
 
-    // if (
-    //   seg.rightSector.ceilingTexture === seg.leftSector.ceilingTexture &&
-    //   seg.leftSector.floorTexture === seg.rightSector.floorTexture &&
-    //   seg.leftSector.lightLevel === seg.rightSector.lightLevel &&
-    //   seg.linedef.rightSidedef.middleTexture === "-"
-    // ) {
-    //   return;
-    // }
+    if (
+      seg.rightSector.ceilingTexture === seg.leftSector.ceilingTexture &&
+      seg.leftSector.floorTexture === seg.rightSector.floorTexture &&
+      seg.leftSector.lightLevel === seg.rightSector.lightLevel &&
+      seg.linedef.rightSidedef.middleTexture === "-"
+    ) {
+      return;
+    }
 
-    // this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+    this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
 
 
   }
@@ -224,10 +224,10 @@ class WallRenderer {
 
 
   drawSolidWall(seg, xScreenV1, xScreenV2) {
-    // if (seg.leftSector !== null) {
-    //   this.drawWall(seg, xScreenV1, xScreenV2, true);
-    //   return;
-    // }
+    if (seg.leftSector !== null) {
+      this.drawWall(seg, xScreenV1, xScreenV2, true);
+      return;
+    }
 
 
     let {
@@ -303,14 +303,14 @@ class WallRenderer {
 
       if (drawCeiling) {
 
-        const textureWidth = 64; // Ensure this matches your actual texture size.
-        const textureHeight = 64; // Assuming square texture for simplicity.
+        const textureWidth = 64;
+        const textureHeight = 64;
         function adjustColorComponent(color, lightLevel) {
           return Math.min(255, Math.floor(color * lightLevel));
         }
 
 
-        // let c = this.textureManager.texturePool.get(ceilingTexture);
+
         const textureLump = gameEngine.lumpData.find(lump => lump.name === ceilingTexture);
 
         const dataView = new DataView(textureLump.data);
@@ -326,17 +326,12 @@ class WallRenderer {
           textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
           textureImageObj.data[pixelIdx + 3] = 255;
         }
-        // // let textureImageData = textureImageObj.data;
-        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
-        // let textureWidth = c.textureWidth;
-        // let textureHeight = c.textureHeight;
-        // let textureData = c.textureImageData;
+
         let cy1 = this.upperclip[x] + 1;
         let cy2 = Math.min(drawWallY1, this.lowerclip[x]);
 
 
-        // let imageData = new ImageData(1, cy2 - cy1 + 1);
-        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+
         let imageData
         if (cy1 < cy2 && ceilingTexture !== "F_SKY1") {
           imageData = new ImageData(1, cy2 - cy1 + 1);
@@ -362,8 +357,7 @@ class WallRenderer {
             let dy = (rightY - leftY) / this.canvas.canvasWidth;
             let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
             let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
-            // tx = (tx + textureWidth) % textureWidth;
-            // ty = (ty + textureHeight) % textureHeight;
+
 
             const texPos = (ty * textureWidth + tx) * 4;
 
@@ -413,14 +407,14 @@ class WallRenderer {
       }
 
       if (drawFloor) {
-        const textureWidth = 64; // Ensure this matches your actual texture size.
-        const textureHeight = 64; // Assuming square texture for simplicity.
+        const textureWidth = 64;
+        const textureHeight = 64;
         function adjustColorComponent(color, lightLevel) {
           return Math.min(255, Math.floor(color * lightLevel));
         }
 
 
-        // let c = this.textureManager.texturePool.get(ceilingTexture);
+
         const textureLump = gameEngine.lumpData.find(lump => lump.name === floorTexture);
 
         const dataView = new DataView(textureLump.data);
@@ -436,17 +430,12 @@ class WallRenderer {
           textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
           textureImageObj.data[pixelIdx + 3] = 255;
         }
-        // // let textureImageData = textureImageObj.data;
-        // let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
-        // let textureWidth = c.textureWidth;
-        // let textureHeight = c.textureHeight;
-        // let textureData = c.textureImageData;
+
         let floorY1 = Math.max(drawWallY2 + 1, this.upperclip[x] + 1);
         let floorY2 = this.lowerclip[x] - 1;
 
 
-        // let imageData = new ImageData(1, cy2 - cy1 + 1);
-        // const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+
         let imageData
         if (floorY1 < floorY2) {
           imageData = new ImageData(1, floorY2 - floorY1 + 1);
@@ -472,8 +461,7 @@ class WallRenderer {
             let dy = (rightY - leftY) / this.canvas.canvasWidth;
             let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
             let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
-            // tx = (tx + textureWidth) % textureWidth;
-            // ty = (ty + textureHeight) % textureHeight;
+
 
             const texPos = (ty * textureWidth + tx) * 4;
 
