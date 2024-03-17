@@ -303,8 +303,8 @@ class WallRenderer {
     let textureImageObj = this.flatManager.flatPool.get(ceilingTexture);
     let textureImageObjFloor = this.flatManager.flatPool.get(floorTexture);
     for (let x = xScreenV1; x <= xScreenV2; x++) {
-      let drawWallY1 = Math.trunc(wallY1) - 1;
-      let drawWallY2 = Math.trunc(wallY2);
+      let drawWallY1 = Math.floor(wallY1) - 1;
+      let drawWallY2 = Math.floor(wallY2);
 
       if (drawCeiling) {
 
@@ -417,8 +417,8 @@ class WallRenderer {
 
           //   let dx = (rightX - leftX) / this.canvas.canvasWidth;
           //   let dy = (rightY - leftY) / this.canvas.canvasWidth;
-          //   let tx = Math.trunc(leftX + dx * x) & (textureWidth - 1);
-          //   let ty = Math.trunc(leftY + dy * x) & (textureHeight - 1);
+          //   let tx = Math.floor(leftX + dx * x) & (textureWidth - 1);
+          //   let ty = Math.floor(leftY + dy * x) & (textureHeight - 1);
 
 
           //   const texPos = (ty * textureWidth + tx) * 4;
@@ -482,8 +482,8 @@ class WallRenderer {
 
       let dx = (rightX - leftX) / this.canvas.canvasWidth;
       let dy = (rightY - leftY) / this.canvas.canvasWidth;
-      let tx = Math.trunc(leftX + dx * x) & (textureWidthFlat - 1);
-      let ty = Math.trunc(leftY + dy * x) & (textureHeightFlat - 1);
+      let tx = Math.floor(leftX + dx * x) & (textureWidthFlat - 1);
+      let ty = Math.floor(leftY + dy * x) & (textureHeightFlat - 1);
 
 
       const texPos = (ty * textureWidthFlat + tx) * 4;
@@ -510,12 +510,12 @@ class WallRenderer {
       let imageData = new ImageData(1, wallY2 - wallY1 + 1);
       const accumulatedImageData = new Uint32Array(imageData.data.buffer);
       let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
-      textureColumn = Math.trunc(textureColumn) & (textureWidth - 1);
+      textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
 
       for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
         let texY = isPowerOfTwo(textureHeight)
-          ? Math.trunc(textureY) & (textureHeight - 1)
-          : Math.trunc(textureY) % textureHeight;
+          ? Math.floor(textureY) & (textureHeight - 1)
+          : Math.floor(textureY) % textureHeight;
 
         const texPos = texY * textureWidth + textureColumn;
         let pixelValue = textureData[texPos];
@@ -790,8 +790,8 @@ class WallRenderer {
     const textureHeightFlat = 64;
 
     for (let x = xScreenV1; x <= xScreenV2; x++) {
-      let drawWallY1 = Math.trunc(wallY1) - 1;
-      let drawWallY2 = Math.trunc(wallY2);
+      let drawWallY1 = Math.floor(wallY1) + 1;
+      let drawWallY2 = Math.floor(wallY2);
 
       let { textureColumn, inverseScale } = this.calculateTextureColAndScale(
         segTextured,
@@ -803,8 +803,8 @@ class WallRenderer {
       );
 
       if (drawUpperWall) {
-        let drawUpperWallY1 = Math.trunc(wallY1 - 1);
-        let drawUpperWallY2 = Math.trunc(portalY1);
+        let drawUpperWallY1 = Math.floor(wallY1 - 1);
+        let drawUpperWallY2 = Math.floor(portalY1);
         if (drawCeiling) {
 
           let cy1 = this.upperclip[x] + 1;
@@ -855,8 +855,8 @@ class WallRenderer {
             this.drawFlat(floorY2, floorY1, worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
           }
         }
-        let drawLowerWallY1 = Math.trunc(portalY2) - 1;
-        let drawLowerWallY2 = Math.trunc(wallY2);
+        let drawLowerWallY1 = Math.floor(portalY2) - 1;
+        let drawLowerWallY2 = Math.floor(wallY2);
 
         let lowerWallY1 = Math.max(drawLowerWallY1, this.upperclip[x] + 1);
         let lowerWallY2 = Math.min(drawLowerWallY2, this.lowerclip[x] - 1);
@@ -968,7 +968,7 @@ class WallRenderer {
 
     if (drawUpperWall) {
       if (worldBackZ1 > worldFrontZ2) {
-        portalY1 = Math.trunc(HALFHEIGHT - worldBackZ1 * realWallScale1);
+        portalY1 = Math.floor(HALFHEIGHT - worldBackZ1 * realWallScale1);
         portalY1Step = -realWallScaleStep * worldBackZ1;
       } else {
         portalY1 = wallY2;
