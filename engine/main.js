@@ -82,9 +82,10 @@ document
     };
 
     const textureManager = new TextureManager(texture.maptextures, palette.palettes[0]);
+    const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
 
-    const levelManager = new LevelManager(levels, dataObjects, textureManager);
+    const levelManager = new LevelManager(levels, dataObjects, textureManager, flatManager);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 
