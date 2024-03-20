@@ -1,5 +1,5 @@
 class LevelManager {
-  constructor(levels, data) {
+  constructor(levels, data, textureManager, flatManager) {
     const colorGenerator = new ColorGenerator(data.sidedefObjects);
 
     const wallRendererDependencies = {
@@ -9,7 +9,7 @@ class LevelManager {
 
     this.wallRenderer = new WallRenderer(
       colorGenerator,
-      wallRendererDependencies
+      wallRendererDependencies, textureManager, flatManager
     );
 
     this.solidSegsManager = wallRendererDependencies.solidSegsManager;
@@ -37,16 +37,25 @@ class LevelManager {
   }
 
   draw() {
+
+
     this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
       this.wallRenderer.solidsegs
     );
     this.wallRenderer.initClipHeights();
 
-    //  gameEngine.canvas.clearCanvas();
+    // gameEngine.canvas.clearCanvas();
     // this.wallRenderer.drawTexture();
     // this.wallRenderer.drawFlat();
 
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
+    gameEngine.canvas.offScreenCtx.font = '50px Arial';
+    gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
+    gameEngine.canvas.offScreenCtx.fillText(`FPS ${gameEngine.logic.ticks.length}`, 400, 50);
+
+
+    // gameEngine.canvas.offScreenCtx.fillRect(100, 100, 200, 200);
+    //gameEngine.canvas.updateCanvas();
     traverseBSP = true;
     // console.log(traverseCount);
     traverseCount = 0;

@@ -68,7 +68,11 @@ class GameEngine {
 
     this.levelManager.draw();
 
-    //  this.canvas.updateCanvas();
+
+
+
+
+    this.canvas.updateCanvas();
   }
 
   update() {

@@ -27,8 +27,7 @@ document
     const levels = levelParser.parse(selectedValue);
 
     gameEngine.lumpData = lumpData;
-    // const flats = new Flats();
-    // gameEngine.flat = flats;
+
 
     const palette = new ReadPalette(lumpData);
 
@@ -56,6 +55,8 @@ document
     gameEngine.addEntity(player);
     gameEngine.player = player;
 
+
+
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
 
@@ -80,7 +81,11 @@ document
       segObjects,
     };
 
-    const levelManager = new LevelManager(levels, dataObjects);
+    const textureManager = new TextureManager(texture.maptextures, palette.palettes[0]);
+    const flatManager = new FlatManager(lumpData, palette.palettes[0]);
+
+
+    const levelManager = new LevelManager(levels, dataObjects, textureManager, flatManager);
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 
