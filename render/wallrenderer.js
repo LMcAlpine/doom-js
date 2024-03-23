@@ -611,8 +611,8 @@ class WallRenderer {
       let anglea = new Angle(RIGHT_ANGLE_DEGREES + (visangle - viewangle));
       let angleb = new Angle(RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle));
 
-      let sinea = Math.sin(anglea.angle);
-      let sineb = Math.sin(angleb.angle);
+      let sinea = Math.sin(degreesToRadians(anglea.angle));
+      let sineb = Math.sin(degreesToRadians(angleb.angle));
 
       let p = screenwidth / 2.0;
       let num = p * sineb;
@@ -674,24 +674,27 @@ class WallRenderer {
 
 
 
-    let realWallNormalAngle = seg.angle + RIGHT_ANGLE_DEGREES;
-    let offsetAngle = realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
+    let realWallNormalAngle = new Angle(seg.angle + RIGHT_ANGLE_DEGREES).angle;
+    let offsetAngle = new Angle(realWallNormalAngle - gameEngine.player.realWallAngle1.angle).angle;
 
-    //  let distangle = new Angle(RIGHT_ANGLE_DEGREES - offsetAngle);
+    let distangle = new Angle(RIGHT_ANGLE_DEGREES - offsetAngle);
     let hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
 
-    let realWallDistance = hypotenuse * Math.cos(degreesToRadians(offsetAngle));
+    //let realWallDistance = hypotenuse * Math.cos(degreesToRadians(offsetAngle));
+    let realWallDistance = hypotenuse * Math.sin(degreesToRadians(distangle.angle));
 
+    let t = screenToXView(xScreenV1, 640);
 
+    let visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(t)).angle;
 
-    //let visangle = gameEngine.player.direction + screenToXView(xScreenV1, 640);
+    // let realWallScale1 = this.geometry.scaleFromGlobalAngle(
+    //   xScreenV1,
+    //   realWallNormalAngle,
+    //   realWallDistance);
 
-    let realWallScale1 = this.geometry.scaleFromGlobalAngle(
-      xScreenV1,
-      realWallNormalAngle,
-      realWallDistance);
+    let realWallScale1 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
 
-    // visangle = gameEngine.player.direction + screenToXView(xScreenV2, 640);
+    visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(screenToXView(xScreenV2, 640))).angle;
 
     let rwx = xScreenV1;
     let rwStopX = xScreenV2 + 1;
@@ -699,7 +702,8 @@ class WallRenderer {
     let rwScaleStep;
     let scale2;
     if (xScreenV2 > xScreenV1) {
-      scale2 = this.geometry.scaleFromGlobalAngle(xScreenV2, realWallNormalAngle, realWallDistance);
+      // scale2 = this.geometry.scaleFromGlobalAngle(xScreenV2, realWallNormalAngle, realWallDistance);
+      scale2 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
       rwScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
 
 
@@ -868,13 +872,14 @@ class WallRenderer {
     let realWallOffset
 
     if (segTextured) {
-      //  offsetAngle = realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
+      offsetAngle = new Angle(realWallNormalAngle - gameEngine.player.realWallAngle1.angle).angle;
 
 
       realWallOffset = hypotenuse * Math.sin(degreesToRadians(offsetAngle));
-      //  this.realWallOffset = 360 - this.realWallOffset;
+      // this line below fixed the door being misaligned in e1m2? but I did make a lot of changes besides this
+      realWallOffset = -realWallOffset;
       realWallOffset += seg.offset + side.xOffset
-      realWallCenterAngle = realWallNormalAngle - gameEngine.player.direction;
+      realWallCenterAngle = new Angle(gameEngine.player.direction.angle - realWallNormalAngle).angle;
 
 
 
@@ -926,8 +931,9 @@ class WallRenderer {
   }
   renderSegLoop(seg, xScreenV1, xScreenV2, viewHeight, wallTexture, wallY1, wallY1Step, wallY2, wallY2Step, realWallDistance, segTextured, midtexture, middleTextureAlt, lightLevel, rwScaleStep, realWallCenterAngle, realWallOffset, realWallScale1, upperWallTexture, lowerWallTexture, pixhigh, pixhighstep, pixlow, pixlowstep, toptexture, bottomtexture, upperTextureAlt, lowerTextureAlt) {
     function playerDistToScreen(screenWidth) {
-      return screenWidth / 2.0 / Math.tan(degreesToRadians(45.0));
+      return screenWidth / 2.0 / Math.tan(degreesToRadians(45));
     }
+
     function screenToXView(x, screenWidth) {
       return Math.atan((screenWidth / 2.0 - x) / playerDistToScreen(screenWidth));
     }
@@ -1007,9 +1013,9 @@ class WallRenderer {
       let textureColumn;
       let inverseScale;
       if (segTextured) {
-        // angle = this.realWallCenterAngle + screenToXView(x, 640);
-        // textureColumn = (this.realWallOffset - Math.tan(degreesToRadians(angle)) * Math.abs(realWallDistance));
-        // inverseScale = 1.0 / this.rwScale;
+        angle = realWallCenterAngle + radiansToDegrees(screenToXView(x, 640));
+        textureColumn = (realWallOffset - Math.tan(degreesToRadians(angle)) * realWallDistance);
+        inverseScale = 1.0 / realWallScale1;
         // angle = this.realWallCenterAngle - getXToAngle(x);
         // textureColumn =
         //   realWallDistance * Math.tan(degreesToRadians(angle)) - this.realWallOffset;
@@ -1020,10 +1026,10 @@ class WallRenderer {
         // let textureColumn;
         // let inverseScale;
 
-        angle = realWallCenterAngle - getXToAngle(x);
-        textureColumn =
-          realWallDistance * Math.tan(degreesToRadians(angle)) - realWallOffset;
-        inverseScale = 1 / realWallScale1;
+        // angle = realWallCenterAngle - getXToAngle(x);
+        // textureColumn =
+        //   realWallDistance * Math.tan(degreesToRadians(angle)) - realWallOffset;
+        // inverseScale = 1 / realWallScale1;
 
       }
 

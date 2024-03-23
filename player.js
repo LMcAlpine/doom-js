@@ -22,8 +22,8 @@ class Player {
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    this.direction = location.direction;
-   // this.direction = -87;
+    this.direction = new Angle(location.direction);
+    // this.direction = -87;
 
     this.fov = fov;
 
@@ -52,8 +52,8 @@ class Player {
 
     this.realWallAngle1 = Object.assign({}, angleToV1);
 
-    angleToV1 = Angle.subtract(angleToV1.angle, this.direction);
-    angleToV2 = Angle.subtract(angleToV2.angle, this.direction);
+    angleToV1 = Angle.subtract(angleToV1.angle, this.direction.angle);
+    angleToV2 = Angle.subtract(angleToV2.angle, this.direction.angle);
 
     const halfFOV = new Angle(45);
     const v1Moved = angleToV1.add(halfFOV.angle);
@@ -95,34 +95,34 @@ class Player {
   update() {
     console.log("x: " + this.x);
     console.log("y ;" + this.y);
-    console.log("angle: " + this.direction);
+    console.log("angle: " + this.direction.angle);
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 
     const speed = 0.3 * gameEngine.clockTick;
     const rot = 0.12 * gameEngine.clockTick;
 
-    const radians = (this.direction * Math.PI) / 180;
+    const radians = (this.direction.angle * Math.PI) / 180;
     const dx = Math.sin(radians);
     const dy = Math.cos(radians);
 
     if (gameEngine.keys["w"] === true) {
       this.x +=
-        Math.cos((this.direction * Math.PI) / 180) *
+        Math.cos((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
       this.y +=
-        Math.sin((this.direction * Math.PI) / 180) *
+        Math.sin((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
     }
     if (gameEngine.keys["s"] === true) {
       this.x -=
-        Math.cos((this.direction * Math.PI) / 180) *
+        Math.cos((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
       this.y -=
-        Math.sin((this.direction * Math.PI) / 180) *
+        Math.sin((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
     }
@@ -136,10 +136,12 @@ class Player {
     }
 
     if (gameEngine.keys["ArrowLeft"] === true) {
-      this.direction += magRotation * gameEngine.clockTick;
+      // this.direction += magRotation * gameEngine.clockTick;
+      this.direction = this.direction.add(magRotation * gameEngine.clockTick);
     }
     if (gameEngine.keys["ArrowRight"] === true) {
-      this.direction -= magRotation * gameEngine.clockTick;
+      //this.direction -= magRotation * gameEngine.clockTick;
+      this.direction = this.direction.subtract(magRotation * gameEngine.clockTick);
     }
 
     this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
