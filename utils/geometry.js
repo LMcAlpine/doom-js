@@ -16,9 +16,19 @@ class Geometry {
   }
 
   distanceToPoint(vertex) {
+
+    let dx = Math.abs(gameEngine.player.x - vertex.x);
+    let dy = Math.abs(gameEngine.player.y - vertex.y);
+
+    // if (dy > dx) {
+    //   let temp = dx;
+    //   dx = dy;
+    //   dy = temp;
+    // }
+
     return Math.sqrt(
-      (gameEngine.player.x - vertex.x) ** 2 +
-        (gameEngine.player.y - vertex.y) ** 2
+      (dx) ** 2 +
+      (dy) ** 2
     );
   }
 
