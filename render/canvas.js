@@ -27,7 +27,7 @@ class Canvas {
     this.offScreenWidth = 640;
     this.offScreenHeight = 400;
     this.offScreenCtx = this.offScreenCanvas.getContext("2d");
-    this.offScreenCtx = this.ctx;
+    //  this.offScreenCtx = this.ctx;
 
     // this.offScreenBuffer = this.offscreenCtx.getImageData(0, 0, this.offscreenWidth, this.offScreenHeight);
 
@@ -37,43 +37,6 @@ class Canvas {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.offScreenCtx.clearRect(0, 0, this.offScreenWidth, this.offScreenHeight);
 
-  }
-
-  drawWallCol(
-    offscreenCtx,
-    entireTextureData,
-    textureColumn,
-    x,
-    y1,
-    y2,
-    textureAlt,
-    invScale,
-    lightLevel, textureWidth, textureHeight, wallWidth, largeImageData, startX
-  ) {
-    if (y1 < y2) {
-
-
-      textureColumn = Math.trunc(textureColumn) % textureWidth;
-
-
-
-      let textureY = textureAlt + (y1 - HALFHEIGHT) * invScale;
-
-      for (let i = 0; i < y2; i++) {
-
-        const texY = Math.trunc(textureY) % textureHeight;
-        const texPos = (texY * textureWidth + textureColumn) * 4;
-
-        let index = (i * wallWidth + (x - startX)) * 4;
-        largeImageData.data[index] = entireTextureData[texPos] * lightLevel;
-        largeImageData.data[index + 1] = entireTextureData[texPos + 1] * lightLevel;
-        largeImageData.data[index + 2] = entireTextureData[texPos + 2] * lightLevel;
-        largeImageData.data[index + 3] = 255;
-
-        textureY += invScale;
-      }
-
-    }
   }
 
 

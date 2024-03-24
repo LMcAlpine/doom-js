@@ -93,9 +93,9 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
-    console.log("x: " + this.x);
-    console.log("y ;" + this.y);
-    console.log("angle: " + this.direction.angle);
+    // console.log("x: " + this.x);
+    // console.log("y ;" + this.y);
+    // console.log("angle: " + this.direction.angle);
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 
