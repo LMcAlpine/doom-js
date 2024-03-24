@@ -38,6 +38,7 @@ class LevelManager {
 
   draw() {
 
+    gameEngine.visplaneRenderer.clearPlanes(gameEngine.player.direction.angle);
 
     this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
       this.wallRenderer.solidsegs
@@ -52,6 +53,8 @@ class LevelManager {
     gameEngine.canvas.offScreenCtx.font = '50px Arial';
     gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
     gameEngine.canvas.offScreenCtx.fillText(`FPS ${gameEngine.logic.ticks.length}`, 400, 50);
+
+    gameEngine.visplaneRenderer.drawPlanes();
 
 
     // gameEngine.canvas.offScreenCtx.fillRect(100, 100, 200, 200);

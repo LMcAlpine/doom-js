@@ -124,20 +124,36 @@ function getRandomInt(min, max, seed) {
   return Math.floor(seededRandom(seed) * (max - min + 1)) + min;
 }
 
+// function angleToX(angle) {
+//   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
+//   let x = 0;
+//   if (angle > 90) {
+//     angle = new Angle(angle - 90);
+
+//     x =
+//       SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+//   } else {
+//     angle = Angle.subtract(90, angle);
+//     x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+//     x += SCREENDISTANCE;
+//   }
+//   return Math.floor(x);
+// }
 function angleToX(angle) {
   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
-  let x = 0;
-  if (angle > 90) {
-    angle = new Angle(angle - 90);
+  angle = new Angle(angle - 90);
+  return Math.floor(SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+  // if (angle > 90) {
+  //   angle = new Angle(angle - 90);
 
-    x =
-      SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-  } else {
-    angle = Angle.subtract(90, angle);
-    x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-    x += SCREENDISTANCE;
-  }
-  return Math.floor(x);
+  //   x =
+  //     SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+  // } else {
+  //   angle = Angle.subtract(90, angle);
+  //   x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
+  //   x += SCREENDISTANCE;
+  // }
+  //return Math.floor(x);
 }
 
 function getXToAngle(x) {
