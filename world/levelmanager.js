@@ -38,6 +38,7 @@ class LevelManager {
 
   draw() {
 
+    gameEngine.visplaneRenderer.clearPlanes(gameEngine.player.direction.angle);
 
     this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
       this.wallRenderer.solidsegs

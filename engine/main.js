@@ -44,6 +44,10 @@ document
 
     const canvas = new Canvas("myCanvas");
 
+    let visplaneRenderer = new VisplaneRenderer();
+
+    gameEngine.visplaneRenderer = visplaneRenderer;
+
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },

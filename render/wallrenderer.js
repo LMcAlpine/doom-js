@@ -860,6 +860,8 @@ class WallRenderer {
       upperTextureAlt += side.yOffset;
       lowerTextureAlt += side.yOffset;
 
+      gameEngine.visplaneRenderer.lastopening += rwStopX - rwx;
+
     }
 
 
@@ -905,6 +907,8 @@ class WallRenderer {
     let wallY2 = HALFHEIGHT - worldFrontZ2 * realWallScale1;
     const wallY2Step = -rwScaleStep * worldFrontZ2;
 
+    const lightLevel = rightSector.lightLevel;
+
     let pixhigh = 0;
     let pixhighstep = 0;
 
@@ -921,7 +925,14 @@ class WallRenderer {
       }
     }
 
-    const lightLevel = rightSector.lightLevel;
+    if (this.markceiling) {
+      gameEngine.visplaneRenderer.ceilingplane = gameEngine.visplaneRenderer.checkPlane(rwx, rwStopX, gameEngine.visplaneRenderer.ceilingplane);
+    }
+    if (this.markfloor) {
+      gameEngine.visplaneRenderer.floorplane = gameEngine.visplaneRenderer.checkPlane(rwx, rwStopX, gameEngine.visplaneRenderer.floorplane);
+    }
+
+
 
     // if (seg.linedef.rightSidedef.middleTexture === "-") {
     //   return;
@@ -990,7 +1001,9 @@ class WallRenderer {
           bottom = this.lowerclip[x] - 1;
         }
         if (top < bottom) {
-
+          let ceil = gameEngine.visplaneRenderer.ceilingplane;
+          gameEngine.visplaneRenderer.visplanes[ceil].top[x] = Math.floor(top);
+          gameEngine.visplaneRenderer.visplanes[ceil].bottom[x] = Math.floor(bottom);
         }
       }
 
@@ -1005,8 +1018,13 @@ class WallRenderer {
         if (top <= this.upperclip[x]) {
           top = this.upperclip[x] + 1;
         }
-        if (top <= bottom) { }
+        if (top <= bottom) {
+          let floor = gameEngine.visplaneRenderer.floorplane;
+          gameEngine.visplaneRenderer.visplanes[floor].top[x] = Math.floor(top);
+          gameEngine.visplaneRenderer.visplanes[floor].bottom[x] = Math.floor(bottom);
+        }
       }
+
 
 
       let angle;
