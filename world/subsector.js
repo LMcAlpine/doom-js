@@ -21,15 +21,6 @@ class Subsector {
    */
   handleSubsector(subsectorID) {
     const subsector = this.subsectors[subsectorID];
-    let sector = this.segs[subsector.firstSegNumber].rightSector;
-
-    if (sector.floorHeight < gameEngine.player.height) {
-      gameEngine.visplaneRenderer.floorplane = gameEngine.visplaneRenderer.findPlane(sector.floorHeight, sector.floorTexture, "F_SKY1", sector.lightLevel);
-    }
-
-    if (sector.ceilingHeight > gameEngine.player.height || sector.ceilingTexture === "F_SKY1") {
-      gameEngine.visplaneRenderer.ceilingplane = gameEngine.visplaneRenderer.findPlane(sector.ceilingHeight, sector.ceilingTexture, "F_SKY_1", sector.lightLevel);
-    }
 
     for (let i = 0; i < subsector.segCount; i++) {
       const seg = this.segs[subsector.firstSegNumber + i];
