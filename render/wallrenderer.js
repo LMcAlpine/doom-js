@@ -619,59 +619,11 @@ class WallRenderer {
       let den = realWallDistance * sinea;
       return num / den;
 
-
-
-
-      // const xAngle = this.xToAngle[x];
-      // const num =
-      //   SCREENDISTANCE *
-      //   Math.cos(
-      //     degreesToRadians(
-      //       realWallNormalAngle - xAngle - gameEngine.player.direction
-      //     )
-      //   );
-      // const den = realWallDistance * Math.cos(degreesToRadians(xAngle));
-
-      // let scale = num / den;
-      // scale = Math.min(MAXSCALE, Math.max(MINSCALE, scale));
-      // return scale;
     }
 
 
-
-
-    // let rightSector = seg.rightSector;
-    // let leftSector = seg.leftSector;
     let line = seg.linedef;
     let side = seg.linedef.rightSidedef;
-
-    // const realWallNormalAngle = seg.angle + RIGHT_ANGLE_DEGREES;
-    // const offsetAngle =
-    //   realWallNormalAngle - gameEngine.player.realWallAngle1.angle;
-
-    // const hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
-    // const realWallDistance =
-    //   hypotenuse * Math.cos(degreesToRadians(offsetAngle));
-
-    // const realWallScale1 = this.geometry.scaleFromGlobalAngle(
-    //   xScreenV1,
-    //   realWallNormalAngle,
-    //   realWallDistance
-    // );
-    // let scale2;
-    // let realWallScaleStep = 0;
-    // if (xScreenV1 < xScreenV2) {
-    //   scale2 = this.geometry.scaleFromGlobalAngle(
-    //     xScreenV2,
-    //     realWallNormalAngle,
-    //     realWallDistance
-    //   );
-    //   realWallScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
-    // } else {
-    //   scale2 = realWallScale1
-    //   realWallScaleStep = 0;
-    // }
-
 
 
     let realWallNormalAngle = new Angle(seg.angle + RIGHT_ANGLE_DEGREES).angle;
@@ -680,17 +632,12 @@ class WallRenderer {
     let distangle = new Angle(RIGHT_ANGLE_DEGREES - offsetAngle);
     let hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
 
-    //let realWallDistance = hypotenuse * Math.cos(degreesToRadians(offsetAngle));
     let realWallDistance = hypotenuse * Math.sin(degreesToRadians(distangle.angle));
 
     let t = screenToXView(xScreenV1, 640);
 
     let visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(t)).angle;
 
-    // let realWallScale1 = this.geometry.scaleFromGlobalAngle(
-    //   xScreenV1,
-    //   realWallNormalAngle,
-    //   realWallDistance);
 
     let realWallScale1 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
 
@@ -702,7 +649,7 @@ class WallRenderer {
     let rwScaleStep;
     let scale2;
     if (xScreenV2 > xScreenV1) {
-      // scale2 = this.geometry.scaleFromGlobalAngle(xScreenV2, realWallNormalAngle, realWallDistance);
+
       scale2 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
       rwScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
 
@@ -713,7 +660,7 @@ class WallRenderer {
       rwScaleStep = 0;
     }
     let rightSector = seg.rightSector;
-    // let leftSector = seg.leftSector;
+
 
     //world top
     let worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
@@ -865,7 +812,7 @@ class WallRenderer {
       upperTextureAlt += side.yOffset;
       lowerTextureAlt += side.yOffset;
 
-      gameEngine.visplaneRenderer.lastopening += rwStopX - rwx;
+
 
     }
 
@@ -888,14 +835,6 @@ class WallRenderer {
       realWallOffset += seg.offset + side.xOffset
       realWallCenterAngle = new Angle(gameEngine.player.direction.angle - realWallNormalAngle).angle;
 
-
-
-
-
-
-      // realWallOffset = hypotenuse * Math.sin(degreesToRadians(offsetAngle));
-      // realWallOffset += seg.offset + side.xOffset;
-      // realWallCenterAngle = realWallNormalAngle - gameEngine.player.direction;
     }
 
     if (rightSector.floorHeight > gameEngine.player.height) {
@@ -944,19 +883,9 @@ class WallRenderer {
 
     }
 
-    if (this.markceiling) {
-      gameEngine.visplaneRenderer.ceilingplane = gameEngine.visplaneRenderer.checkPlane(rwx, rwStopX, gameEngine.visplaneRenderer.ceilingplane);
-    }
-    if (this.markfloor) {
-      gameEngine.visplaneRenderer.floorplane = gameEngine.visplaneRenderer.checkPlane(rwx, rwStopX, gameEngine.visplaneRenderer.floorplane);
-    }
-
     ceilingTexture = rightSector.ceilingTexture;
     floorTexture = rightSector.floorTexture;
 
-    // if (seg.linedef.rightSidedef.middleTexture === "-") {
-    //   return;
-    // }
     this.renderSegLoop(seg, rwx, rwStopX, gameEngine.player.height, seg.linedef.rightSidedef.middleTexture.toUpperCase(), wallY1, wallY1Step, wallY2, wallY2Step, realWallDistance, segTextured, midtexture, middleTextureAlt, lightLevel, rwScaleStep, realWallCenterAngle, realWallOffset, realWallScale1, upperWallTexture, lowerWallTexture, pixhigh, pixhighstep, pixlow, pixlowstep, toptexture, bottomtexture, upperTextureAlt, lowerTextureAlt, ceilingTexture, worldFrontZ1, worldFrontZ2, floorTexture);
 
   }
@@ -1020,15 +949,6 @@ class WallRenderer {
           this.drawFlat(Math.floor(cy2), Math.floor(top), worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel);
         }
 
-
-
-        if (top < bottom) {
-          let ceil = gameEngine.visplaneRenderer.ceilingplane;
-          gameEngine.visplaneRenderer.visplanes[ceil].top[x] = Math.floor(top);
-          gameEngine.visplaneRenderer.visplanes[ceil].bottom[x] = Math.floor(bottom);
-
-
-        }
       }
 
       let yh = Math.floor(wallY2);
@@ -1045,10 +965,6 @@ class WallRenderer {
           top = this.upperclip[x] + 1;
         }
         if (top <= bottom) {
-          let floor = gameEngine.visplaneRenderer.floorplane;
-          gameEngine.visplaneRenderer.visplanes[floor].top[x] = Math.floor(top);
-          gameEngine.visplaneRenderer.visplanes[floor].bottom[x] = Math.floor(bottom);
-
 
           this.drawFlat(Math.floor(bottom), Math.floor(top), worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
 
@@ -1065,44 +981,12 @@ class WallRenderer {
         angle = realWallCenterAngle + radiansToDegrees(screenToXView(x, 640));
         textureColumn = (realWallOffset - Math.tan(degreesToRadians(angle)) * realWallDistance);
         inverseScale = 1.0 / realWallScale1;
-        // angle = this.realWallCenterAngle - getXToAngle(x);
-        // textureColumn =
-        //   realWallDistance * Math.tan(degreesToRadians(angle)) - this.realWallOffset;
-        // inverseScale = 1 / this.rwScale;
-
-
-        // let angle;
-        // let textureColumn;
-        // let inverseScale;
-
-        // angle = realWallCenterAngle - getXToAngle(x);
-        // textureColumn =
-        //   realWallDistance * Math.tan(degreesToRadians(angle)) - realWallOffset;
-        // inverseScale = 1 / realWallScale1;
 
       }
 
-
-
       if (midtexture) {
 
-
-        // const wallY1 = Math.max(drawWallY1, this.upperclip[x]);
-        // const wallY2 = Math.min(drawWallY2, this.lowerclip[x]);
-
-        // const wallY1 = Math.max(drawWallY1, this.upperclip[x] + 1);
-        // const wallY2 = Math.min(drawWallY2, this.lowerclip[x] - 1);
         if (yl < yh) {
-
-          // let { textureColumn, inverseScale } =
-          //   this.calculateTextureColAndScale(
-          //     true,
-          //     realWallCenterAngle,
-          //     x,
-          //     realWallDistance,
-          //     realWallOffset,
-          //     realWallScale1
-          //   );
 
           let wallY1 = yl;
           let wallY2 = yh;
@@ -1117,19 +1001,7 @@ class WallRenderer {
             startX: xScreenV1 // Store the starting X to calculate relative position
           });
 
-          // this.upperclip[x] = gameEngine.player.height;
-          //  this.lowerclip[x] = -1;
 
-          // columnsData.push({
-          //   textureColumn,
-          //   x,
-          //   wallY1,
-          //   wallY2,
-          //   textureAlt: middleTextureAlt,
-          //   inverseScale,
-          //   lightLevel,
-          //   startX: xScreenV1 // Store the starting X to calculate relative position
-          // });
         }
       }
       else {
@@ -1143,24 +1015,8 @@ class WallRenderer {
 
           if (mid > yl) {
 
-
-
-
-            // yh for wally2 and not mid.... but why?
-            // if (this.drawUpperWall) {
             upperColumns.push({ textureColumn, x, wallY1: yl, wallY2: Math.floor(mid), textureAlt: upperTextureAlt, inverseScale, lightLevel, startX: xScreenV1 })
-            // gameEngine.canvas.offScreenCtx.strokeStyle = "red";
-            // gameEngine.canvas.offScreenCtx.beginPath();
-            // gameEngine.canvas.offScreenCtx.moveTo(x, yl);
-            // gameEngine.canvas.offScreenCtx.lineTo(x, Math.floor(mid));
-            // gameEngine.canvas.offScreenCtx.stroke();
-            // }
 
-
-
-
-
-            /// store column data for upper wall
 
             this.upperclip[x] = Math.floor(mid);
           }
@@ -1169,10 +1025,6 @@ class WallRenderer {
           }
 
 
-          // if (this.upperclip[x] < Math.floor(mid)) {
-          //   this.upperclip[x] = Math.floor(mid);
-          // }
-          //this.upperclip[x] = Math.max(this.upperclip[x], Math.floor(mid));
         }
         else if (this.markceiling) {
           this.upperclip[x] = yl - 1;
@@ -1191,11 +1043,8 @@ class WallRenderer {
 
 
           if (mid <= yh + 1) {
-            // store bottom column data here
-            // if (mid < yh) {
-            lowerColumns.push({ textureColumn, x, wallY1: Math.floor(mid), wallY2: Math.floor(yh) + 1, textureAlt: lowerTextureAlt, inverseScale, lightLevel, startX: xScreenV1 });
-            //  }
 
+            lowerColumns.push({ textureColumn, x, wallY1: Math.floor(mid), wallY2: Math.floor(yh) + 1, textureAlt: lowerTextureAlt, inverseScale, lightLevel, startX: xScreenV1 });
 
 
             this.lowerclip[x] = Math.floor(mid);
@@ -1210,40 +1059,15 @@ class WallRenderer {
 
       }
 
-      // let drawWallY1 = Math.floor(wallY1) - 1;
-      // let drawWallY2 = Math.floor(wallY2);
 
 
 
 
 
-      // wallY1 = Math.max(drawWallY1, this.upperclip[x] + 1);
-      // wallY2 = Math.min(drawWallY2, this.lowerclip[x] - 1);
-      // if (wallY1 < wallY2) {
-
-      //   let { textureColumn, inverseScale } =
-      //     this.calculateTextureColAndScale(
-      //       true,
-      //       realWallCenterAngle,
-      //       x,
-      //       realWallDistance,
-      //       realWallOffset,
-      //       realWallScale1
-      //     );
-
-      //   columnsData.push({
-      //     textureColumn,
-      //     x,
-      //     wallY1,
-      //     wallY2,
-      //     textureAlt: middleTextureAlt,
-      //     inverseScale,
-      //     lightLevel,
-      //     startX: xScreenV1 // Store the starting X to calculate relative position
-      //   });
 
 
-      //}
+
+
 
       // vertically move down
       wallY1 += wallY1Step;
@@ -1256,14 +1080,7 @@ class WallRenderer {
 
     if (toptexture) {
 
-      // columnsData.forEach(({ x, wallY1, wallY2, textureColumn, textureAlt, inverseScale }) => {
-      //   // Highlighting the first row at wallY1
-      //   gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
-      //   gameEngine.canvas.offScreenCtx.fillRect(x, wallY1, 1, 1);
 
-      //   // Highlighting the last row at wallY2
-      //   gameEngine.canvas.offScreenCtx.fillRect(x, wallY2, 1, 1);
-      // });
 
       this.drawSegmentWithTexture(upperColumns, textureWidthUpper, textureHeightUpper, textureDataUpper, lightLevel);
 
