@@ -54,6 +54,8 @@ class LevelManager {
     gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
     gameEngine.canvas.offScreenCtx.fillText(`FPS ${gameEngine.logic.ticks.length}`, 400, 50);
 
+    gameEngine.visplaneRenderer.drawPlanes();
+
 
     // gameEngine.canvas.offScreenCtx.fillRect(100, 100, 200, 200);
     //gameEngine.canvas.updateCanvas();

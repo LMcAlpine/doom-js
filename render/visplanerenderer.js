@@ -106,6 +106,56 @@ class VisplaneRenderer {
         return this.lastVisplane;
     }
 
+    drawPlanes() {
+        this.visplanes.forEach((plane) => {
+            if (plane.minx > plane.maxx) {
+                return;
+            }
+
+            if (plane.picnum === "F_SKY1") {
+                // draw sky
+            }
+            else {
+                this.drawRegularPlane(plane);
+            }
+
+        })
+    }
+
+    drawRegularPlane(plane) {
+        // for (let x = plane.minx; x <= plane.maxx; x++) {
+        // const t1 = plane.top[x];
+        // const b1 = plane.bottom[x];
+
+        // const t2 = x < plane.maxx ? plane.top[x + 1] : t1;
+        // const b2 = x < plane.maxx ? plane.bottom[x + 1] : b1;
+        if (plane.maxx < plane.top.length) {
+            plane.top[plane.maxx] = Number.MAX_VALUE;
+        }
+        if (plane.minx > 0) {
+            plane.top[plane.minx] = Number.MAX_VALUE;
+        }
+
+        plane.baseXScale = this.baseXScale;
+        plane.baseYScale = this.baseYScale;
+        plane.direction = gameEngine.player.direction.angle;
+
+        for (let x = plane.minx; x <= plane.maxx;x++){
+
+        }
+
+
+
+        //this.makeSpans(x, t1, b1, t2, b2, plane);
+        // }
+    }
+
+    makeSpans(x, t1, b1, t2, b2, plane) {
+        while (t1 < t2 && t1 <= b1) {
+
+        }
+    }
+
 
 
 }
