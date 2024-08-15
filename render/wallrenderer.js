@@ -4,6 +4,10 @@ const FULL_ALPHA = 255;
 const UPPER_UNPEGGED = 8;
 const LOWER_UNPEGGED = 16;
 
+let drawSeg_O = { x1: 0, x2: 0 };
+let ceilingTexture = "-"
+let floorTexture = "-";
+
 class WallRenderer {
   constructor(colorGenerator, dependencies, textureManager, flatManager) {
     this.colorGenerator = colorGenerator;
@@ -309,9 +313,9 @@ class WallRenderer {
         let red = pixelValue & 0xFF;
 
         // Apply light level to RGB components
-        red = adjustColorComponent(red, lightLevel);
-        green = adjustColorComponent(green, lightLevel);
-        blue = adjustColorComponent(blue, lightLevel);
+        // red = adjustColorComponent(red, lightLevel);
+        // green = adjustColorComponent(green, lightLevel);
+        // blue = adjustColorComponent(blue, lightLevel);
 
         // Repack the ABGR components into a Uint32 value
         accumulatedImageData[y] = (alpha << 24) | (blue << 16) | (green << 8) | red;
@@ -336,23 +340,41 @@ class WallRenderer {
     let side = seg.linedef.rightSidedef;
 
 
-    let realWallNormalAngle = new Angle(seg.angle + RIGHT_ANGLE_DEGREES).angle;
-    let offsetAngle = new Angle(realWallNormalAngle - gameEngine.player.realWallAngle1.angle).angle;
+    // Taking the angle of the seg in the worldspace and adding 90 degrees to it
+    // this results in a perpendicular line (the normal)
+    let perpendicularWallAngle = new Angle(seg.angle + RIGHT_ANGLE_DEGREES).angle;
+    // The difference between the angle of the perpendicular line and the angle from the player to the first vertex of the seg
+    // how much rotation needs to occur to go from the angle to v1 to the angle of the perpendicular line
+    // inner angle of the right triangle (and in my opinion is the angle at the bottom right of the triangle)
+    let angleToPerpendicular = new Angle(perpendicularWallAngle - gameEngine.player.realWallAngle1.angle).angle;
+    // the missing angle in the right triangle (in my opinion the top left of the right triangle)
+    // The reason I think this angle is the top left is because of the sin calculation.
+    let complementaryAngle = new Angle(RIGHT_ANGLE_DEGREES - angleToPerpendicular);
+    // the distance from the player to v1
+    let distanceToVertex = this.geometry.distanceToPoint(seg.startVertex);
 
-    let distangle = new Angle(RIGHT_ANGLE_DEGREES - offsetAngle);
-    let hypotenuse = this.geometry.distanceToPoint(seg.startVertex);
+    // the opposite side of complementaryAngle
+    // sin(theta) = opp/hyp
+    // sin(theta) * hyp = opp
+    // this is the length of the perpendicular (normal) line from the seg (or infinite extended line) to the player
+    // If complementaryAngle was at the bottom right of the triangle then the perpendicularDistance would be its adjacent.
+    // That is why I think this angle is at the top left of the triangle because the opposite side of the angle is the perpendicularDistance 
+    // we are trying to find. 
+    let perpendicularDistance = distanceToVertex * Math.sin(degreesToRadians(complementaryAngle.angle));
 
-    let realWallDistance = hypotenuse * Math.sin(degreesToRadians(distangle.angle));
+    // let t = screenToXView(xScreenV1, 640);
 
-    let t = screenToXView(xScreenV1, 640);
-
-    let visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(t)).angle;
+    let visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(screenToXView(xScreenV1, canvasWidth))).angle;
 
 
-    let realWallScale1 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
+    let realWallScale1 = scaleFromViewAngle(visangle, perpendicularWallAngle, perpendicularDistance, gameEngine.player.direction.angle, canvasWidth);
 
-    visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(screenToXView(xScreenV2, 640))).angle;
+    visangle = new Angle(gameEngine.player.direction.angle + radiansToDegrees(screenToXView(xScreenV2, canvasWidth))).angle;
 
+
+    drawSeg_O.x1 = xScreenV1;
+    drawSeg_O.x2 = xScreenV2;
+    drawSeg_O.currentLine = line;
     let rwx = xScreenV1;
     let rwStopX = xScreenV2 + 1;
 
@@ -360,7 +382,7 @@ class WallRenderer {
     let scale2;
     if (xScreenV2 > xScreenV1) {
 
-      scale2 = scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, gameEngine.player.direction.angle, 640);
+      scale2 = scaleFromViewAngle(visangle, perpendicularWallAngle, perpendicularDistance, gameEngine.player.direction.angle, canvasWidth);
       rwScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
 
 
@@ -372,17 +394,18 @@ class WallRenderer {
     let rightSector = seg.rightSector;
 
 
-    //world top
-    let worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;
-    // world bottom
-    let worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;
 
-    let midtexture = false;
+    let worldFrontZ1 = rightSector.ceilingHeight - gameEngine.player.height;        // world top
+    let worldFrontZ2 = rightSector.floorHeight - gameEngine.player.height;          // world bottom
+
+    let midTexture = false;
+    let topTexture = false;
+    let bottomTexture = false;
+
 
     let upperWallTexture;
     let lowerWallTexture;
-    let toptexture = false;
-    let bottomtexture = false;
+
 
     let middleTextureAlt = 0;
     let upperTextureAlt = 0;
@@ -392,14 +415,13 @@ class WallRenderer {
     let worldBackZ1;
     let worldBackZ2;
 
-    let ceilingTexture = "-"
-    let floorTexture = "-";
+
     if (!seg.leftSector) {
       this.markfloor = true;
       this.markceiling = true;
 
       const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
-      midtexture = wallTexture !== "-";
+      midTexture = wallTexture !== "-";
       ceilingTexture = rightSector.ceilingTexture;
       floorTexture = rightSector.floorTexture;
       const lightLevel = rightSector.lightLevel;
@@ -417,6 +439,8 @@ class WallRenderer {
       middleTextureAlt += side.yOffset;
     }
     else {
+      // two sided line
+
       const leftSector = seg.leftSector;
 
       // worldhigh
@@ -426,6 +450,7 @@ class WallRenderer {
       //world low
       worldBackZ2 = leftSector.floorHeight - gameEngine.player.height;
 
+      // look into fixing this 
       if (
         rightSector.ceilingTexture === "F_SKY1" &&
         leftSector.ceilingTexture === "F_SKY1"
@@ -496,7 +521,7 @@ class WallRenderer {
 
       // check this !!!
       if (worldBackZ1 < worldFrontZ1) {
-        toptexture = upperWallTexture !== "-";
+        topTexture = upperWallTexture !== "-";
         if (line.flag & UPPER_UNPEGGED) {
           upperTextureAlt = worldFrontZ1;
         } else {
@@ -515,7 +540,7 @@ class WallRenderer {
 
       // let lowerTextureAlt;
       if (worldBackZ2 > worldFrontZ2) {
-        bottomtexture = lowerWallTexture !== "-";
+        bottomTexture = lowerWallTexture !== "-";
         if (line.flag & LOWER_UNPEGGED) {
           lowerTextureAlt = worldFrontZ1;
         } else {
@@ -531,35 +556,39 @@ class WallRenderer {
 
     }
 
-
+    // outside the else 
 
     let segTextured = false;
-    if (midtexture || upperWallTexture || lowerWallTexture) {
+    if (midTexture || upperWallTexture || lowerWallTexture) {
       segTextured = true;
     }
     let realWallCenterAngle;
     let realWallOffset
 
     if (segTextured) {
-      offsetAngle = new Angle(realWallNormalAngle - gameEngine.player.realWallAngle1.angle).angle;
+      angleToPerpendicular = new Angle(perpendicularWallAngle - gameEngine.player.realWallAngle1.angle).angle;
 
 
-      realWallOffset = hypotenuse * Math.sin(degreesToRadians(offsetAngle));
+      realWallOffset = distanceToVertex * Math.sin(degreesToRadians(angleToPerpendicular));
       // this line below fixed the door being misaligned in e1m2? but I did make a lot of changes besides this
       realWallOffset = -realWallOffset;
       realWallOffset += seg.offset + side.xOffset
-      realWallCenterAngle = new Angle(gameEngine.player.direction.angle - realWallNormalAngle).angle;
+      realWallCenterAngle = new Angle(gameEngine.player.direction.angle - perpendicularWallAngle).angle;
 
     }
+
+    // need to calculate light table
 
     if (rightSector.floorHeight > gameEngine.player.height) {
       this.markfloor = false;
     }
 
+    // need to fix the sky check 
     if (rightSector.ceilingHeight < gameEngine.player.height && rightSector.ceilingTexture !== "F_SKY1") {
       this.markceiling = false;
     }
 
+    // stepping values for texture edges
     let wallY1 = HALFHEIGHT - worldFrontZ1 * realWallScale1;
     const wallY1Step = -rwScaleStep * worldFrontZ1;
 
@@ -598,10 +627,12 @@ class WallRenderer {
 
     }
 
+    // render planes here?
+    
     ceilingTexture = rightSector.ceilingTexture;
     floorTexture = rightSector.floorTexture;
 
-    this.renderSegLoop(seg, rwx, rwStopX, gameEngine.player.height, seg.linedef.rightSidedef.middleTexture.toUpperCase(), wallY1, wallY1Step, wallY2, wallY2Step, realWallDistance, segTextured, midtexture, middleTextureAlt, lightLevel, rwScaleStep, realWallCenterAngle, realWallOffset, realWallScale1, upperWallTexture, lowerWallTexture, pixhigh, pixhighstep, pixlow, pixlowstep, toptexture, bottomtexture, upperTextureAlt, lowerTextureAlt, ceilingTexture, worldFrontZ1, worldFrontZ2, floorTexture);
+    this.renderSegLoop(seg, rwx, rwStopX, gameEngine.player.height, seg.linedef.rightSidedef.middleTexture.toUpperCase(), wallY1, wallY1Step, wallY2, wallY2Step, perpendicularDistance, segTextured, midTexture, middleTextureAlt, lightLevel, rwScaleStep, realWallCenterAngle, realWallOffset, realWallScale1, upperWallTexture, lowerWallTexture, pixhigh, pixhighstep, pixlow, pixlowstep, topTexture, bottomTexture, upperTextureAlt, lowerTextureAlt, ceilingTexture, worldFrontZ1, worldFrontZ2, floorTexture);
 
   }
   renderSegLoop(seg, xScreenV1, xScreenV2, viewHeight, wallTexture, wallY1, wallY1Step, wallY2, wallY2Step, realWallDistance, segTextured, midtexture, middleTextureAlt, lightLevel, rwScaleStep, realWallCenterAngle, realWallOffset, realWallScale1, upperWallTexture, lowerWallTexture, pixhigh, pixhighstep, pixlow, pixlowstep, toptexture, bottomtexture, upperTextureAlt, lowerTextureAlt, ceilingTexture, worldFrontZ1, worldFrontZ2, floorTexture) {

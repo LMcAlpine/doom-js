@@ -203,3 +203,4 @@ function adjustColorComponent(component, lightLevel) {
 // function adjustColorComponent(color, lightLevel) {
 //   return Math.min(255, Math.floor(color * lightLevel));
 // }
+
