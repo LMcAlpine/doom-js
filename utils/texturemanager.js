@@ -95,8 +95,8 @@ class TextureManager {
             for (let j = 0; j < column.length; j++) {
                 const post = column[j];
                 for (let k = 0; k < post.data.length; k++) {
-                    const pixel = post.data[k];
-                    const pixelDraw = this.palette[pixel];
+                    const pixelIndex = post.data[k];
+                    const pixelDraw = this.palette[pixelIndex];
                     const x = xStart + i;
                     const y = yStart + post.topDelta + k;
                     const pos = y * textureWidth + x;
@@ -117,6 +117,7 @@ class TextureManager {
         let textureWidth = this.textures[indexOfName].width;
         let textureHeight = this.textures[indexOfName].height;
 
+        // seems redundant?
         let textureImageObj = new ImageData(textureWidth, textureHeight);
         // let textureImageData = textureImageObj.data;
         let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);

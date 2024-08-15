@@ -292,7 +292,13 @@ class WallRenderer {
   drawSegmentWithTexture(columnsData, textureWidth, textureHeight, textureData, lightLevel) {
     columnsData.forEach(({ x, wallY1, wallY2, textureColumn, textureAlt, inverseScale }) => {
 
+
+      // uint8 array
+      // 8 elements is 1 byte, 8 bits is 1 byte
       let imageData = new ImageData(1, wallY2 - wallY1 + 1);
+      // uin32 array
+      // 1 element is 4 bytes
+      // 1 element is 32 bits which is 4 bytes
       const accumulatedImageData = new Uint32Array(imageData.data.buffer);
       let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
       textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
@@ -628,7 +634,7 @@ class WallRenderer {
     }
 
     // render planes here?
-    
+
     ceilingTexture = rightSector.ceilingTexture;
     floorTexture = rightSector.floorTexture;
 
@@ -687,13 +693,17 @@ class WallRenderer {
           bottom = this.lowerclip[x] - 1;
         }
 
-        let cy2 = Math.min(yl + 1, this.lowerclip[x] - 1);
-        if (ceilingTexture !== "F_SKY1" && top < cy2) {
-          this.drawFlat(Math.floor(cy2), Math.floor(top), worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel);
-          // cy2 = Math.floor(cy2);
-          // top = Math.floor(top);
-          // ceilingData.push({ cy2, top, worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel });
+        if (top <= bottom) {
+          // ceilingplane
         }
+
+        // let cy2 = Math.min(yl + 1, this.lowerclip[x] - 1);
+        // if (ceilingTexture !== "F_SKY1" && top < cy2) {
+        //   this.drawFlat(Math.floor(cy2), Math.floor(top), worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel);
+        //   // cy2 = Math.floor(cy2);
+        //   // top = Math.floor(top);
+        //   // ceilingData.push({ cy2, top, worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel });
+        // }
 
       }
 
@@ -712,10 +722,13 @@ class WallRenderer {
         }
         if (top <= bottom) {
 
+          // set floorplane here
+
+
           // bottom = Math.floor(bottom);
           // top = Math.floor(top);
           //floorData.push({ bottom, top, worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel });
-          this.drawFlat(Math.floor(bottom), Math.floor(top), worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
+          //this.drawFlat(Math.floor(bottom), Math.floor(top), worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
 
 
         }
@@ -730,6 +743,11 @@ class WallRenderer {
         angle = realWallCenterAngle + radiansToDegrees(screenToXView(x, 640));
         textureColumn = (realWallOffset - Math.tan(degreesToRadians(angle)) * realWallDistance);
         inverseScale = 1.0 / realWallScale1;
+
+        // dc
+        // colormap
+        // x
+        // iscale
 
       }
 

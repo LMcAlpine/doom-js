@@ -17,7 +17,42 @@ document
       return;
     }
 
+    // identify version 
+    let gameMission = GameMission.doom;
+    let gameMode = "";
+    if (gameMission === GameMission.doom) {
+      gameMode = GameMode.shareware;
+    }
+    let startMap = 1;
+    let startEpisode = 1;
+
+    // need to setup the framebuffer/video buffer
+
+    // ...
+
+    // loop has started but still initializing 
+
+    // checking the gamemode
+    // if gamemmode === commercial
+    // else
+    // switch gameepisode
+    // case 1
+    // these comments need to be changed into code but only doing SKY1 for now
+    let skyTextureName = "SKY1";
+    // might need a texture number for this name
+
+    // G_DoLoadLevel
+    //skyflatenum = R_FlatNumForName(SKYFLATNAME)
+
+    // ....
+
+    // setup level P_SetupLevel
+
+    // *** need to more setup before regarding the file reading, parsing, lump loading, etc
+
     gameEngine.entities = [];
+
+    gameEngine.skyTextureName = "SKY1";
 
     const wadFileReader = new WADFileReader(file);
     const arrayBuffer = await wadFileReader.readFile();
