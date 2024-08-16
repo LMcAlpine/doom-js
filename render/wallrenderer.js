@@ -311,20 +311,13 @@ class WallRenderer {
         const texPos = texY * textureWidth + textureColumn;
         let pixelValue = textureData[texPos];
 
-        // Assuming textureData is a Uint32Array of packed ABGR values (common for little-endian architectures)
-        // Unpack ABGR components
-        let alpha = pixelValue >>> 24;
-        let blue = (pixelValue >> 16) & 0xFF;
-        let green = (pixelValue >> 8) & 0xFF;
-        let red = pixelValue & 0xFF;
-
         // Apply light level to RGB components
         // red = adjustColorComponent(red, lightLevel);
         // green = adjustColorComponent(green, lightLevel);
         // blue = adjustColorComponent(blue, lightLevel);
 
         // Repack the ABGR components into a Uint32 value
-        accumulatedImageData[y] = (alpha << 24) | (blue << 16) | (green << 8) | red;
+        accumulatedImageData[y] = pixelValue;
 
         textureY += inverseScale;
       }

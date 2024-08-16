@@ -31,11 +31,16 @@ class Canvas {
 
     // this.offScreenBuffer = this.offscreenCtx.getImageData(0, 0, this.offscreenWidth, this.offScreenHeight);
 
+    this.screenImageData = this.ctx.createImageData(canvas.width, canvas.height);
+    this.framebuffer = new Uint32Array(canvas.width * canvas.height);
+    //  this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
+
   }
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.offScreenCtx.clearRect(0, 0, this.offScreenWidth, this.offScreenHeight);
+   // this.framebuffer.fill(0);
 
   }
 

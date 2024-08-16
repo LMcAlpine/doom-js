@@ -104,6 +104,7 @@ class TextureManager {
                     // Correctly pack RGBA into a single Uint32 value for little-endian systems
                     // ABGR (little-endian)
                     const packedPixel = (FULL_ALPHA << 24) | (pixelDraw.blue << 16) | (pixelDraw.green << 8) | pixelDraw.red;
+
                     textureUint32Array[pos] = packedPixel;
                 }
             }
