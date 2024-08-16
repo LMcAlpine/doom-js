@@ -141,7 +141,9 @@ class Player {
     }
     if (gameEngine.keys["ArrowRight"] === true) {
       //this.direction -= magRotation * gameEngine.clockTick;
-      this.direction = this.direction.subtract(magRotation * gameEngine.clockTick);
+      this.direction = this.direction.subtract(
+        magRotation * gameEngine.clockTick
+      );
     }
 
     this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
@@ -159,5 +161,5 @@ class Player {
    * Method to draw
    * @param {Object} ctx - canvas context
    */
-  draw(ctx) { }
+  draw(ctx) {}
 }

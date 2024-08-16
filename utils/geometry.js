@@ -16,7 +16,6 @@ class Geometry {
   }
 
   distanceToPoint(vertex) {
-
     let dx = Math.abs(gameEngine.player.x - vertex.x);
     let dy = Math.abs(gameEngine.player.y - vertex.y);
 
@@ -26,10 +25,7 @@ class Geometry {
     //   dy = temp;
     // }
 
-    return Math.sqrt(
-      (dx) ** 2 +
-      (dy) ** 2
-    );
+    return Math.sqrt(dx ** 2 + dy ** 2);
   }
 
   scaleFromGlobalAngle(x, realWallNormalAngle, realWallDistance) {

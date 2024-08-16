@@ -1,4 +1,4 @@
-const MAPTEXTUREHEADERLENGTH = 22;  // in bytes
+const MAPTEXTUREHEADERLENGTH = 22; // in bytes
 const MAPPATCHSTRUCTURELENGTH = 10; // in bytes
 
 class Textures {
@@ -39,7 +39,11 @@ class Textures {
 
     const patches = [];
     for (let i = 0; i < patchCount; i++) {
-      patches.push(this.parseMapPatch(data.slice(MAPTEXTUREHEADERLENGTH + i * MAPPATCHSTRUCTURELENGTH)));
+      patches.push(
+        this.parseMapPatch(
+          data.slice(MAPTEXTUREHEADERLENGTH + i * MAPPATCHSTRUCTURELENGTH)
+        )
+      );
     }
     const texture = { name, masked, width, height, patches };
     return texture;

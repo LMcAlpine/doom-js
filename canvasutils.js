@@ -142,7 +142,9 @@ function getRandomInt(min, max, seed) {
 function angleToX(angle) {
   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
   angle = new Angle(angle - 90);
-  return Math.floor(SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE);
+  return Math.floor(
+    SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE
+  );
   // if (angle > 90) {
   //   angle = new Angle(angle - 90);
 
@@ -172,11 +174,17 @@ function screenToXView(x, screenWidth) {
   return Math.atan((screenWidth / 2.0 - x) / playerDistToScreen(screenWidth));
 }
 
-function scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, viewangle, screenwidth) {
-
-
+function scaleFromViewAngle(
+  visangle,
+  realWallNormalAngle,
+  realWallDistance,
+  viewangle,
+  screenwidth
+) {
   let anglea = new Angle(RIGHT_ANGLE_DEGREES + (visangle - viewangle));
-  let angleb = new Angle(RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle));
+  let angleb = new Angle(
+    RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle)
+  );
 
   let sinea = Math.sin(degreesToRadians(anglea.angle));
   let sineb = Math.sin(degreesToRadians(angleb.angle));
@@ -185,9 +193,7 @@ function scaleFromViewAngle(visangle, realWallNormalAngle, realWallDistance, vie
   let num = p * sineb;
   let den = realWallDistance * sinea;
   return num / den;
-
 }
-
 
 function isPowerOfTwo(number) {
   return (number & (number - 1)) === 0;
@@ -195,12 +201,9 @@ function isPowerOfTwo(number) {
 
 function adjustColorComponent(component, lightLevel) {
   return Math.min(255, Math.max(0, Math.floor(component * lightLevel)));
-
 }
-
 
 // flats
 // function adjustColorComponent(color, lightLevel) {
 //   return Math.min(255, Math.floor(color * lightLevel));
 // }
-

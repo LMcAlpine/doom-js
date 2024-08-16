@@ -9,7 +9,9 @@ class LevelManager {
 
     this.wallRenderer = new WallRenderer(
       colorGenerator,
-      wallRendererDependencies, textureManager, flatManager
+      wallRendererDependencies,
+      textureManager,
+      flatManager
     );
 
     this.solidSegsManager = wallRendererDependencies.solidSegsManager;
@@ -37,9 +39,6 @@ class LevelManager {
   }
 
   draw() {
-
-
-
     this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
       this.wallRenderer.solidsegs
     );
@@ -50,12 +49,13 @@ class LevelManager {
     // this.wallRenderer.drawFlat();
 
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
-    gameEngine.canvas.offScreenCtx.font = '50px Arial';
-    gameEngine.canvas.offScreenCtx.fillStyle = 'blue';
-    gameEngine.canvas.offScreenCtx.fillText(`FPS ${gameEngine.logic.ticks.length}`, 400, 50);
-
-
-
+    gameEngine.canvas.offScreenCtx.font = "50px Arial";
+    gameEngine.canvas.offScreenCtx.fillStyle = "blue";
+    gameEngine.canvas.offScreenCtx.fillText(
+      `FPS ${gameEngine.logic.ticks.length}`,
+      400,
+      50
+    );
 
     // gameEngine.canvas.offScreenCtx.fillRect(100, 100, 200, 200);
     //gameEngine.canvas.updateCanvas();

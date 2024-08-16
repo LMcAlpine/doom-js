@@ -13,14 +13,11 @@ class Canvas {
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
 
-
     // offscreen
 
     this.offScreenCanvas = document.createElement("canvas");
     this.offScreenCanvas.width = canvas.width; // Set offscreen canvas width to match main canvas
     this.offScreenCanvas.height = canvas.height; // Set offscreen canvas height to match main canvas
-
-
 
     // OMG THIS DOESN'T SET THE OFFSCREEN CANVAS WIDTH... AHHHHHHH
     // I was making a wrong assumption that it somehow was setting the width to the offscreen canvas.
@@ -31,23 +28,26 @@ class Canvas {
 
     // this.offScreenBuffer = this.offscreenCtx.getImageData(0, 0, this.offscreenWidth, this.offScreenHeight);
 
-    this.screenImageData = this.ctx.createImageData(canvas.width, canvas.height);
+    this.screenImageData = this.ctx.createImageData(
+      canvas.width,
+      canvas.height
+    );
     this.framebuffer = new Uint32Array(canvas.width * canvas.height);
     //  this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
-
   }
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.offScreenCtx.clearRect(0, 0, this.offScreenWidth, this.offScreenHeight);
-   // this.framebuffer.fill(0);
-
+    this.offScreenCtx.clearRect(
+      0,
+      0,
+      this.offScreenWidth,
+      this.offScreenHeight
+    );
+    // this.framebuffer.fill(0);
   }
-
 
   updateCanvas() {
-
     this.ctx.drawImage(this.offScreenCanvas, 0, 0);
   }
-
 }
