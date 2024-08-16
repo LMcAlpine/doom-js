@@ -101,9 +101,18 @@ class TextureManager {
                     const y = yStart + post.topDelta + k;
                     const pos = y * textureWidth + x;
 
-                    // Correctly pack RGBA into a single Uint32 value for little-endian systems
-                    // ABGR (little-endian)
-                    const packedPixel = (FULL_ALPHA << 24) | (pixelDraw.blue << 16) | (pixelDraw.green << 8) | pixelDraw.red;
+
+
+                    let packedPixel;
+                    if (ENDIAN) {
+                        // Correctly pack RGBA into a single Uint32 value for little-endian systems
+                        // ABGR (little-endian)
+                        packedPixel = (FULL_ALPHA << 24) | (pixelDraw.blue << 16) | (pixelDraw.green << 8) | pixelDraw.red;
+                    }
+                    else {
+                        packedPixel = (pixelDraw.red << 24) | (pixelDraw.green << 16) | (pixelDraw.blue << 8) | FULL_ALPHA;
+                    };
+
 
                     textureUint32Array[pos] = packedPixel;
                 }

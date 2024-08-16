@@ -1,5 +1,11 @@
 const gameEngine = new GameEngine("myCanvas", 50);
 
+const ENDIAN = (() => {
+  const buffer = new ArrayBuffer(2);
+  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
+  return new Int16Array(buffer)[0] === 256;
+})();
+
 let levelSelect = document.getElementById("levels");
 
 let selectedValue = "E1M1";
@@ -17,7 +23,7 @@ document
       return;
     }
 
-    // identify version 
+    // identify version
     let gameMission = GameMission.doom;
     let gameMode = "";
     if (gameMission === GameMission.doom) {
@@ -30,7 +36,7 @@ document
 
     // ...
 
-    // loop has started but still initializing 
+    // loop has started but still initializing
 
     // checking the gamemode
     // if gamemmode === commercial
@@ -63,7 +69,6 @@ document
 
     gameEngine.lumpData = lumpData;
 
-
     const palette = new ReadPalette(lumpData);
 
     gameEngine.palette = palette;
@@ -79,10 +84,6 @@ document
 
     const canvas = new Canvas("myCanvas");
 
-
-
-
-
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },
@@ -93,8 +94,6 @@ document
 
     gameEngine.addEntity(player);
     gameEngine.player = player;
-
-
 
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
@@ -120,11 +119,18 @@ document
       segObjects,
     };
 
-    const textureManager = new TextureManager(texture.maptextures, palette.palettes[0]);
+    const textureManager = new TextureManager(
+      texture.maptextures,
+      palette.palettes[0]
+    );
     const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
-
-    const levelManager = new LevelManager(levels, dataObjects, textureManager, flatManager);
+    const levelManager = new LevelManager(
+      levels,
+      dataObjects,
+      textureManager,
+      flatManager
+    );
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 

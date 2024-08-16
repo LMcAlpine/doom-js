@@ -316,7 +316,6 @@ class WallRenderer {
         // green = adjustColorComponent(green, lightLevel);
         // blue = adjustColorComponent(blue, lightLevel);
 
-        // Repack the ABGR components into a Uint32 value
         accumulatedImageData[y] = pixelValue;
 
         textureY += inverseScale;
