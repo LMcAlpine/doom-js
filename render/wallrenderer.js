@@ -318,13 +318,7 @@ class WallRenderer {
   ) {
     columnsData.forEach(
       ({ x, wallY1, wallY2, textureColumn, textureAlt, inverseScale }) => {
-        // uint8 array
-        // 8 elements is 1 byte, 8 bits is 1 byte
-        let imageData = new ImageData(1, wallY2 - wallY1 + 1);
-        // uin32 array
-        // 1 element is 4 bytes
-        // 1 element is 32 bits which is 4 bytes
-        const accumulatedImageData = new Uint32Array(imageData.data.buffer);
+
         let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
         textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
 
@@ -849,16 +843,18 @@ class WallRenderer {
         if (yl < yh) {
           let wallY1 = yl;
           let wallY2 = yh;
-          columnsData.push({
-            textureColumn,
-            x,
-            wallY1,
-            wallY2,
-            textureAlt: middleTextureAlt,
-            inverseScale,
-            lightLevel,
-            startX: xScreenV1, // Store the starting X to calculate relative position
-          });
+          // columnsData.push({
+          //   textureColumn,
+          //   x,
+          //   wallY1,
+          //   wallY2,
+          //   textureAlt: middleTextureAlt,
+          //   inverseScale,
+          //   lightLevel,
+          //   startX: xScreenV1, // Store the starting X to calculate relative position
+          // });
+
+          this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x)
         }
       } else {
         if (toptexture) {
@@ -880,6 +876,9 @@ class WallRenderer {
               lightLevel,
               startX: xScreenV1,
             });
+
+            // not performant
+            // this.drawColumn(upperTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x)
 
             this.upperclip[x] = Math.floor(mid);
           } else {
@@ -933,15 +932,15 @@ class WallRenderer {
     //   this.drawFlat(bottom, top, worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
     // })
 
-    if (midtexture) {
-      this.drawSegmentWithTexture(
-        columnsData,
-        textureWidth,
-        textureHeight,
-        textureData,
-        lightLevel
-      );
-    }
+    // if (midtexture) {
+    //   this.drawSegmentWithTexture(
+    //     columnsData,
+    //     textureWidth,
+    //     textureHeight,
+    //     textureData,
+    //     lightLevel
+    //   );
+    // }
 
     if (toptexture) {
       this.drawSegmentWithTexture(
@@ -960,6 +959,39 @@ class WallRenderer {
         textureDataLower,
         lightLevel
       );
+    }
+  }
+
+  drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x) {
+    textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
+    const screenBuffer = this.canvas.screenBuffer;
+    const canvasWidth = this.canvas.canvasWidth;
+
+    let dest = this.canvas.ylookup[wallY1] + x;
+    const FRACBITS = 16;
+    const FRACUNIT = 1 << FRACBITS;
+    let frac = Math.floor(textureAlt * FRACUNIT + (wallY1 - this.canvas.canvasHeight / 2) * inverseScale * FRACUNIT);
+    const fracstep = Math.floor(inverseScale * FRACUNIT);
+
+    const textureWidthLog2 = Math.log2(textureWidth);
+
+    for (let y = wallY1; y < wallY2 + 1; y++) {
+
+      const texY = (frac >> FRACBITS) % textureHeight;
+      const texPos = (texY << textureWidthLog2) + textureColumn;
+      //const texPos = texY * textureWidth + textureColumn;
+      let pixelValue = textureData[texPos];
+
+      // Apply light level to RGB components
+      // red = adjustColorComponent(red, lightLevel);
+      // green = adjustColorComponent(green, lightLevel);
+      // blue = adjustColorComponent(blue, lightLevel);
+      screenBuffer[dest] = pixelValue;
+
+
+      dest += canvasWidth;
+      frac += fracstep;
+
     }
   }
 }

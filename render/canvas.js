@@ -34,6 +34,11 @@ class Canvas {
     );
     // this.framebuffer = new Uint32Array(canvas.width * canvas.height);
     this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
+
+    this.ylookup = [];
+    for (let i = 0; i < canvas.height; i++) {
+      this.ylookup[i] = (i) * this.canvasWidth;
+    }
   }
 
   clearCanvas() {
