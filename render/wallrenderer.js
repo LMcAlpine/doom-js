@@ -854,7 +854,7 @@ class WallRenderer {
           //   startX: xScreenV1, // Store the starting X to calculate relative position
           // });
 
-          this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x)
+          this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel)
         }
       } else {
         if (toptexture) {
@@ -962,7 +962,7 @@ class WallRenderer {
     }
   }
 
-  drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x) {
+  drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel) {
     textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
     const screenBuffer = this.canvas.screenBuffer;
     const canvasWidth = this.canvas.canvasWidth;
@@ -982,12 +982,13 @@ class WallRenderer {
       //const texPos = texY * textureWidth + textureColumn;
       let pixelValue = textureData[texPos];
 
-      // Apply light level to RGB components
-      // red = adjustColorComponent(red, lightLevel);
-      // green = adjustColorComponent(green, lightLevel);
-      // blue = adjustColorComponent(blue, lightLevel);
-      screenBuffer[dest] = pixelValue;
+      // Apply light level
+      const alpha = pixelValue >> 24;
+      const blue = adjustColorComponent((pixelValue >> 16) & 0xFF, lightLevel);
+      const green = adjustColorComponent((pixelValue >> 8) & 0xFF, lightLevel);
+      const red = adjustColorComponent(pixelValue & 0xFF, lightLevel);
 
+      screenBuffer[dest] = (alpha << 24) | (blue << 16) | (green << 8) | red;
 
       dest += canvasWidth;
       frac += fracstep;
