@@ -7,11 +7,7 @@ class BSPTraversal {
     this.subsector = subsector;
   }
 
-  update() {
-    this.traverseBSP(this.nodes.length - 1);
-  }
 
-  draw(ctx) {}
 
   traverseBSP(nodeID) {
     // check for is this node a leaf node.
@@ -51,16 +47,6 @@ class BSPTraversal {
       }
     }
 
-    // //traversing left
-    // if (isOnLeft) {
-    //   this.traverseBSP(bsp.leftChild);
-    //   this.traverseBSP(bsp.rightChild);
-    // } else {
-    //   // traversing right
-
-    //   this.traverseBSP(bsp.rightChild);
-    //   this.traverseBSP(bsp.leftChild);
-    // }
   }
 
   isPotentiallyVisible(boundingBox) {

@@ -6,12 +6,13 @@ class Subsector {
    * @param {Object} segmentData - contains necessary data for the segments.
    * @param {WallRenderer} wallRenderer - modular component to handle rendering of walls.
    */
-  constructor(levelsData, segmentData, wallRenderer) {
+  constructor(levelsData, segmentData, wallRenderer, linkedSubsectors) {
     Object.assign(this, {
       subsectors: levelsData.subsectors,
       segs: segmentData.segs,
       vertices: levelsData.vertices,
       wallRenderer: wallRenderer,
+      linkedSubsectors: linkedSubsectors
     });
   }
 
@@ -20,7 +21,15 @@ class Subsector {
    * @param {number} subsectorID - ID of the current subsector.
    */
   handleSubsector(subsectorID) {
-    const subsector = this.subsectors[subsectorID];
+    //const subsector = this.subsectors[subsectorID];
+    const subsector = this.linkedSubsectors[subsectorID];
+
+    // check floor visibility
+    if (subsector.sector.floorHeight < gameEngine.player.height) { }
+
+
+
+    // check ceiling visibility
 
     for (let i = 0; i < subsector.segCount; i++) {
       const seg = this.segs[subsector.firstSegNumber + i];

@@ -26,7 +26,13 @@ class LevelManager {
       sidedefs: data.sidedefObjects,
     };
 
-    const subsector = new Subsector(levelsData, segmentData, this.wallRenderer);
+    this.linkedSubsectors = [];
+    for (let i = 0; i < levelsData.subsectors.length; i++) {
+      this.linkedSubsectors[i] = { sector: segmentData.segs[levelsData.subsectors[i].firstSegNumber].frontsector, ...levelsData.subsectors[i] }
+    }
+
+
+    const subsector = new Subsector(levelsData, segmentData, this.wallRenderer, this.linkedSubsectors);
     this.bspTraversal = new BSPTraversal(levels, subsector);
 
     this.subsector = subsector;
