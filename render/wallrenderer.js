@@ -843,16 +843,6 @@ class WallRenderer {
         if (yl < yh) {
           let wallY1 = yl;
           let wallY2 = yh;
-          // columnsData.push({
-          //   textureColumn,
-          //   x,
-          //   wallY1,
-          //   wallY2,
-          //   textureAlt: middleTextureAlt,
-          //   inverseScale,
-          //   lightLevel,
-          //   startX: xScreenV1, // Store the starting X to calculate relative position
-          // });
 
           this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel)
         }
@@ -866,16 +856,6 @@ class WallRenderer {
           }
 
           if (mid > yl) {
-            // upperColumns.push({
-            //   textureColumn,
-            //   x,
-            //   wallY1: yl,
-            //   wallY2: Math.floor(mid),
-            //   textureAlt: upperTextureAlt,
-            //   inverseScale,
-            //   lightLevel,
-            //   startX: xScreenV1,
-            // });
 
             this.drawColumn(upperTextureAlt, yl, Math.floor(mid), inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel)
 
@@ -896,16 +876,6 @@ class WallRenderer {
           }
 
           if (mid <= yh + 1) {
-            // lowerColumns.push({
-            //   textureColumn,
-            //   x,
-            //   wallY1: Math.floor(mid),
-            //   wallY2: Math.floor(yh) + 1,
-            //   textureAlt: lowerTextureAlt,
-            //   inverseScale,
-            //   lightLevel,
-            //   startX: xScreenV1,
-            // });
 
             this.drawColumn(lowerTextureAlt, Math.floor(mid), Math.floor(yh) + 1, inverseScale, textureColumn, textureWidthLower, textureHeightLower, textureDataLower, x, lightLevel)
 
@@ -933,34 +903,6 @@ class WallRenderer {
     //   this.drawFlat(bottom, top, worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
     // })
 
-    // if (midtexture) {
-    //   this.drawSegmentWithTexture(
-    //     columnsData,
-    //     textureWidth,
-    //     textureHeight,
-    //     textureData,
-    //     lightLevel
-    //   );
-    // }
-
-    // if (toptexture) {
-    //   this.drawSegmentWithTexture(
-    //     upperColumns,
-    //     textureWidthUpper,
-    //     textureHeightUpper,
-    //     textureDataUpper,
-    //     lightLevel
-    //   );
-    // }
-    // if (bottomtexture) {
-    //   this.drawSegmentWithTexture(
-    //     lowerColumns,
-    //     textureWidthLower,
-    //     textureHeightLower,
-    //     textureDataLower,
-    //     lightLevel
-    //   );
-    // }
   }
 
   drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel) {
@@ -973,34 +915,6 @@ class WallRenderer {
     const fracstep = Math.floor(inverseScale * FRACUNIT);
 
     const textureWidthLog2 = Math.log2(textureWidth);
-
-
-
-
-
-
-    // for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
-    //   let texY = isPowerOfTwo(textureHeight)
-    //     ? Math.floor(textureY) & (textureHeight - 1)
-    //     : Math.floor(textureY) % textureHeight;
-
-    //   const texPos = texY * textureWidth + textureColumn;
-    //   let pixelValue = textureData[texPos];
-
-    //   // Apply light level to RGB components
-    //   // red = adjustColorComponent(red, lightLevel);
-    //   // green = adjustColorComponent(green, lightLevel);
-    //   // blue = adjustColorComponent(blue, lightLevel);
-
-    //   //accumulatedImageData[y] = pixelValue;
-    //   // this.canvas.screenBuffer[y*this.canvas.canvasWidth + x] = pixelValue;
-
-    //   textureY += inverseScale;
-    // }
-
-
-
-
 
     for (let y = wallY1; y < wallY2 + 1; y++) {
 
