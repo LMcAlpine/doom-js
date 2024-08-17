@@ -965,12 +965,10 @@ class WallRenderer {
   drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel) {
     textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
     const screenBuffer = this.canvas.screenBuffer;
-    const canvasWidth = this.canvas.canvasWidth;
+
 
     let dest = this.canvas.ylookup[wallY1] + x;
-    const FRACBITS = 16;
-    const FRACUNIT = 1 << FRACBITS;
-    let frac = Math.floor(textureAlt * FRACUNIT + (wallY1 - this.canvas.canvasHeight / 2) * inverseScale * FRACUNIT);
+    let frac = Math.floor(textureAlt * FRACUNIT + (wallY1 - CANVASHEIGHT / 2) * inverseScale * FRACUNIT);
     const fracstep = Math.floor(inverseScale * FRACUNIT);
 
     const textureWidthLog2 = Math.log2(textureWidth);
@@ -990,7 +988,7 @@ class WallRenderer {
 
       screenBuffer[dest] = (alpha << 24) | (blue << 16) | (green << 8) | red;
 
-      dest += canvasWidth;
+      dest += CANVASWIDTH;
       frac += fracstep;
 
     }

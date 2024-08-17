@@ -1,6 +1,9 @@
 this.canvasWidth = document.getElementById("myCanvas").width;
 this.canvasHeight = document.getElementById("myCanvas").height;
 
+const CANVASWIDTH = this.canvasWidth;
+const CANVASHEIGHT = this.canvasHeight;
+
 this.margin = 10; // The size of the margin
 this.marginsPerSide = 2;
 
@@ -12,6 +15,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 
 const FOV = 90;
 const HALFFOV = FOV / 2;
+
+const FRACBITS = 16;
+const FRACUNIT = 1 << FRACBITS;
 
 let traverseBSP;
 let traverseCount = 0;
