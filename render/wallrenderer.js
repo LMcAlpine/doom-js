@@ -328,7 +328,27 @@ class WallRenderer {
         let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
         textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
 
-        for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
+        // for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
+        //   let texY = isPowerOfTwo(textureHeight)
+        //     ? Math.floor(textureY) & (textureHeight - 1)
+        //     : Math.floor(textureY) % textureHeight;
+
+        //   const texPos = texY * textureWidth + textureColumn;
+        //   let pixelValue = textureData[texPos];
+
+        //   // Apply light level to RGB components
+        //   // red = adjustColorComponent(red, lightLevel);
+        //   // green = adjustColorComponent(green, lightLevel);
+        //   // blue = adjustColorComponent(blue, lightLevel);
+
+        //   //accumulatedImageData[y] = pixelValue;
+        //   // this.canvas.screenBuffer[y*this.canvas.canvasWidth + x] = pixelValue;
+
+        //   textureY += inverseScale;
+        // }
+
+
+        for (let y = wallY1; y < wallY2 + 1; y++) {
           let texY = isPowerOfTwo(textureHeight)
             ? Math.floor(textureY) & (textureHeight - 1)
             : Math.floor(textureY) % textureHeight;
@@ -341,12 +361,16 @@ class WallRenderer {
           // green = adjustColorComponent(green, lightLevel);
           // blue = adjustColorComponent(blue, lightLevel);
 
-          accumulatedImageData[y] = pixelValue;
-
+          //accumulatedImageData[y] = pixelValue;
+          // this.canvas.screenBuffer[y*this.canvas.canvasWidth + x] = pixelValue;
+          this.canvas.screenBuffer[y * this.canvas.canvasWidth + x] = pixelValue;
           textureY += inverseScale;
         }
 
-        gameEngine.canvas.offScreenCtx.putImageData(imageData, x, wallY1);
+
+
+
+        // gameEngine.canvas.offScreenCtx.putImageData(imageData, x, wallY1);
       }
     );
   }
@@ -387,7 +411,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -400,7 +424,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;

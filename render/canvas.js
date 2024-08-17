@@ -32,22 +32,25 @@ class Canvas {
       canvas.width,
       canvas.height
     );
-    this.framebuffer = new Uint32Array(canvas.width * canvas.height);
-    //  this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
+    // this.framebuffer = new Uint32Array(canvas.width * canvas.height);
+    this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
   }
 
   clearCanvas() {
-    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.offScreenCtx.clearRect(
-      0,
-      0,
-      this.offScreenWidth,
-      this.offScreenHeight
-    );
-    // this.framebuffer.fill(0);
+    // this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    // this.offScreenCtx.clearRect(
+    //   0,
+    //   0,
+    //   this.offScreenWidth,
+    //   this.offScreenHeight
+    // );
+    this.screenBuffer.fill(0);
   }
 
   updateCanvas() {
-    this.ctx.drawImage(this.offScreenCanvas, 0, 0);
+
+
+    this.ctx.putImageData(this.screenImageData, 0, 0);
+    //  this.ctx.drawImage(this.offScreenCanvas, 0, 0);
   }
 }
