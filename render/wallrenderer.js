@@ -29,6 +29,9 @@ class WallRenderer {
 
     this.textureManager = textureManager;
     this.flatManager = flatManager;
+
+    this.visplanes = new Map();
+    this.visplanesArray = [];
   }
 
   /**
@@ -667,6 +670,11 @@ class WallRenderer {
 
     // render planes here?
 
+    if (this.markfloor) {
+      floorPlane = checkPlane(floorPlane, x1, x2 - 1);
+    }
+
+
     ceilingTexture = rightSector.ceilingTexture;
     floorTexture = rightSector.floorTexture;
 
@@ -904,6 +912,31 @@ class WallRenderer {
     // })
 
   }
+
+  findPlane(height, textureName, lightLevel) {
+    if (textureName === "F_SKY1") {
+      height = 0;
+      lightLevel = 0;
+    }
+
+
+    const key = `${height}_${textureName}_${lightLevel}`;
+
+    if (this.visplanes.has(key)) {
+      return this.visplanes.get(key);
+    }
+
+    const newPlane = { height: height, textureName: textureName, lightLevel: lightLevel, minX: CANVASWIDTH, maxX: -1, top: new Array(CANVASWIDTH).fill(0xff) };
+
+    this.visplanes.set(key, newPlane);
+    return newPlane;
+
+  }
+
+  checkPlane(plane, x1, x2) {
+
+  }
+
 
   drawColumn(textureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel) {
     textureColumn = Math.floor(textureColumn) & (textureWidth - 1);

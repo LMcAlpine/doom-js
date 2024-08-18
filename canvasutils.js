@@ -24,6 +24,10 @@ let traverseCount = 0;
 
 const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 
+// temp
+let floorPlane;
+let ceilingPlane;
+
 function calculateScale2D(maxX, minX, maxY, minY) {
   const scaleX =
     (this.canvasWidth - this.marginsPerSide * this.margin) / (maxX - minX);

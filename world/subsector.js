@@ -25,7 +25,9 @@ class Subsector {
     const subsector = this.linkedSubsectors[subsectorID];
 
     // check floor visibility
-    if (subsector.sector.floorHeight < gameEngine.player.height) { }
+    if (subsector.sector.floorHeight < gameEngine.player.height) {
+      floorPlane = this.wallRenderer.findPlane(subsector.sector.floorHeight, subsector.sector.floorTexture, subsector.sector.lightLevel);
+    }
 
 
 
