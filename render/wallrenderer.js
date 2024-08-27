@@ -56,7 +56,7 @@ class WallRenderer {
     //left sector == backsector
     //right sector == front sector
     if (seg.leftSector === null) {
-      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1);
+      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1);
       return;
     }
 
@@ -65,7 +65,7 @@ class WallRenderer {
       seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
       seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
     ) {
-      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1);
       return;
     }
 
@@ -74,7 +74,7 @@ class WallRenderer {
       seg.rightSector.ceilingHeight !== seg.leftSector.ceilingHeight ||
       seg.rightSector.floorHeight !== seg.leftSector.floorHeight
     ) {
-      this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+      this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1);
       return;
     }
 
@@ -87,23 +87,21 @@ class WallRenderer {
       return;
     }
 
-    this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1, angleV1, angleV2);
+    this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1);
   }
 
-  clipPortalWalls(seg, xScreenV1, xScreenV2, angleV1, angleV2) {
+  clipPortalWalls(seg, xScreenV1, xScreenV2) {
     let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
     if (xScreenV1 < this.solidsegs[totalSolidSegs].first) {
       if (xScreenV2 < this.solidsegs[totalSolidSegs].first - 1) {
         // draw wall
-        // this.drawWall(seg, xScreenV1, xScreenV2);
         this.storeWallRange(seg, xScreenV1, xScreenV2);
 
         return;
       }
 
       //draw some other wall
-      // this.drawWall(seg, xScreenV1, this.solidsegs[totalSolidSegs].first - 1);
       this.storeWallRange(
         seg,
         xScreenV1,
@@ -115,18 +113,9 @@ class WallRenderer {
       return;
     }
 
-    this.drawRemainingPortalSegments(seg, xScreenV2, angleV1, totalSolidSegs);
-  }
-
-  drawRemainingPortalSegments(seg, xScreenV2, angleV1, totalSolidSegs) {
     let next = totalSolidSegs;
     while (xScreenV2 >= this.solidsegs[next + 1].first - 1) {
       // draw wall
-      // this.drawWall(
-      //   seg,
-      //   this.solidsegs[next].last + 1,
-      //   this.solidsegs[next + 1].first - 1
-      // );
       this.storeWallRange(
         seg,
         this.solidsegs[next].last + 1,
@@ -138,17 +127,16 @@ class WallRenderer {
         return;
       }
     }
-    //   this.drawWall(seg, this.solidsegs[next].last + 1, xScreenV2);
     this.storeWallRange(seg, this.solidsegs[next].last + 1, xScreenV2);
   }
 
-  clipSolidWalls(seg, xScreenV1, xScreenV2, angleV1) {
+
+  clipSolidWalls(seg, xScreenV1, xScreenV2) {
     let totalSolidSegs = this.getInitialSolidSegs(xScreenV1);
 
     if (xScreenV1 < this.solidsegs[totalSolidSegs].first) {
       if (xScreenV2 < this.solidsegs[totalSolidSegs].first - 1) {
         // draw wall
-        // this.drawSolidWall(seg, xScreenV1, xScreenV2, angleV1);
         this.storeWallRange(seg, xScreenV1, xScreenV2);
         this.solidsegs.splice(totalSolidSegs, 0, {
           first: xScreenV1,
@@ -158,12 +146,6 @@ class WallRenderer {
       }
 
       //draw some other wall
-      // this.drawSolidWall(
-      //   seg,
-      //   xScreenV1,
-      //   this.solidsegs[totalSolidSegs].first - 1,
-      //   angleV1
-      // );
       this.storeWallRange(
         seg,
         xScreenV1,
@@ -175,15 +157,9 @@ class WallRenderer {
     if (xScreenV2 <= this.solidsegs[totalSolidSegs].last) {
       return;
     }
-    // this.drawRemainingWallSegments(seg, xScreenV2, angleV1, totalSolidSegs);
     let next = totalSolidSegs;
     while (xScreenV2 >= this.solidsegs[next + 1].first - 1) {
-      // this.drawSolidWall(
-      //   seg,
-      //   this.solidsegs[next].last + 1,
-      //   this.solidsegs[next + 1].first - 1,
-      //   angleV1
-      // );
+
       this.storeWallRange(
         seg,
         this.solidsegs[next].last + 1,
@@ -201,7 +177,6 @@ class WallRenderer {
         return;
       }
     }
-    // this.drawSolidWall(seg, this.solidsegs[next].last + 1, xScreenV2, angleV1);
     this.storeWallRange(seg, this.solidsegs[next].last + 1, xScreenV2);
     this.solidsegs[totalSolidSegs].last = xScreenV2;
 
@@ -212,36 +187,7 @@ class WallRenderer {
     }
   }
 
-  drawRemainingWallSegments(seg, xScreenV2, angleV1, totalSolidSegs) {
-    let next = totalSolidSegs;
-    while (xScreenV2 >= this.solidsegs[next + 1].first - 1) {
-      this.drawSolidWall(
-        seg,
-        this.solidsegs[next].last + 1,
-        this.solidsegs[next + 1].first - 1,
-        angleV1
-      );
-      next++;
 
-      if (xScreenV2 <= this.solidsegs[next].last) {
-        this.solidsegs[totalSolidSegs].last = this.solidsegs[next].last;
-        if (this.solidsegs[next] !== this.solidsegs[totalSolidSegs]) {
-          totalSolidSegs++;
-          next++;
-          this.solidsegs.splice(totalSolidSegs, next - totalSolidSegs);
-        }
-        return;
-      }
-    }
-    this.drawSolidWall(seg, this.solidsegs[next].last + 1, xScreenV2, angleV1);
-    this.solidsegs[totalSolidSegs].last = xScreenV2;
-
-    if (this.solidsegs[next] !== this.solidsegs[totalSolidSegs]) {
-      totalSolidSegs++;
-      next++;
-      this.solidsegs.splice(totalSolidSegs, next - totalSolidSegs);
-    }
-  }
 
   getInitialSolidSegs(xScreenV1) {
     let totalSolidSegs = 0;
