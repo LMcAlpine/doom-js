@@ -5,6 +5,13 @@ class Textures {
   constructor(lumps) {
     const texture1Lump = lumps.find((lump) => lump.name === "TEXTURE1");
     this.maptextures = this.parseTextureHeader(texture1Lump);
+    const texture2Lump = lumps.find((lump) => lump.name === "TEXTURE2");
+    if (texture2Lump) {
+      let maptextures2 = this.parseTextureHeader(texture2Lump);
+
+      this.maptextures = this.maptextures.concat(maptextures2);
+    }
+
   }
 
   parseTextureHeader(textureLump) {
