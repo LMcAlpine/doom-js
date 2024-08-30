@@ -8,6 +8,8 @@ let drawSeg_O = { x1: 0, x2: 0 };
 let ceilingTexture = "-";
 let floorTexture = "-";
 
+
+
 class WallRenderer {
   constructor(colorGenerator, dependencies, textureManager, flatManager) {
     this.colorGenerator = colorGenerator;
@@ -44,6 +46,14 @@ class WallRenderer {
 
   clearVisplanes() {
     this.visplanes.clear();
+
+    const FRAC_PI_2 = Math.PI / 2;
+    // const degreesToRadians = (degrees) => degrees * (Math.PI / 180);
+
+    const viewAngleRadians = degreesToRadians(gameEngine.player.direction);
+
+    gameEngine.basexscale = Math.cos(viewAngleRadians - FRAC_PI_2) / (this.screen_width / 2);
+    gameEngine.baseyscale = -Math.sin(viewAngleRadians - FRAC_PI_2) / (this.screen_width / 2);
   }
 
   addWall(seg, angleV1, angleV2) {
@@ -968,17 +978,21 @@ class WallRenderer {
       return plane;
     }
 
-    const key = `${plane.height}_${plane.textureName}_${plane.lightLevel}`;
+    const key = `${plane.height}_${plane.textureName}_${plane.lightLevel}_${i}`;
+    const color = plane.color;
 
-    if (this.visplanes.has(key)) {
-      return this.visplanes.get(key);
-    }
+    // returning an old plane when we actually want a new one. 
+    // if (this.visplanes.has(key)) {
+    //   return this.visplanes.get(key);
+    // }
 
-    const newPlane = { height: plane.height, textureName: plane.textureName, lightLevel: plane.lightLevel, minX: x1, maxX: x2, top: new Array(CANVASWIDTH).fill(0xff) };
+    // forgot to set color here, so there was no plane being drawn cause color was undefined.
+    const newPlane = { height: plane.height, textureName: plane.textureName, lightLevel: plane.lightLevel, minX: x1, maxX: x2, top: new Array(CANVASWIDTH).fill(0xff), bottom: new Array(CANVASWIDTH).fill(0), color };
 
 
 
 
+    // since the key is not unique it is overwriting, fixed by adding i to the end of the key? not sure if this will be a good fix
     this.visplanes.set(key, newPlane);
 
     return newPlane;
