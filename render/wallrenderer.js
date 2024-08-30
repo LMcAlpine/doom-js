@@ -993,6 +993,22 @@ class WallRenderer {
 
 
     // since the key is not unique it is overwriting, fixed by adding i to the end of the key? not sure if this will be a good fix
+
+
+    // I was having an issue where a visplane was having an overlapping span in one column
+    // the problem was that one column had two spans
+    // one span was above the other
+    // the code would run through and it would run a check to see if a visplane already existed in the visplane map
+    // so, it would check the key and think,yes, this visplane already exists so lets return that visplane
+    // the problem was that I technically wanted a new visplane, but that was not happening
+    // so, it was returning a visplane that already existed and then later down the line, the top and bottom arrays were being modified in error
+    // this was problematic because the previous information in those areas were important
+    // so, I needed to have a new visplane created
+    // I did this, but I had a problem because the new visplane had no bottom array, I realized this by stepping through the debugger. I fixed that by adding the bottom array init above
+    // then, I had a problem because there was no visplane being drawn. I stepped through the debugger and I noticed there was no color field. 
+    // I fixed this by adding a colorfield above when the new plane is created
+    // I was able to fix these two issues but now there are further issues to fix related to off by one errors and potentially undefined colors, or reused visplanes in error
+    // I am investigating these issues by stepping through the debugger
     this.visplanes.set(key, newPlane);
 
     return newPlane;
