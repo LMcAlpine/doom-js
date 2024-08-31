@@ -787,7 +787,7 @@ class WallRenderer {
           // set floorplane here
 
           floorPlane.top[x] = top;
-          floorPlane.bottom[x] = bottom+1;
+          floorPlane.bottom[x] = bottom + 1;
 
           // bottom = Math.floor(bottom);
           // top = Math.floor(top);
@@ -812,18 +812,18 @@ class WallRenderer {
       }
 
       if (midtexture) {
-        if (yl < yh) {
-          let wallY1 = yl;
-          let wallY2 = yh;
+        // if (yl < yh) {
+        let wallY1 = yl;
+        let wallY2 = yh;
 
-          this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel)
-
-
-          // this.upperclip[x] = CANVASHEIGHT;
-          // this.lowerclip[x] = -1;
+        this.drawColumn(middleTextureAlt, wallY1, wallY2, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel)
 
 
-        }
+        // this.upperclip[x] = CANVASHEIGHT;
+        // this.lowerclip[x] = -1;
+
+
+        //  }
       } else {
         if (toptexture) {
           mid = pixhigh;
@@ -836,6 +836,7 @@ class WallRenderer {
           if (mid > yl) {
 
             this.drawColumn(upperTextureAlt, yl, Math.floor(mid), inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel)
+
 
             this.upperclip[x] = Math.floor(mid);
           } else {
@@ -1128,18 +1129,16 @@ class WallRenderer {
 
 
     let dest = this.canvas.ylookup[wallY1] + x;
-    let frac = Math.floor(textureAlt * FRACUNIT + (wallY1 - CANVASHEIGHT / 2) * inverseScale * FRACUNIT);
-    const fracstep = Math.floor(inverseScale * FRACUNIT);
+    let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
 
-
-
-    const textureWidthLog2 = Math.log2(textureWidth);
 
     for (let y = wallY1; y <= wallY2; y++) {
 
-      const texY = (frac >> FRACBITS) % textureHeight;
-      const texPos = (texY << textureWidthLog2) + textureColumn;
-      //const texPos = texY * textureWidth + textureColumn;
+      let texY = isPowerOfTwo(textureHeight)
+        ? Math.floor(textureY) & (textureHeight - 1)
+        : Math.floor(textureY) % textureHeight;
+
+      const texPos = texY * textureWidth + textureColumn;
       let pixelValue = textureData[texPos];
 
       // Apply light level
@@ -1151,7 +1150,7 @@ class WallRenderer {
       screenBuffer[dest] = (alpha << 24) | (blue << 16) | (green << 8) | red;
 
       dest += CANVASWIDTH;
-      frac += fracstep;
+      textureY += inverseScale;
     }
   }
 }
