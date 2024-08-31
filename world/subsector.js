@@ -31,9 +31,9 @@ class Subsector {
       floorPlane = null;
     }
 
-    // if (subsector.sector.ceilingHeight > gameEngine.player.height) {
-    //   ceilingPlane = this.wallRenderer.findPlane(subsector.sector.ceilingHeight, subsector.sector.ceilingTexture, subsector.sector.lightLevel);
-    // }
+    if (subsector.sector.ceilingHeight > gameEngine.player.height) {
+      ceilingPlane = this.wallRenderer.findPlane(subsector.sector.ceilingHeight, subsector.sector.ceilingTexture, subsector.sector.lightLevel);
+    }
 
 
 

@@ -15,15 +15,15 @@ class Player {
     this.x = location.xPosition;
     this.y = location.yPosition;
 
-    // this.x = 2938;
-    // this.y = -2887;
+    // this.x = 2943;
+    // this.y = -2875;
 
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     this.direction = new Angle(location.direction);
-    // this.direction = -87;
+    //this.direction = new Angle(277.88437500000066);
 
     this.fov = fov;
 
@@ -87,6 +87,9 @@ class Player {
     const adjacent = vertex.x - this.x;
     const opposite = vertex.y - this.y;
     return Angle.radiansToDegrees(Math.atan2(opposite, adjacent));
+    // let t = Math.atan2(opposite, adjacent);
+    // let r = parseFloat(t.toFixed(7))
+    // return new Angle(parseFloat(t.toFixed(7)));
   }
 
   /**
@@ -161,5 +164,5 @@ class Player {
    * Method to draw
    * @param {Object} ctx - canvas context
    */
-  draw(ctx) {}
+  draw(ctx) { }
 }
