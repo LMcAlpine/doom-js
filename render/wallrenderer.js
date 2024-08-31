@@ -786,8 +786,8 @@ class WallRenderer {
         if (top <= bottom) {
           // set floorplane here
 
-          floorPlane.top[x] = Math.floor(top);
-          floorPlane.bottom[x] = Math.floor(bottom);
+          floorPlane.top[x] = top;
+          floorPlane.bottom[x] = bottom+1;
 
           // bottom = Math.floor(bottom);
           // top = Math.floor(top);

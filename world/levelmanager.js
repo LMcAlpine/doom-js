@@ -105,13 +105,13 @@ class LevelManager {
 
 
           // Iterate through each row from top to bottom within this column
-          for (let y = topY; y <= bottomY; y++) {
+          for (let y = topY; y < bottomY; y++) {
             let screenPosition = y * CANVASWIDTH + j;
             gameEngine.canvas.screenBuffer[screenPosition] = visplane.color;
           }
         }
       }
-      //gameEngine.canvas.updateCanvas();
+     // gameEngine.canvas.updateCanvas();
     }
 
   }
