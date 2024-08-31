@@ -923,7 +923,7 @@ class WallRenderer {
       lightLevel: lightLevel,
       minX: CANVASWIDTH,
       maxX: -1,
-      top: new Array(CANVASWIDTH).fill(0xff),
+      top: new Array(CANVASWIDTH).fill(Number.MAX_VALUE),
       bottom: new Array(CANVASWIDTH).fill(0),
       color: color // Assign the consistent color to the visplane
     };
@@ -979,7 +979,7 @@ class WallRenderer {
       lightLevel: plane.lightLevel,
       minX: x1,
       maxX: x2,
-      top: new Array(CANVASWIDTH).fill(0xff),
+      top: new Array(CANVASWIDTH).fill(Number.MAX_VALUE),
       bottom: new Array(CANVASWIDTH).fill(0),
       color: color
     };
