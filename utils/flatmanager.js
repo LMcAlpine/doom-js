@@ -26,16 +26,18 @@ class FlatManager {
     for (let j = 0; j < flatData.length; j++) {
       const dataView = new DataView(flatData[j].data);
       let textureImageObj = new ImageData(64, 64);
+      let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
 
       for (let i = 0; i < 4096; i++) {
         const index = dataView.getUint8(i);
         const pixelColor = this.palette[index];
 
-        const pixelIdx = i * 4;
-        textureImageObj.data[pixelIdx] = pixelColor.red;
-        textureImageObj.data[pixelIdx + 1] = pixelColor.green;
-        textureImageObj.data[pixelIdx + 2] = pixelColor.blue;
-        textureImageObj.data[pixelIdx + 3] = 255;
+        let packedPixel;
+        if (ENDIAN) {
+          packedPixel = (FULL_ALPHA << 24) | (pixelColor.blue << 16) | (pixelColor.green << 8) | pixelColor.red;
+        } else { packedPixel = (pixelColor.red << 24) | (pixelColor.green << 16) | (pixelColor.blue << 8) | FULL_ALPHA; }
+
+        textureUint32Array[i] = packedPixel;
       }
       this.flatPool.set(flatData[j].name, textureImageObj);
     }
