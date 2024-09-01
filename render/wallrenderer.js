@@ -231,7 +231,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -244,7 +244,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
@@ -563,27 +563,47 @@ class WallRenderer {
     worldFrontZ1,
     worldFrontZ2
   ) {
-    let textureWidth;
-    let textureHeight;
-    let textureData;
-    if (wallTexture !== "-") {
-      let r = this.textureManager.texturePool.get(wallTexture);
-      textureWidth = r.textureWidth;
-      textureHeight = r.textureHeight;
-      textureData = r.textureImageData;
-    }
+
+    let {
+      textureWidth: textureWidth,
+      textureHeight: textureHeight,
+      textureData: textureData,
+    } = this.textureManager.getTextureInfo(wallTexture);
+
+
 
     // wall segment
+    // high level of abstraction
     let {
       textureWidth: textureWidthUpper,
       textureHeight: textureHeightUpper,
       textureData: textureDataUpper,
     } = this.textureManager.getTextureInfo(upperWallTexture);
+    // high level of abstraction
     let {
       textureWidth: textureWidthLower,
       textureHeight: textureHeightLower,
       textureData: textureDataLower,
     } = this.textureManager.getTextureInfo(lowerWallTexture);
+
+    // my goal with renderSegLoop is to render a segment
+    // but it is doing multiple things
+    // it is checking if textures exist, 
+    // it is grabbing texture data
+    // it is calculating wall coordinates,
+    // it is setting boundaries
+    // it is calculating angles, textureColumn, and scale
+    // it is making calls to drawColumn
+    // it has nested if and else statements
+    // it is incrementing coordinates and scale
+
+    // rendering a seg is directly drawing a column, not setting data or setting boundaries, not iterating over the screen coordinates
+
+    // TO render a seg, we check to see what type of seg this is, and if so we draw the seg
+    // but if im checking the type of seg, im not really doing the actual rendering?
+    // seems like you could just make the call to drawColumn. Not sure
+
+
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.floor(wallY1) + 1;
