@@ -153,15 +153,23 @@ class LevelParser {
   parseSidedefs(sidedefsLump) {
     const dataView = new DataView(sidedefsLump.data);
     const sidedefs = [];
+    const textDecoder = new TextDecoder('utf-8');
 
     for (let i = 0; i < sidedefsLump.size; i += 30) {
       const xOffset = dataView.getInt16(i, true);
       const yOffset = dataView.getInt16(i + 2, true);
 
-      // Read and trim texture names
-      const upperTextureName = String.fromCharCode(
-        ...new Uint8Array(sidedefsLump.data.slice(i + 4, i + 12))
-      ).replace(/\u0000/g, ""); // Remove null characters
+      // const upperTextureName = String.fromCharCode(
+      //   ...new Uint8Array(sidedefsLump.data.slice(i + 4, i + 12))
+      // ).replace(/\u0000/g, ""); // Remove null characters
+
+      const rawName = new Uint8Array(sidedefsLump.data.slice(i + 4, i + 12));
+      const nullIndex = rawName.indexOf(0);  // Find the first null byte
+      const validData = nullIndex >= 0 ? rawName.slice(0, nullIndex) : rawName;
+      const upperTextureName = textDecoder.decode(validData).trim();
+
+
+
 
       const lowerTextureName = String.fromCharCode(
         ...new Uint8Array(sidedefsLump.data.slice(i + 12, i + 20))
