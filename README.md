@@ -20,11 +20,12 @@ The primary goal of Doom-JS is to reproduce the aesthetics of the classic Doom G
 
 ## Screenshots
 
-![image](https://github.com/LMcAlpine/doom-js/assets/66102230/16839fa1-0af0-4d46-9dfe-3647ebe0f67b)
+![Screenshot 2024-08-31 231241](https://github.com/user-attachments/assets/51a304d5-96fa-4da4-bffa-d601d582fa59)
 
-![image](https://github.com/LMcAlpine/doom-js/assets/66102230/f78d36e6-e59a-43b5-ac31-fe0a2f8c68a9)
+![Screenshot 2024-09-01 000436](https://github.com/user-attachments/assets/4341980f-c79f-4e7b-8b06-5cbed45946f1)
 
-![image](https://github.com/LMcAlpine/doom-js/assets/66102230/88ea1815-42f9-484e-b2e5-c15cf4093ffe)
+![image](https://github.com/user-attachments/assets/55303fd4-8008-431e-99da-11de7051a470)
+
 
 
 
