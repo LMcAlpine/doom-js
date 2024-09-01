@@ -608,8 +608,7 @@ class WallRenderer {
 
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
-      let yl = Math.floor(wallY1) + 1;
-      yl = Math.max(yl, this.upperclip[x] + 1);
+      let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let top;
       let bottom;
 
@@ -631,8 +630,8 @@ class WallRenderer {
       //   }
       // }
 
-      let yh = Math.floor(wallY2);
-      yh = Math.min(yh, this.lowerclip[x] - 1);
+      //  let yh = Math.floor(wallY2);
+      let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
 
       // if (this.markfloor) {
