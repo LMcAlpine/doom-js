@@ -603,6 +603,8 @@ class WallRenderer {
     // but if im checking the type of seg, im not really doing the actual rendering?
     // seems like you could just make the call to drawColumn. Not sure
 
+    // to render a seg, we iterate over all x coordinates for the seg, 
+
 
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
@@ -660,11 +662,6 @@ class WallRenderer {
         textureColumn =
           realWallOffset - Math.tan(degreesToRadians(angle)) * realWallDistance;
         inverseScale = 1.0 / realWallScale1;
-
-        // dc
-        // colormap
-        // x
-        // iscale
       }
 
       // if (midtexture) {
@@ -692,6 +689,21 @@ class WallRenderer {
       // } 
 
       this.checkAndDrawMiddleWall(midtexture, { middleTextureAlt, yl, yh, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel })
+
+      if (toptexture) {
+        mid = pixhigh;
+        pixhigh += pixhighstep;
+
+        if (mid >= this.lowerclip[x]) {
+          mid = this.lowerclip[x] - 1;
+        }
+        this.checkAndDrawUpperWall({ upperTextureAlt, yl, mid, inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel })
+
+      }
+      else if (this.markceiling) {
+        this.upperclip[x] = yl - 1;
+      }
+
       //  else {
       // if (toptexture) {
       //   mid = pixhigh;
@@ -719,41 +731,44 @@ class WallRenderer {
       //   } else {
       //     this.upperclip[x] = yl - 1;
       //   }
-      // } else if (this.markceiling) {
+      // }
+
+      // else if (this.markceiling) {
       //   this.upperclip[x] = yl - 1;
       // }
 
-      // if (bottomtexture) {
-      //   mid = pixlow + 1;
-      //   pixlow += pixlowstep;
+      if (bottomtexture) {
+        mid = pixlow + 1;
+        pixlow += pixlowstep;
 
-      //   if (mid <= this.upperclip[x]) {
-      //     mid = this.upperclip[x] + 1;
-      //   }
+        if (mid <= this.upperclip[x]) {
+          mid = this.upperclip[x] + 1;
+        }
 
-      //   if (mid <= yh + 1) {
-      //     // mid becoming less than 0. Look into this
-      //     this.drawColumn(
-      //       lowerTextureAlt,
-      //       Math.abs(Math.floor(mid)),
-      //       Math.floor(yh) + 1,
-      //       inverseScale,
-      //       textureColumn,
-      //       textureWidthLower,
-      //       textureHeightLower,
-      //       textureDataLower,
-      //       x,
-      //       lightLevel
-      //     );
+        this.checkAndDrawLowerWall({ lowerTextureAlt, mid, yh, inverseScale, textureColumn, textureWidthLower, textureHeightLower, textureDataLower, x, lightLevel });
+        // if (mid <= yh + 1) {
+        //   // mid becoming less than 0. Look into this
+        //   this.drawColumn(
+        //     lowerTextureAlt,
+        //     Math.abs(Math.floor(mid)),
+        //     Math.floor(yh) + 1,
+        //     inverseScale,
+        //     textureColumn,
+        //     textureWidthLower,
+        //     textureHeightLower,
+        //     textureDataLower,
+        //     x,
+        //     lightLevel
+        //   );
 
-      //     this.lowerclip[x] = Math.floor(mid);
-      //   } else {
-      //     this.lowerclip[x] = yh + 1;
-      //   }
-      // } else if (this.markfloor) {
-      //   this.lowerclip[x] = yh + 1;
+        //   this.lowerclip[x] = Math.floor(mid);
+        // } else {
+        //   this.lowerclip[x] = yh + 1;
+        // }
+      } else if (this.markfloor) {
+        this.lowerclip[x] = yh + 1;
+      }
       // }
-      //}
 
       // vertically move down
       wallY1 += wallY1Step;
@@ -789,6 +804,50 @@ class WallRenderer {
     }
 
 
+  }
+
+  checkAndDrawUpperWall(wallData) {
+
+    if (wallData.mid > wallData.yl) {
+      this.drawColumn(
+        wallData.upperTextureAlt,
+        wallData.yl,
+        Math.floor(wallData.mid),
+        wallData.inverseScale,
+        wallData.textureColumn,
+        wallData.textureWidthUpper,
+        wallData.textureHeightUpper,
+        wallData.textureDataUpper,
+        wallData.x,
+        wallData.lightLevel
+      );
+
+      this.upperclip[wallData.x] = Math.floor(wallData.mid);
+    } else {
+      this.upperclip[wallData.x] = wallData.yl - 1;
+    }
+  }
+
+  checkAndDrawLowerWall(wallData) {
+    if (wallData.mid <= wallData.yh + 1) {
+      // mid becoming less than 0. Look into this
+      this.drawColumn(
+        wallData.lowerTextureAlt,
+        Math.abs(Math.floor(wallData.mid)),
+        Math.floor(wallData.yh) + 1,
+        wallData.inverseScale,
+        wallData.textureColumn,
+        wallData.textureWidthLower,
+        wallData.textureHeightLower,
+        wallData.textureDataLower,
+        wallData.x,
+        wallData.lightLevel
+      );
+
+      this.lowerclip[wallData.x] = Math.floor(wallData.mid);
+    } else {
+      this.lowerclip[wallData.x] = wallData.yh + 1;
+    }
   }
 
   getTexture(textureName) {
