@@ -13,8 +13,6 @@ class GameLogic {
     this.ticks = [];
   }
 
-
-
   tick() {
     const current = performance.now();
     const delta = (current - this.lastTimestamp) / 1000;

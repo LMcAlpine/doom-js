@@ -1,5 +1,11 @@
 const gameEngine = new GameEngine("myCanvas", 50);
 
+const ENDIAN = (() => {
+  const buffer = new ArrayBuffer(2);
+  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
+  return new Int16Array(buffer)[0] === 256;
+})();
+
 let levelSelect = document.getElementById("levels");
 
 let selectedValue = "E1M1";
@@ -17,7 +23,42 @@ document
       return;
     }
 
+    // identify version
+    let gameMission = GameMission.doom;
+    let gameMode = "";
+    if (gameMission === GameMission.doom) {
+      gameMode = GameMode.shareware;
+    }
+    let startMap = 1;
+    let startEpisode = 1;
+
+    // need to setup the framebuffer/video buffer
+
+    // ...
+
+    // loop has started but still initializing
+
+    // checking the gamemode
+    // if gamemmode === commercial
+    // else
+    // switch gameepisode
+    // case 1
+    // these comments need to be changed into code but only doing SKY1 for now
+    let skyTextureName = "SKY1";
+    // might need a texture number for this name
+
+    // G_DoLoadLevel
+    //skyflatenum = R_FlatNumForName(SKYFLATNAME)
+
+    // ....
+
+    // setup level P_SetupLevel
+
+    // *** need to more setup before regarding the file reading, parsing, lump loading, etc
+
     gameEngine.entities = [];
+
+    gameEngine.skyTextureName = "SKY1";
 
     const wadFileReader = new WADFileReader(file);
     const arrayBuffer = await wadFileReader.readFile();
@@ -27,7 +68,6 @@ document
     const levels = levelParser.parse(selectedValue);
 
     gameEngine.lumpData = lumpData;
-
 
     const palette = new ReadPalette(lumpData);
 
@@ -44,10 +84,6 @@ document
 
     const canvas = new Canvas("myCanvas");
 
-
-
-
-
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },
@@ -58,8 +94,6 @@ document
 
     gameEngine.addEntity(player);
     gameEngine.player = player;
-
-
 
     gameEngine.canvas = canvas;
     gameEngine.ctx = canvas.ctx;
@@ -85,11 +119,18 @@ document
       segObjects,
     };
 
-    const textureManager = new TextureManager(texture.maptextures, palette.palettes[0]);
+    const textureManager = new TextureManager(
+      texture.maptextures,
+      palette.palettes[0]
+    );
     const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
-
-    const levelManager = new LevelManager(levels, dataObjects, textureManager, flatManager);
+    const levelManager = new LevelManager(
+      levels,
+      dataObjects,
+      textureManager,
+      flatManager
+    );
     gameEngine.levelManager = levelManager;
     gameEngine.init();
 

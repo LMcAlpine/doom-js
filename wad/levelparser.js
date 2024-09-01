@@ -369,6 +369,4 @@ class LevelParser {
     }
     return things;
   }
-
-
 }
