@@ -231,7 +231,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -244,7 +244,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
@@ -503,10 +503,8 @@ class WallRenderer {
     floorTexture = rightSector.floorTexture;
 
     this.renderSegLoop(
-      seg,
       rwx,
       rwStopX,
-      gameEngine.player.height,
       seg.linedef.rightSidedef.middleTexture.toUpperCase(),
       wallY1,
       wallY1Step,
@@ -531,17 +529,13 @@ class WallRenderer {
       bottomTexture,
       upperTextureAlt,
       lowerTextureAlt,
-      ceilingTexture,
       worldFrontZ1,
-      worldFrontZ2,
-      floorTexture
+      worldFrontZ2
     );
   }
   renderSegLoop(
-    seg,
     xScreenV1,
     xScreenV2,
-    viewHeight,
     wallTexture,
     wallY1,
     wallY1Step,
@@ -566,12 +560,9 @@ class WallRenderer {
     bottomtexture,
     upperTextureAlt,
     lowerTextureAlt,
-    ceilingTexture,
     worldFrontZ1,
-    worldFrontZ2,
-    floorTexture
+    worldFrontZ2
   ) {
-
     let textureWidth;
     let textureHeight;
     let textureData;
@@ -581,7 +572,6 @@ class WallRenderer {
       textureHeight = r.textureHeight;
       textureData = r.textureImageData;
     }
-
 
     // wall segment
     let {
@@ -619,8 +609,6 @@ class WallRenderer {
           ceilingPlane.bottom[x] = bottom;
           ceilingPlane.worldFront = worldFrontZ1;
         }
-
-
       }
 
       let yh = Math.floor(wallY2);
@@ -640,7 +628,6 @@ class WallRenderer {
           floorPlane.top[x] = top;
           floorPlane.bottom[x] = bottom + 1;
           floorPlane.worldFront = worldFrontZ2;
-
         }
       }
 
