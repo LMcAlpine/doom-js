@@ -614,42 +614,42 @@ class WallRenderer {
       let bottom;
 
       let mid;
-      if (this.markceiling) {
-        top = this.upperclip[x] + 1;
-        bottom = yl;
+      // if (this.markceiling) {
+      //   top = this.upperclip[x] + 1;
+      //   bottom = yl;
 
-        if (bottom >= this.lowerclip[x]) {
-          bottom = this.lowerclip[x] - 1;
-        }
+      //   if (bottom >= this.lowerclip[x]) {
+      //     bottom = this.lowerclip[x] - 1;
+      //   }
 
-        if (top <= bottom) {
-          // ceilingplane
+      //   if (top <= bottom) {
+      //     // ceilingplane
 
-          ceilingPlane.top[x] = top;
-          ceilingPlane.bottom[x] = bottom;
-          ceilingPlane.worldFront = worldFrontZ1;
-        }
-      }
+      //     ceilingPlane.top[x] = top;
+      //     ceilingPlane.bottom[x] = bottom;
+      //     ceilingPlane.worldFront = worldFrontZ1;
+      //   }
+      // }
 
       let yh = Math.floor(wallY2);
       if (yh >= this.lowerclip[x] - 1.0) {
         yh = this.lowerclip[x] - 1.0;
       }
-      if (this.markfloor) {
-        top = yh + 1;
-        bottom = this.lowerclip[x] - 1;
+      // if (this.markfloor) {
+      //   top = yh + 1;
+      //   bottom = this.lowerclip[x] - 1;
 
-        if (top <= this.upperclip[x]) {
-          top = this.upperclip[x] + 1;
-        }
-        if (top <= bottom) {
-          // set floorplane here
+      //   if (top <= this.upperclip[x]) {
+      //     top = this.upperclip[x] + 1;
+      //   }
+      //   if (top <= bottom) {
+      //     // set floorplane here
 
-          floorPlane.top[x] = top;
-          floorPlane.bottom[x] = bottom + 1;
-          floorPlane.worldFront = worldFrontZ2;
-        }
-      }
+      //     floorPlane.top[x] = top;
+      //     floorPlane.bottom[x] = bottom + 1;
+      //     floorPlane.worldFront = worldFrontZ2;
+      //   }
+      // }
 
       let angle;
       let textureColumn;
@@ -667,96 +667,137 @@ class WallRenderer {
         // iscale
       }
 
-      if (midtexture) {
-        // if (yl < yh) {
-        let wallY1 = yl;
-        let wallY2 = yh;
+      // if (midtexture) {
+      //   // if (yl < yh) {
+      //   let wallY1 = yl;
+      //   let wallY2 = yh;
 
-        this.drawColumn(
-          middleTextureAlt,
-          wallY1,
-          wallY2,
-          inverseScale,
-          textureColumn,
-          textureWidth,
-          textureHeight,
-          textureData,
-          x,
-          lightLevel
-        );
+      //   this.drawColumn(
+      //     middleTextureAlt,
+      //     wallY1,
+      //     wallY2,
+      //     inverseScale,
+      //     textureColumn,
+      //     textureWidth,
+      //     textureHeight,
+      //     textureData,
+      //     x,
+      //     lightLevel
+      //   );
 
-        // this.upperclip[x] = CANVASHEIGHT;
-        // this.lowerclip[x] = -1;
+      //   // this.upperclip[x] = CANVASHEIGHT;
+      //   // this.lowerclip[x] = -1;
 
-        //  }
-      } else {
-        if (toptexture) {
-          mid = pixhigh;
-          pixhigh += pixhighstep;
+      //   //  }
+      // } 
 
-          if (mid >= this.lowerclip[x]) {
-            mid = this.lowerclip[x] - 1;
-          }
+      this.checkAndDrawMiddleWall(midtexture, { middleTextureAlt, yl, yh, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel })
+      //  else {
+      // if (toptexture) {
+      //   mid = pixhigh;
+      //   pixhigh += pixhighstep;
 
-          if (mid > yl) {
-            this.drawColumn(
-              upperTextureAlt,
-              yl,
-              Math.floor(mid),
-              inverseScale,
-              textureColumn,
-              textureWidthUpper,
-              textureHeightUpper,
-              textureDataUpper,
-              x,
-              lightLevel
-            );
+      //   if (mid >= this.lowerclip[x]) {
+      //     mid = this.lowerclip[x] - 1;
+      //   }
 
-            this.upperclip[x] = Math.floor(mid);
-          } else {
-            this.upperclip[x] = yl - 1;
-          }
-        } else if (this.markceiling) {
-          this.upperclip[x] = yl - 1;
-        }
+      //   if (mid > yl) {
+      //     this.drawColumn(
+      //       upperTextureAlt,
+      //       yl,
+      //       Math.floor(mid),
+      //       inverseScale,
+      //       textureColumn,
+      //       textureWidthUpper,
+      //       textureHeightUpper,
+      //       textureDataUpper,
+      //       x,
+      //       lightLevel
+      //     );
 
-        if (bottomtexture) {
-          mid = pixlow + 1;
-          pixlow += pixlowstep;
+      //     this.upperclip[x] = Math.floor(mid);
+      //   } else {
+      //     this.upperclip[x] = yl - 1;
+      //   }
+      // } else if (this.markceiling) {
+      //   this.upperclip[x] = yl - 1;
+      // }
 
-          if (mid <= this.upperclip[x]) {
-            mid = this.upperclip[x] + 1;
-          }
+      // if (bottomtexture) {
+      //   mid = pixlow + 1;
+      //   pixlow += pixlowstep;
 
-          if (mid <= yh + 1) {
-            // mid becoming less than 0. Look into this
-            this.drawColumn(
-              lowerTextureAlt,
-              Math.abs(Math.floor(mid)),
-              Math.floor(yh) + 1,
-              inverseScale,
-              textureColumn,
-              textureWidthLower,
-              textureHeightLower,
-              textureDataLower,
-              x,
-              lightLevel
-            );
+      //   if (mid <= this.upperclip[x]) {
+      //     mid = this.upperclip[x] + 1;
+      //   }
 
-            this.lowerclip[x] = Math.floor(mid);
-          } else {
-            this.lowerclip[x] = yh + 1;
-          }
-        } else if (this.markfloor) {
-          this.lowerclip[x] = yh + 1;
-        }
-      }
+      //   if (mid <= yh + 1) {
+      //     // mid becoming less than 0. Look into this
+      //     this.drawColumn(
+      //       lowerTextureAlt,
+      //       Math.abs(Math.floor(mid)),
+      //       Math.floor(yh) + 1,
+      //       inverseScale,
+      //       textureColumn,
+      //       textureWidthLower,
+      //       textureHeightLower,
+      //       textureDataLower,
+      //       x,
+      //       lightLevel
+      //     );
+
+      //     this.lowerclip[x] = Math.floor(mid);
+      //   } else {
+      //     this.lowerclip[x] = yh + 1;
+      //   }
+      // } else if (this.markfloor) {
+      //   this.lowerclip[x] = yh + 1;
+      // }
+      //}
 
       // vertically move down
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
       realWallScale1 += rwScaleStep;
     }
+  }
+
+  checkAndDrawMiddleWall(midtexture, wallData) {
+
+    if (midtexture) {
+      // if (yl < yh) {
+      // let wallY1 = yl;
+      // let wallY2 = yh;
+
+      this.drawColumn(
+        wallData.middleTextureAlt,
+        wallData.yl,
+        wallData.yh,
+        wallData.inverseScale,
+        wallData.textureColumn,
+        wallData.textureWidth,
+        wallData.textureHeight,
+        wallData.textureData,
+        wallData.x,
+        wallData.lightLevel
+      );
+
+      // this.upperclip[x] = CANVASHEIGHT;
+      // this.lowerclip[x] = -1;
+
+      //  }
+    }
+
+
+  }
+
+  getTexture(textureName) {
+    let {
+      textureWidth,
+      textureHeight,
+      textureData,
+    } = this.textureManager.getTextureInfo(textureName);
+    return { textureWidth, textureHeight, textureData };
   }
 
   findPlane(height, textureName, lightLevel) {
