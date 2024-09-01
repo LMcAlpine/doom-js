@@ -630,7 +630,6 @@ class WallRenderer {
       //   }
       // }
 
-      //  let yh = Math.floor(wallY2);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
 
@@ -664,10 +663,8 @@ class WallRenderer {
       this.checkAndDrawMiddleWall(midtexture, { middleTextureAlt, yl, yh, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel })
 
       if (toptexture) {
-        mid = pixhigh;
+        mid = this.calculateMidUpperWall(pixhigh, x);
         pixhigh += pixhighstep;
-
-        mid = Math.min(mid, this.lowerclip[x] - 1);
         this.checkAndDrawUpperWall({ upperTextureAlt, yl, mid, inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel })
 
       }
@@ -676,10 +673,8 @@ class WallRenderer {
       }
 
       if (bottomtexture) {
-        mid = pixlow + 1;
+        mid = this.calculateMidLowerWall(pixlow, x)
         pixlow += pixlowstep;
-
-        mid = Math.max(mid, this.upperclip[x] + 1);
 
         this.checkAndDrawLowerWall({ lowerTextureAlt, mid, yh, inverseScale, textureColumn, textureWidthLower, textureHeightLower, textureDataLower, x, lightLevel });
 
@@ -692,6 +687,13 @@ class WallRenderer {
       wallY2 += wallY2Step;
       realWallScale1 += rwScaleStep;
     }
+  }
+  calculateMidUpperWall(pixhigh, x) {
+    return Math.min(pixhigh, this.lowerclip[x] - 1);
+  }
+
+  calculateMidLowerWall(pixlow, x) {
+    return Math.max(pixlow + 1, this.upperclip[x] + 1);
   }
 
   checkAndDrawMiddleWall(midtexture, wallData) {
@@ -772,6 +774,7 @@ class WallRenderer {
     this.lowerclip[wallData.x] = Math.floor(wallData.mid);
 
   }
+
 
   getTexture(textureName) {
     let {
