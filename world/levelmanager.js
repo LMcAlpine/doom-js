@@ -116,9 +116,45 @@ class LevelManager {
 
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];
+
+
+
+      let textureWidthSky;
+      let textureHeightSky;
+      let textureDataSky;
+      if (visplane.textureName === "F_SKY1") {
+
+        let r = this.wallRenderer.textureManager.texturePool.get("SKY1");
+        textureWidthSky = r.textureWidth;
+        textureHeightSky = r.textureHeight;
+        textureDataSky = r.textureImageData;
+
+        for (let x = visplane.minX; x <= visplane.maxX; x++) {
+          let topY = visplane.top[x];
+          let bottomY = visplane.bottom[x];
+
+          if (topY <= bottomY) {
+
+            // for (let y = topY; y < bottomY; y++) {
+            //   let screenPosition = y * CANVASWIDTH + x;
+            //   gameEngine.canvas.screenBuffer[screenPosition] = 0xFFFF0000;
+            // }
+            // gameEngine.canvas.updateCanvas();
+
+            let textureColumn = (gameEngine.player.direction.angle + getXToAngle(x)) * 2.8444; // Random number. No idea. Credit to room4doom for the random number
+
+            this.wallRenderer.drawColumn(CANVASHEIGHT / 2, topY, bottomY, 1, textureColumn, textureWidthSky, textureHeightSky, textureDataSky, x, 1);
+            //  gameEngine.canvas.updateCanvas();
+          }
+
+        }
+        continue;
+      }
+
       let flat = this.flatManager.flatPool.get(visplane.textureName);
 
       if (!flat) continue;
+
 
       const textureWidthFlat = flat.width;
       const textureHeightFlat = flat.height;
@@ -172,71 +208,6 @@ class LevelManager {
 
       //gameEngine.canvas.updateCanvas();
     }
-
-
-
-
-
-    // for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
-    //   let visplane = this.wallRenderer.visplanes[i];
-
-    //   if (visplane.minX > visplane.maxX) {
-    //     continue;
-    //   }
-
-    //   visplane.top[visplane.maxX + 1] = 0xff;
-    //   visplane.top[visplane.minX - 1] = 0xff;
-
-    //   for (let x = visplane.minX; x < visplane.maxX; x++) {
-
-
-
-
-    //     let x = i;
-    //     let top1 = visplane.top[x - 1];
-    //     let bot1 = visplane.bottom[x - 1];
-    //     let top2 = visplane.top[x];
-    //     let bot2 = visplane.bottom[x];
-
-
-    //     let planeHeight = Math.abs(visplane.height - gameEngine.player.height);
-    //     while (top1 < top2 && top1 <= bot1) {
-    //       let y = top1;
-    //       let x1 = this.spanstart[top1];
-    //       let x2 = x - 1;
-
-    //       let distance;
-    //       let angle;
-    //       let length;
-    //       let xstep;
-    //       let ystep;
-
-    //       distance = planeHeight * this.yslope[x];
-    //       xstep = distance * visplane.basexscale;
-    //       ystep = distance * visplane.baseyscale;
-
-    //       let distscale = screenToXView(x1, CANVASWIDTH)
-
-
-    //       top1++;
-    //     }
-    //     while (bot1 > bot2 && bot1 >= top1) {
-    //       let y = bot1;
-    //       let x1 = this.spanstart[bot1];
-    //       let x2 = x - 1;
-    //       bot1--;
-    //     }
-
-    //     while (top2 < top1 && top2 <= bot2) {
-    //       this.spanstart[top2] = x;
-    //       top2++;
-    //     }
-
-    //     while (bot2 > bot1 && bot2 >= top2) {
-    //       this.spanstart[bot2] = x;
-    //       bot2--;
-    //     }
-
 
     //     // Draw the top pixel
     //     // let topY = visplane.top[i];
