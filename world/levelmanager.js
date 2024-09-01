@@ -87,32 +87,181 @@ class LevelManager {
     // console.log(traverseCount);
     traverseCount = 0;
 
+    // for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
+    //   let visplane = this.wallRenderer.visplanes[i];
+    //   let flat = this.flatManager.flatPool.get(visplane.textureName);
+    //   for (let j = visplane.minX; j <= visplane.maxX; j++) {
+    //     let topY = visplane.top[j];
+    //     let bottomY = visplane.bottom[j];
+
+    //     if (topY <= bottomY) {
+    //       // Draw lines to visualize the top and bottom boundaries
+    //       // let screenPositionTop = topY * CANVASWIDTH + j;
+    //       // let screenPositionBottom = bottomY * CANVASWIDTH + j;
+
+    //       // gameEngine.canvas.screenBuffer[screenPositionTop] = 0xFF0000FF;  // Red for top
+    //       // gameEngine.canvas.screenBuffer[screenPositionBottom] = 0xFFFF0000; // Blue for bottom
+
+
+
+    //       // Iterate through each row from top to bottom within this column
+    //       for (let y = topY; y < bottomY; y++) {
+    //         let screenPosition = y * CANVASWIDTH + j;
+    //         gameEngine.canvas.screenBuffer[screenPosition] = visplane.color;
+    //       }
+    //     }
+    //   }
+    //   // gameEngine.canvas.updateCanvas();
+    // }
 
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];
+      let flat = this.flatManager.flatPool.get(visplane.textureName);
+
+      if (!flat) continue;
+
+      const textureWidthFlat = flat.width;
+      const textureHeightFlat = flat.height;
+      const textureData = flat.data;
+
       for (let j = visplane.minX; j <= visplane.maxX; j++) {
         let topY = visplane.top[j];
         let bottomY = visplane.bottom[j];
 
         if (topY <= bottomY) {
-          // Draw lines to visualize the top and bottom boundaries
-          // let screenPositionTop = topY * CANVASWIDTH + j;
-          // let screenPositionBottom = bottomY * CANVASWIDTH + j;
-
-          // gameEngine.canvas.screenBuffer[screenPositionTop] = 0xFF0000FF;  // Red for top
-          // gameEngine.canvas.screenBuffer[screenPositionBottom] = 0xFFFF0000; // Blue for bottom
 
 
+          // Calculate direction vectors for texture mapping
+          let playerDirectionX = Math.cos(degreesToRadians(gameEngine.player.direction.angle));
+          let playerDirectionY = Math.sin(degreesToRadians(gameEngine.player.direction.angle));
 
-          // Iterate through each row from top to bottom within this column
-          for (let y = topY; y < bottomY; y++) {
+          // Iterate from top to bottom in this column
+          for (let y = topY; y <= bottomY; y++) {
+            let z = (HALFWIDTH * visplane.worldFront) / (HALFHEIGHT - y);
+            let px = playerDirectionX * z + gameEngine.player.x;
+            let py = playerDirectionY * z + gameEngine.player.y;
+
+            let leftX = -playerDirectionY * z + px;
+            let leftY = playerDirectionX * z + py;
+            let rightX = playerDirectionY * z + px;
+            let rightY = -playerDirectionX * z + py;
+
+            let dx = (rightX - leftX) / CANVASWIDTH;
+            let dy = (rightY - leftY) / CANVASWIDTH;
+            let tx = Math.floor(leftX + dx * j) & (textureWidthFlat - 1);
+            let ty = Math.floor(leftY + dy * j) & (textureHeightFlat - 1);
+            const texPos = (ty * textureWidthFlat + tx) * 4;
+
+
             let screenPosition = y * CANVASWIDTH + j;
-            gameEngine.canvas.screenBuffer[screenPosition] = visplane.color;
+
+            // Apply color to the screen buffer
+            let r = textureData[texPos];
+            let g = textureData[texPos + 1];
+            let b = textureData[texPos + 2];
+            let a = textureData[texPos + 3];
+
+            gameEngine.canvas.screenBuffer[screenPosition] = (a << 24) | (b << 16) | (g << 8) | r;
+
           }
         }
       }
-     // gameEngine.canvas.updateCanvas();
+
+      //gameEngine.canvas.updateCanvas();
     }
+
+
+
+
+
+    // for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
+    //   let visplane = this.wallRenderer.visplanes[i];
+
+    //   if (visplane.minX > visplane.maxX) {
+    //     continue;
+    //   }
+
+    //   visplane.top[visplane.maxX + 1] = 0xff;
+    //   visplane.top[visplane.minX - 1] = 0xff;
+
+    //   for (let x = visplane.minX; x < visplane.maxX; x++) {
+
+
+
+
+    //     let x = i;
+    //     let top1 = visplane.top[x - 1];
+    //     let bot1 = visplane.bottom[x - 1];
+    //     let top2 = visplane.top[x];
+    //     let bot2 = visplane.bottom[x];
+
+
+    //     let planeHeight = Math.abs(visplane.height - gameEngine.player.height);
+    //     while (top1 < top2 && top1 <= bot1) {
+    //       let y = top1;
+    //       let x1 = this.spanstart[top1];
+    //       let x2 = x - 1;
+
+    //       let distance;
+    //       let angle;
+    //       let length;
+    //       let xstep;
+    //       let ystep;
+
+    //       distance = planeHeight * this.yslope[x];
+    //       xstep = distance * visplane.basexscale;
+    //       ystep = distance * visplane.baseyscale;
+
+    //       let distscale = screenToXView(x1, CANVASWIDTH)
+
+
+    //       top1++;
+    //     }
+    //     while (bot1 > bot2 && bot1 >= top1) {
+    //       let y = bot1;
+    //       let x1 = this.spanstart[bot1];
+    //       let x2 = x - 1;
+    //       bot1--;
+    //     }
+
+    //     while (top2 < top1 && top2 <= bot2) {
+    //       this.spanstart[top2] = x;
+    //       top2++;
+    //     }
+
+    //     while (bot2 > bot1 && bot2 >= top2) {
+    //       this.spanstart[bot2] = x;
+    //       bot2--;
+    //     }
+
+
+    //     // Draw the top pixel
+    //     // let topY = visplane.top[i];
+    //     // if (topY >= 0 && topY < CANVASHEIGHT) {
+    //     //   let topScreenPosition = topY * CANVASWIDTH + i;
+    //     //   gameEngine.canvas.screenBuffer[topScreenPosition] = 0xFF0000FF; // Red color for top pixels
+    //     //   gameEngine.canvas.updateCanvas();
+    //     // }
+    //     // // gameEngine.canvas.updateCanvas();
+
+    //     // //Draw the bottom pixel
+    //     // let bottomY = visplane.bottom[i];
+    //     // if (bottomY >= 0 && bottomY < CANVASHEIGHT) {
+    //     //   let bottomScreenPosition = bottomY * CANVASWIDTH + i;
+    //     //   gameEngine.canvas.screenBuffer[bottomScreenPosition] = 0xFFFF0000; // Blue color for bottom pixels
+    //     //   gameEngine.canvas.updateCanvas();
+    //     // }
+    //   }
+    //   // gameEngine.canvas.updateCanvas();
+    // };
+
+
+
+  }
+
+  mapPlane(y, x1, x2) {
+
+
 
   }
 

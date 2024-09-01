@@ -761,6 +761,7 @@ class WallRenderer {
 
           ceilingPlane.top[x] = top;
           ceilingPlane.bottom[x] = bottom;
+          ceilingPlane.worldFront = worldFrontZ1;
         }
 
         // let cy2 = Math.min(yl + 1, this.lowerclip[x] - 1);
@@ -788,6 +789,7 @@ class WallRenderer {
 
           floorPlane.top[x] = top;
           floorPlane.bottom[x] = bottom + 1;
+          floorPlane.worldFront = worldFrontZ2;
 
           // bottom = Math.floor(bottom);
           // top = Math.floor(top);
