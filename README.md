@@ -43,6 +43,7 @@ https://www.gamers.org/dhs/helpdocs/dmsp1666.html
 - DIYDoom by Amro Ibrahim
 https://github.com/amroibrahim/DIYDoom
 
+- room4doom
 https://github.com/flukejones/room4doom
 
 - A Brief Summary of DOOM-style Rendering by Robert Forsman and Bernd Kreimeier
