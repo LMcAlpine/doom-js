@@ -609,9 +609,10 @@ class WallRenderer {
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.floor(wallY1) + 1;
-      if (yl < this.upperclip[x] + 1) {
-        yl = this.upperclip[x] + 1;
-      }
+      // if (yl < this.upperclip[x] + 1) {
+      //   yl = this.upperclip[x] + 1;
+      // }
+      yl = Math.max(yl, this.upperclip[x] + 1);
       let top;
       let bottom;
 
@@ -634,9 +635,12 @@ class WallRenderer {
       // }
 
       let yh = Math.floor(wallY2);
-      if (yh >= this.lowerclip[x] - 1.0) {
-        yh = this.lowerclip[x] - 1.0;
-      }
+      // if (yh >= this.lowerclip[x] - 1.0) {
+      //   yh = this.lowerclip[x] - 1.0;
+      // }
+      yh = Math.min(yh, this.lowerclip[x] - 1);
+
+
       // if (this.markfloor) {
       //   top = yh + 1;
       //   bottom = this.lowerclip[x] - 1;
@@ -670,9 +674,10 @@ class WallRenderer {
         mid = pixhigh;
         pixhigh += pixhighstep;
 
-        if (mid >= this.lowerclip[x]) {
-          mid = this.lowerclip[x] - 1;
-        }
+        // if (mid >= this.lowerclip[x]) {
+        //   mid = this.lowerclip[x] - 1;
+        // }
+        mid = Math.min(mid, this.lowerclip[x] - 1);
         this.checkAndDrawUpperWall({ upperTextureAlt, yl, mid, inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel })
 
       }
@@ -684,9 +689,10 @@ class WallRenderer {
         mid = pixlow + 1;
         pixlow += pixlowstep;
 
-        if (mid <= this.upperclip[x]) {
-          mid = this.upperclip[x] + 1;
-        }
+        // if (mid <= this.upperclip[x]) {
+        //   mid = this.upperclip[x] + 1;
+        // }
+        mid = Math.max(mid, this.upperclip[x] + 1);
 
         this.checkAndDrawLowerWall({ lowerTextureAlt, mid, yh, inverseScale, textureColumn, textureWidthLower, textureHeightLower, textureDataLower, x, lightLevel });
 
