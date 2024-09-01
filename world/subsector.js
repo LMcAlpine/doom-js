@@ -12,7 +12,7 @@ class Subsector {
       segs: segmentData.segs,
       vertices: levelsData.vertices,
       wallRenderer: wallRenderer,
-      linkedSubsectors: linkedSubsectors
+      linkedSubsectors: linkedSubsectors,
     });
   }
 
@@ -26,16 +26,22 @@ class Subsector {
 
     // check floor visibility
     if (subsector.sector.floorHeight < gameEngine.player.height) {
-      floorPlane = this.wallRenderer.findPlane(subsector.sector.floorHeight, subsector.sector.floorTexture, subsector.sector.lightLevel);
+      floorPlane = this.wallRenderer.findPlane(
+        subsector.sector.floorHeight,
+        subsector.sector.floorTexture,
+        subsector.sector.lightLevel
+      );
     } else {
       floorPlane = null;
     }
 
     if (subsector.sector.ceilingHeight > gameEngine.player.height) {
-      ceilingPlane = this.wallRenderer.findPlane(subsector.sector.ceilingHeight, subsector.sector.ceilingTexture, subsector.sector.lightLevel);
+      ceilingPlane = this.wallRenderer.findPlane(
+        subsector.sector.ceilingHeight,
+        subsector.sector.ceilingTexture,
+        subsector.sector.lightLevel
+      );
     }
-
-
 
     // check ceiling visibility
 

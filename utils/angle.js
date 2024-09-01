@@ -20,12 +20,6 @@ class Angle {
       angle += 360;
     }
     return angle;
-    // if (angle < 0) {
-    //   angle += 2 * Math.PI;
-    // }
-    // else if (angle >= 2 * Math.PI) {
-    //   angle -= 2.0 * Math.PI;
-    // }
   }
 
   /**

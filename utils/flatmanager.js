@@ -34,8 +34,18 @@ class FlatManager {
 
         let packedPixel;
         if (ENDIAN) {
-          packedPixel = (FULL_ALPHA << 24) | (pixelColor.blue << 16) | (pixelColor.green << 8) | pixelColor.red;
-        } else { packedPixel = (pixelColor.red << 24) | (pixelColor.green << 16) | (pixelColor.blue << 8) | FULL_ALPHA; }
+          packedPixel =
+            (FULL_ALPHA << 24) |
+            (pixelColor.blue << 16) |
+            (pixelColor.green << 8) |
+            pixelColor.red;
+        } else {
+          packedPixel =
+            (pixelColor.red << 24) |
+            (pixelColor.green << 16) |
+            (pixelColor.blue << 8) |
+            FULL_ALPHA;
+        }
 
         textureUint32Array[i] = packedPixel;
       }

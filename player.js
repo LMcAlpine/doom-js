@@ -164,5 +164,5 @@ class Player {
    * Method to draw
    * @param {Object} ctx - canvas context
    */
-  draw(ctx) { }
+  draw(ctx) {}
 }

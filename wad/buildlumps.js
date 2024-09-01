@@ -55,11 +55,10 @@ function buildSegs(segs, vertices, linedefs) {
 
     //test
     // let side = segs[i].direction;
-    // let sidedef = 
+    // let sidedef =
 
     let rightSidedef;
     let leftSidedef;
-
 
     let sidedef;
     let frontsector;
@@ -67,8 +66,7 @@ function buildSegs(segs, vertices, linedefs) {
       // our right sidedef (and sector) is the opposite directions left sidedef (and sector)
       sidedef = seg.linedef.leftSidedef; // second sidedef of the linedef
       frontsector = sidedef.sector;
-    }
-    else {
+    } else {
       sidedef = seg.linedef.rightSidedef;
       frontsector = sidedef.sector;
     }

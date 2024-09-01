@@ -7,8 +7,6 @@ class BSPTraversal {
     this.subsector = subsector;
   }
 
-
-
   traverseBSP(nodeID) {
     // check for is this node a leaf node.
 
@@ -46,7 +44,6 @@ class BSPTraversal {
         this.traverseBSP(bsp.leftChild);
       }
     }
-
   }
 
   isPotentiallyVisible(boundingBox) {

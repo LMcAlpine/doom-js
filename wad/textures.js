@@ -11,7 +11,6 @@ class Textures {
 
       this.maptextures = this.maptextures.concat(maptextures2);
     }
-
   }
 
   parseTextureHeader(textureLump) {

@@ -19,14 +19,14 @@ const HALFFOV = FOV / 2;
 // const FRACBITS = 16;
 // const FRACUNIT = 1 << FRACBITS;
 
-const ANG45 = 0x20000000
-const ANG90 = 0x40000000
-const ANG180 = 0x80000000
-const ANG270 = 0xc0000000
-const ANG_MAX = 0xffffffff
+const ANG45 = 0x20000000;
+const ANG90 = 0x40000000;
+const ANG180 = 0x80000000;
+const ANG270 = 0xc0000000;
+const ANG_MAX = 0xffffffff;
 
-const ANG1 = (ANG45 / 45)
-const ANG60 = (ANG180 / 3)
+const ANG1 = ANG45 / 45;
+const ANG60 = ANG180 / 3;
 
 let traverseBSP;
 let traverseCount = 0;
