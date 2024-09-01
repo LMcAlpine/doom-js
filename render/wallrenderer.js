@@ -649,16 +649,7 @@ class WallRenderer {
       //   }
       // }
 
-      let angle;
-      let textureColumn;
-      let inverseScale;
-      if (segTextured) {
-        angle =
-          realWallCenterAngle + radiansToDegrees(screenToXView(x, CANVASWIDTH));
-        textureColumn =
-          realWallOffset - Math.tan(degreesToRadians(angle)) * realWallDistance;
-        inverseScale = 1.0 / realWallScale1;
-      }
+      let { textureColumn, inverseScale } = this.calculateTextureParams({ realWallCenterAngle, realWallOffset, realWallDistance, realWallScale1, x, segTextured });
 
       this.checkAndDrawMiddleWall(midtexture, { middleTextureAlt, yl, yh, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel })
 
@@ -688,6 +679,24 @@ class WallRenderer {
       realWallScale1 += rwScaleStep;
     }
   }
+
+  calculateTextureParams(wallInfo) {
+    let angle;
+    let textureColumn;
+    let inverseScale;
+
+    if (wallInfo.segTextured) {
+      angle =
+        wallInfo.realWallCenterAngle + radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
+      textureColumn =
+        wallInfo.realWallOffset - Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance;
+      inverseScale = 1.0 / wallInfo.realWallScale1;
+    }
+
+    return { textureColumn, inverseScale };
+
+  }
+
   calculateMidUpperWall(pixhigh, x) {
     return Math.min(pixhigh, this.lowerclip[x] - 1);
   }
