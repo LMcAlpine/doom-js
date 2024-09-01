@@ -20,8 +20,8 @@ class WallRenderer {
     this.canvas = gameEngine.canvas;
     // this.canvas = gameEngine.offscreenCanvas;
 
-    this.upperclip = new Array(this.canvas.offScreenWidth);
-    this.lowerclip = new Array(this.canvas.offScreenWidth);
+    this.upperclip = new Array(CANVASWIDTH);
+    this.lowerclip = new Array(CANVASWIDTH);
 
     this.textures = gameEngine.textures.maptextures;
 
