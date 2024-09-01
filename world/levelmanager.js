@@ -160,6 +160,9 @@ class LevelManager {
             let g = textureData[texPos + 1];
             let b = textureData[texPos + 2];
             let a = textureData[texPos + 3];
+            r = adjustColorComponent(r, visplane.lightLevel);
+            g = adjustColorComponent(g, visplane.lightLevel);
+            b = adjustColorComponent(b, visplane.lightLevel);
 
             gameEngine.canvas.screenBuffer[screenPosition] = (a << 24) | (b << 16) | (g << 8) | r;
 
