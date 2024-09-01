@@ -124,7 +124,24 @@ class LevelManager {
       let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
 
-        let r = this.wallRenderer.textureManager.texturePool.get("SKY1");
+
+        let ep = selectedValue[1];
+        let skyname;
+        switch (Number(ep)) {
+          case 1:
+            skyname = "SKY1";
+            break;
+          case 2:
+            skyname = "SKY2";
+            break;
+          case 3:
+            skyname = "SKY3";
+          case 4:
+            skyname = "SKY4";
+        }
+
+
+        let r = this.wallRenderer.textureManager.texturePool.get(skyname);
         textureWidthSky = r.textureWidth;
         textureHeightSky = r.textureHeight;
         textureDataSky = r.textureImageData;
@@ -135,16 +152,10 @@ class LevelManager {
 
           if (topY <= bottomY) {
 
-            // for (let y = topY; y < bottomY; y++) {
-            //   let screenPosition = y * CANVASWIDTH + x;
-            //   gameEngine.canvas.screenBuffer[screenPosition] = 0xFFFF0000;
-            // }
-            // gameEngine.canvas.updateCanvas();
 
             let textureColumn = (gameEngine.player.direction.angle + getXToAngle(x)) * 2.8444; // Random number. No idea. Credit to room4doom for the random number
 
             this.wallRenderer.drawColumn(CANVASHEIGHT / 2, topY, bottomY, 1, textureColumn, textureWidthSky, textureHeightSky, textureDataSky, x, 1);
-            //  gameEngine.canvas.updateCanvas();
           }
 
         }
