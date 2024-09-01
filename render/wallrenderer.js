@@ -195,127 +195,6 @@ class WallRenderer {
     return totalSolidSegs;
   }
 
-  drawFlat(
-    y2,
-    y1,
-    worldFront,
-    x,
-    textureWidthFlat,
-    textureHeightFlat,
-    textureImageObj,
-    lightLevel
-  ) {
-    function adjustColorComponent(color, lightLevel) {
-      return Math.min(255, Math.floor(color * lightLevel));
-    }
-
-    let imageData = new ImageData(1, y2 - y1 + 1);
-    const accumulatedImageData = imageData.data;
-
-    let playerDirectionX = Math.cos(
-      degreesToRadians(gameEngine.player.direction.angle)
-    );
-    let playerDirectionY = Math.sin(
-      degreesToRadians(gameEngine.player.direction.angle)
-    );
-    for (let i = y1; i <= y2; i++) {
-      let z = (HALFWIDTH * worldFront) / (HALFHEIGHT - i);
-      let px = playerDirectionX * z + gameEngine.player.x;
-      let py = playerDirectionY * z + gameEngine.player.y;
-
-      let leftX = -playerDirectionY * z + px;
-      let leftY = playerDirectionX * z + py;
-      let rightX = playerDirectionY * z + px;
-      let rightY = -playerDirectionX * z + py;
-
-      let dx = (rightX - leftX) / this.canvas.canvasWidth;
-      let dy = (rightY - leftY) / this.canvas.canvasWidth;
-      let tx = Math.floor(leftX + dx * x) & (textureWidthFlat - 1);
-      let ty = Math.floor(leftY + dy * x) & (textureHeightFlat - 1);
-
-      const texPos = (ty * textureWidthFlat + tx) * 4;
-
-      // Apply light level adjustment using the adjustColorComponent function
-      accumulatedImageData[(i - y1) * 4] = adjustColorComponent(
-        textureImageObj.data[texPos],
-        lightLevel
-      );
-      accumulatedImageData[(i - y1) * 4 + 1] = adjustColorComponent(
-        textureImageObj.data[texPos + 1],
-        lightLevel
-      );
-      accumulatedImageData[(i - y1) * 4 + 2] = adjustColorComponent(
-        textureImageObj.data[texPos + 2],
-        lightLevel
-      );
-      accumulatedImageData[(i - y1) * 4 + 3] = 255; // Alpha channel
-    }
-
-    gameEngine.canvas.offScreenCtx.putImageData(imageData, x, y1);
-
-    // gameEngine.canvas.offScreenCtx.fillStyle = 'yellow';
-    // gameEngine.canvas.offScreenCtx.fillRect(x, y1, 1, 1);
-
-    // // Highlighting the last row at wallY2
-    // gameEngine.canvas.offScreenCtx.fillRect(x, y2, 1, 1);
-  }
-
-  drawSegmentWithTexture(
-    columnsData,
-    textureWidth,
-    textureHeight,
-    textureData,
-    lightLevel
-  ) {
-    columnsData.forEach(
-      ({ x, wallY1, wallY2, textureColumn, textureAlt, inverseScale }) => {
-        let textureY = textureAlt + (wallY1 - HALFHEIGHT) * inverseScale;
-        textureColumn = Math.floor(textureColumn) & (textureWidth - 1);
-
-        // for (let y = 0; y < wallY2 - wallY1 + 1; y++) {
-        //   let texY = isPowerOfTwo(textureHeight)
-        //     ? Math.floor(textureY) & (textureHeight - 1)
-        //     : Math.floor(textureY) % textureHeight;
-
-        //   const texPos = texY * textureWidth + textureColumn;
-        //   let pixelValue = textureData[texPos];
-
-        //   // Apply light level to RGB components
-        //   // red = adjustColorComponent(red, lightLevel);
-        //   // green = adjustColorComponent(green, lightLevel);
-        //   // blue = adjustColorComponent(blue, lightLevel);
-
-        //   //accumulatedImageData[y] = pixelValue;
-        //   // this.canvas.screenBuffer[y*this.canvas.canvasWidth + x] = pixelValue;
-
-        //   textureY += inverseScale;
-        // }
-
-        for (let y = wallY1; y < wallY2 + 1; y++) {
-          let texY = isPowerOfTwo(textureHeight)
-            ? Math.floor(textureY) & (textureHeight - 1)
-            : Math.floor(textureY) % textureHeight;
-
-          const texPos = texY * textureWidth + textureColumn;
-          let pixelValue = textureData[texPos];
-
-          // Apply light level to RGB components
-          // red = adjustColorComponent(red, lightLevel);
-          // green = adjustColorComponent(green, lightLevel);
-          // blue = adjustColorComponent(blue, lightLevel);
-
-          //accumulatedImageData[y] = pixelValue;
-          // this.canvas.screenBuffer[y*this.canvas.canvasWidth + x] = pixelValue;
-          this.canvas.screenBuffer[y * this.canvas.canvasWidth + x] =
-            pixelValue;
-          textureY += inverseScale;
-        }
-
-        // gameEngine.canvas.offScreenCtx.putImageData(imageData, x, wallY1);
-      }
-    );
-  }
-
   storeWallRange(seg, xScreenV1, xScreenV2) {
     let line = seg.linedef;
     let side = seg.linedef.rightSidedef;
@@ -352,7 +231,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -365,7 +244,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
@@ -692,8 +571,6 @@ class WallRenderer {
     worldFrontZ2,
     floorTexture
   ) {
-    let textureWidthFlat = 64;
-    let textureHeightFlat = 64;
 
     let textureWidth;
     let textureHeight;
@@ -705,7 +582,7 @@ class WallRenderer {
       textureData = r.textureImageData;
     }
 
-    let columnsData = [];
+
     // wall segment
     let {
       textureWidth: textureWidthUpper,
@@ -718,15 +595,6 @@ class WallRenderer {
       textureData: textureDataLower,
     } = this.textureManager.getTextureInfo(lowerWallTexture);
 
-    let upperColumns = [];
-    let lowerColumns = [];
-
-    let ceilingData = [];
-    let floorData = [];
-
-    // const texture1Lump = lumps.find((lump) => lump.name === "TEXTURE1");
-    let textureImageObj = this.flatManager.flatPool.get(ceilingTexture);
-    let textureImageObjFloor = this.flatManager.flatPool.get(floorTexture);
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.floor(wallY1) + 1;
       if (yl < this.upperclip[x] + 1) {
@@ -752,13 +620,7 @@ class WallRenderer {
           ceilingPlane.worldFront = worldFrontZ1;
         }
 
-        // let cy2 = Math.min(yl + 1, this.lowerclip[x] - 1);
-        // if (ceilingTexture !== "F_SKY1" && top < cy2) {
-        //   this.drawFlat(Math.floor(cy2), Math.floor(top), worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel);
-        //   // cy2 = Math.floor(cy2);
-        //   // top = Math.floor(top);
-        //   // ceilingData.push({ cy2, top, worldFrontZ1, x, textureWidthFlat, textureHeightFlat, textureImageObj, lightLevel });
-        // }
+
       }
 
       let yh = Math.floor(wallY2);
@@ -779,10 +641,6 @@ class WallRenderer {
           floorPlane.bottom[x] = bottom + 1;
           floorPlane.worldFront = worldFrontZ2;
 
-          // bottom = Math.floor(bottom);
-          // top = Math.floor(top);
-          //floorData.push({ bottom, top, worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel });
-          //this.drawFlat(Math.floor(bottom), Math.floor(top), worldFrontZ2, x, textureWidthFlat, textureHeightFlat, textureImageObjFloor, lightLevel);
         }
       }
 
@@ -894,25 +752,6 @@ class WallRenderer {
     }
   }
 
-  // findPlane(height, textureName, lightLevel) {
-  //   if (textureName === "F_SKY1") {
-  //     height = 0;
-  //     lightLevel = 0;
-  //   }
-
-  //   const key = `${height}_${textureName}_${lightLevel}`;
-
-  //   if (this.visplanes.has(key)) {
-  //     return this.visplanes.get(key);
-  //   }
-
-  //   const newPlane = { height: height, textureName: textureName, lightLevel: lightLevel, minX: CANVASWIDTH, maxX: -1, top: new Array(CANVASWIDTH).fill(0xff), bottom: new Array(CANVASWIDTH).fill(0) };
-
-  //   this.visplanes.set(key, newPlane);
-  //   return newPlane;
-
-  // }
-
   findPlane(height, textureName, lightLevel) {
     if (textureName === "F_SKY1") {
       height = 0;
@@ -1006,124 +845,6 @@ class WallRenderer {
 
     return newPlane;
   }
-
-  // findPlane(height, textureName, lightLevel) {
-  //   if (textureName === "F_SKY1") {
-  //     height = 0;
-  //     lightLevel = 0;
-  //   }
-
-  //   const key = `${height}_${textureName}_${lightLevel}`;
-
-  //   if (this.visplanes.has(key)) {
-  //     return this.visplanes.get(key);
-  //   }
-
-  //   // Generate a consistent color for this visplane based on its properties
-  //   const color = generateColorForVisplane(height, textureName, lightLevel);
-
-  //   const newPlane = {
-  //     height: height,
-  //     textureName: textureName,
-  //     lightLevel: lightLevel,
-  //     minX: CANVASWIDTH,
-  //     maxX: -1,
-  //     top: new Array(CANVASWIDTH).fill(0xff),
-  //     bottom: new Array(CANVASWIDTH).fill(0),
-  //     color: color // Assign the consistent color to the visplane
-  //   };
-
-  //   this.visplanes.set(key, newPlane);
-  //   return newPlane;
-  // }
-
-  // checkPlane(plane, x1, x2) {
-  //   let intersectLow;
-  //   let intersectHigh;
-  //   let unionLow;
-  //   let unionHigh;
-  //   let i;
-  //   if (x1 < plane.minX) {
-  //     intersectLow = plane.minX;
-  //     unionLow = x1;
-  //   }
-  //   else {
-  //     unionLow = plane.minX;
-  //     intersectLow = x1;
-  //   }
-
-  //   if (x2 > plane.maxX) {
-  //     intersectHigh = plane.maxX;
-  //     unionHigh = x2;
-  //   }
-  //   else {
-  //     unionHigh = plane.maxX;
-  //     intersectHigh = x2;
-  //   }
-
-  //   for (i = intersectLow; i <= intersectHigh; i++) {
-  //     if (plane.top[i] !== 0xff) {
-  //       break;
-  //     }
-  //   }
-
-  //   if (i > intersectHigh) {
-  //     plane.minX = unionLow;
-  //     plane.maxX = unionHigh;
-  //     return plane;
-  //   }
-
-  //   const key = `${plane.height}_${plane.textureName}_${plane.lightLevel}_${i}`;
-  //   const color = plane.color;
-
-  //   // returning an old plane when we actually want a new one.
-  //   // if (this.visplanes.has(key)) {
-  //   //   return this.visplanes.get(key);
-  //   // }
-
-  //   // forgot to set color here, so there was no plane being drawn cause color was undefined.
-  //   const newPlane = { height: plane.height, textureName: plane.textureName, lightLevel: plane.lightLevel, minX: x1, maxX: x2, top: new Array(CANVASWIDTH).fill(0xff), bottom: new Array(CANVASWIDTH).fill(0), color };
-
-  //   // since the key is not unique it is overwriting, fixed by adding i to the end of the key? not sure if this will be a good fix
-
-  //   // I was having an issue where a visplane was having an overlapping span in one column
-  //   // the problem was that one column had two spans
-  //   // one span was above the other
-  //   // the code would run through and it would run a check to see if a visplane already existed in the visplane map
-  //   // so, it would check the key and think,yes, this visplane already exists so lets return that visplane
-  //   // the problem was that I technically wanted a new visplane, but that was not happening
-  //   // so, it was returning a visplane that already existed and then later down the line, the top and bottom arrays were being modified in error
-  //   // this was problematic because the previous information in those areas were important
-  //   // so, I needed to have a new visplane created
-  //   // I did this, but I had a problem because the new visplane had no bottom array, I realized this by stepping through the debugger. I fixed that by adding the bottom array init above
-  //   // then, I had a problem because there was no visplane being drawn. I stepped through the debugger and I noticed there was no color field.
-  //   // I fixed this by adding a colorfield above when the new plane is created
-  //   // I was able to fix these two issues but now there are further issues to fix related to off by one errors and potentially undefined colors, or reused visplanes in error
-  //   // I am investigating these issues by stepping through the debugger
-  //   this.visplanes.set(key, newPlane);
-
-  //   return newPlane;
-
-  // }
-
-  // checkPlane(plane, x1, x2) {
-  //   let intersectLow = Math.max(x1, plane.minX);
-  //   let intersectHigh = Math.min(x2, plane.maxX);
-  //   let unionLow = Math.min(x1, plane.minX);
-  //   let unionHigh = Math.max(x2, plane.maxX);
-
-  //   for (let i = intersectLow; i <= intersectHigh; i++) {
-  //     if (plane.top[i] !== 0xff) {
-  //       // Cannot merge, return a new plane.
-  //       return this.findPlane(plane.height, plane.textureName, plane.lightLevel, x1, x2);
-  //     }
-  //   }
-
-  //   // Extend the existing plane.
-  //   plane.minX = unionLow;
-  //   plane.maxX = unionHigh;
-  //   return plane;
-  // }
 
   drawColumn(
     textureAlt,
