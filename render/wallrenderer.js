@@ -648,6 +648,14 @@ class WallRenderer {
     }
   }
 
+  processVisplaneProperties(top, bottom, x, worldFront, plane) {
+    if (top <= bottom) {
+      plane.top[x] = top;
+      plane.bottom[x] = bottom;
+      plane.worldFront = worldFront;
+    }
+  }
+
   processFloor(yh, x, worldFront) {
     let top;
     let bottom;
@@ -658,13 +666,7 @@ class WallRenderer {
       if (top <= this.upperclip[x]) {
         top = this.upperclip[x] + 1;
       }
-      if (top <= bottom) {
-        // set floorplane here
-
-        floorPlane.top[x] = top;
-        floorPlane.bottom[x] = bottom + 1;
-        floorPlane.worldFront = worldFront;
-      }
+      this.processVisplaneProperties(top, bottom, x, worldFront, floorPlane);
     }
   }
 
@@ -680,13 +682,7 @@ class WallRenderer {
         bottom = this.lowerclip[x] - 1;
       }
 
-      if (top <= bottom) {
-        // ceilingplane
-
-        ceilingPlane.top[x] = top;
-        ceilingPlane.bottom[x] = bottom;
-        ceilingPlane.worldFront = worldFront;
-      }
+      this.processVisplaneProperties(top, bottom, x, worldFront, ceilingPlane);
     }
   }
 
