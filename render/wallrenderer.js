@@ -609,30 +609,13 @@ class WallRenderer {
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
-      // let top;
-      // let bottom;
 
       let mid;
       this.processCeiling(yl, x, worldFrontZ1);
 
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
-
-      // if (this.markfloor) {
-      //   top = yh + 1;
-      //   bottom = this.lowerclip[x] - 1;
-
-      //   if (top <= this.upperclip[x]) {
-      //     top = this.upperclip[x] + 1;
-      //   }
-      //   if (top <= bottom) {
-      //     // set floorplane here
-
-      //     floorPlane.top[x] = top;
-      //     floorPlane.bottom[x] = bottom + 1;
-      //     floorPlane.worldFront = worldFrontZ2;
-      //   }
-      // }
+      this.processFloor(yh, x, worldFrontZ2);
 
       let { textureColumn, inverseScale } = this.calculateTextureParams({ realWallCenterAngle, realWallOffset, realWallDistance, realWallScale1, x, segTextured });
 
@@ -662,6 +645,26 @@ class WallRenderer {
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
       realWallScale1 += rwScaleStep;
+    }
+  }
+
+  processFloor(yh, x, worldFront) {
+    let top;
+    let bottom;
+    if (this.markfloor) {
+      top = yh + 1;
+      bottom = this.lowerclip[x] - 1;
+
+      if (top <= this.upperclip[x]) {
+        top = this.upperclip[x] + 1;
+      }
+      if (top <= bottom) {
+        // set floorplane here
+
+        floorPlane.top[x] = top;
+        floorPlane.bottom[x] = bottom + 1;
+        floorPlane.worldFront = worldFront;
+      }
     }
   }
 
