@@ -609,26 +609,11 @@ class WallRenderer {
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
-      let top;
-      let bottom;
+      // let top;
+      // let bottom;
 
       let mid;
-      // if (this.markceiling) {
-      //   top = this.upperclip[x] + 1;
-      //   bottom = yl;
-
-      //   if (bottom >= this.lowerclip[x]) {
-      //     bottom = this.lowerclip[x] - 1;
-      //   }
-
-      //   if (top <= bottom) {
-      //     // ceilingplane
-
-      //     ceilingPlane.top[x] = top;
-      //     ceilingPlane.bottom[x] = bottom;
-      //     ceilingPlane.worldFront = worldFrontZ1;
-      //   }
-      // }
+      this.processCeiling(yl, x, worldFrontZ1);
 
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
@@ -677,6 +662,28 @@ class WallRenderer {
       wallY1 += wallY1Step;
       wallY2 += wallY2Step;
       realWallScale1 += rwScaleStep;
+    }
+  }
+
+  processCeiling(yl, x, worldFront) {
+
+    let top;
+    let bottom;
+    if (this.markceiling) {
+      top = this.upperclip[x] + 1;
+      bottom = yl;
+
+      if (bottom >= this.lowerclip[x]) {
+        bottom = this.lowerclip[x] - 1;
+      }
+
+      if (top <= bottom) {
+        // ceilingplane
+
+        ceilingPlane.top[x] = top;
+        ceilingPlane.bottom[x] = bottom;
+        ceilingPlane.worldFront = worldFront;
+      }
     }
   }
 
