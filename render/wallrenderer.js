@@ -502,67 +502,76 @@ class WallRenderer {
     ceilingTexture = rightSector.ceilingTexture;
     floorTexture = rightSector.floorTexture;
 
-    this.renderSegLoop(
-      rwx,
-      rwStopX,
-      seg.linedef.rightSidedef.middleTexture.toUpperCase(),
-      wallY1,
-      wallY1Step,
-      wallY2,
-      wallY2Step,
-      perpendicularDistance,
-      segTextured,
-      midTexture,
+    let point1 = { xScreenV1: rwx, wallY1, wallY1Step };
+    let point2 = { xScreenV2: rwStopX, wallY2, wallY2Step };
+
+    let middleWall = {
+      wallTexture: seg.linedef.rightSidedef.middleTexture.toUpperCase(),
       middleTextureAlt,
-      lightLevel,
-      rwScaleStep,
+    };
+    let upperWall = { upperWallTexture, upperTextureAlt };
+    let lowerWall = { lowerWallTexture, lowerTextureAlt };
+    let wallRenderingProperties = {
+      realWallDistance: perpendicularDistance,
       realWallCenterAngle,
       realWallOffset,
       realWallScale1,
-      upperWallTexture,
-      lowerWallTexture,
-      pixhigh,
-      pixhighstep,
-      pixlow,
-      pixlowstep,
-      topTexture,
-      bottomTexture,
-      upperTextureAlt,
-      lowerTextureAlt,
-      worldFrontZ1,
-      worldFrontZ2
+      rwScaleStep,
+    };
+    let pixHighProperties = { pixhigh, pixhighstep };
+    let pixLowProperties = { pixlow, pixlowstep };
+    let drawWallState = {
+      midtexture: midTexture,
+      toptexture: topTexture,
+      bottomtexture: bottomTexture,
+    };
+    let worldFrontZValues = { worldFrontZ1, worldFrontZ2 };
+
+    this.renderSegLoop(
+      point1,
+      point2,
+      middleWall,
+      upperWall,
+      lowerWall,
+      wallRenderingProperties,
+      pixHighProperties,
+      pixLowProperties,
+      drawWallState,
+      worldFrontZValues,
+      segTextured,
+      lightLevel
     );
   }
   renderSegLoop(
-    xScreenV1,
-    xScreenV2,
-    wallTexture,
-    wallY1,
-    wallY1Step,
-    wallY2,
-    wallY2Step,
-    realWallDistance,
+    point1,
+    point2,
+    middleWall,
+    upperWall,
+    lowerWall,
+    wallRenderingProperties,
+    pixHighProperties,
+    pixLowProperties,
+    drawWallState,
+    worldFrontZValues,
     segTextured,
-    midtexture,
-    middleTextureAlt,
-    lightLevel,
-    rwScaleStep,
-    realWallCenterAngle,
-    realWallOffset,
-    realWallScale1,
-    upperWallTexture,
-    lowerWallTexture,
-    pixhigh,
-    pixhighstep,
-    pixlow,
-    pixlowstep,
-    toptexture,
-    bottomtexture,
-    upperTextureAlt,
-    lowerTextureAlt,
-    worldFrontZ1,
-    worldFrontZ2
+    lightLevel
   ) {
+    let { wallTexture, middleTextureAlt } = middleWall;
+    let { upperWallTexture, upperTextureAlt } = upperWall;
+    let { lowerWallTexture, lowerTextureAlt } = lowerWall;
+    let { xScreenV1, wallY1, wallY1Step } = point1;
+    let { xScreenV2, wallY2, wallY2Step } = point2;
+    let {
+      realWallDistance,
+      realWallCenterAngle,
+      realWallOffset,
+      realWallScale1,
+      rwScaleStep,
+    } = wallRenderingProperties;
+    let { pixhigh, pixhighstep } = pixHighProperties;
+    let { pixlow, pixlowstep } = pixLowProperties;
+    let { worldFrontZ1, worldFrontZ2 } = worldFrontZValues;
+    let { midtexture, toptexture, bottomtexture } = drawWallState;
 
     let {
       textureWidth: textureWidth,
@@ -570,16 +579,12 @@ class WallRenderer {
       textureData: textureData,
     } = this.textureManager.getTextureInfo(wallTexture);
 
-
-
     // wall segment
-    // high level of abstraction
     let {
       textureWidth: textureWidthUpper,
       textureHeight: textureHeightUpper,
       textureData: textureDataUpper,
     } = this.textureManager.getTextureInfo(upperWallTexture);
-    // high level of abstraction
     let {
       textureWidth: textureWidthLower,
       textureHeight: textureHeightLower,
@@ -588,7 +593,7 @@ class WallRenderer {
 
     // my goal with renderSegLoop is to render a segment
     // but it is doing multiple things
-    // it is checking if textures exist, 
+    // it is checking if textures exist,
     // it is grabbing texture data
     // it is calculating wall coordinates,
     // it is setting boundaries
@@ -603,9 +608,7 @@ class WallRenderer {
     // but if im checking the type of seg, im not really doing the actual rendering?
     // seems like you could just make the call to drawColumn. Not sure
 
-    // to render a seg, we iterate over all x coordinates for the seg, 
-
-
+    // to render a seg, we iterate over all x coordinates for the seg,
 
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
@@ -617,26 +620,63 @@ class WallRenderer {
 
       this.processFloor(yh, x, worldFrontZ2);
 
-      let { textureColumn, inverseScale } = this.calculateTextureParams({ realWallCenterAngle, realWallOffset, realWallDistance, realWallScale1, x, segTextured });
+      let { textureColumn, inverseScale } = this.calculateTextureParams({
+        realWallCenterAngle,
+        realWallOffset,
+        realWallDistance,
+        realWallScale1,
+        x,
+        segTextured,
+      });
 
-      this.checkAndDrawMiddleWall(midtexture, { middleTextureAlt, yl, yh, inverseScale, textureColumn, textureWidth, textureHeight, textureData, x, lightLevel })
+      this.checkAndDrawMiddleWall(midtexture, {
+        middleTextureAlt,
+        yl,
+        yh,
+        inverseScale,
+        textureColumn,
+        textureWidth,
+        textureHeight,
+        textureData,
+        x,
+        lightLevel,
+      });
 
       if (toptexture) {
         mid = this.calculateMidUpperWall(pixhigh, x);
         pixhigh += pixhighstep;
-        this.checkAndDrawUpperWall({ upperTextureAlt, yl, mid, inverseScale, textureColumn, textureWidthUpper, textureHeightUpper, textureDataUpper, x, lightLevel })
-
-      }
-      else if (this.markceiling) {
+        this.checkAndDrawUpperWall({
+          upperTextureAlt,
+          yl,
+          mid,
+          inverseScale,
+          textureColumn,
+          textureWidthUpper,
+          textureHeightUpper,
+          textureDataUpper,
+          x,
+          lightLevel,
+        });
+      } else if (this.markceiling) {
         this.upperclip[x] = yl - 1;
       }
 
       if (bottomtexture) {
-        mid = this.calculateMidLowerWall(pixlow, x)
+        mid = this.calculateMidLowerWall(pixlow, x);
         pixlow += pixlowstep;
 
-        this.checkAndDrawLowerWall({ lowerTextureAlt, mid, yh, inverseScale, textureColumn, textureWidthLower, textureHeightLower, textureDataLower, x, lightLevel });
-
+        this.checkAndDrawLowerWall({
+          lowerTextureAlt,
+          mid,
+          yh,
+          inverseScale,
+          textureColumn,
+          textureWidthLower,
+          textureHeightLower,
+          textureDataLower,
+          x,
+          lightLevel,
+        });
       } else if (this.markfloor) {
         this.lowerclip[x] = yh + 1;
       }
@@ -683,14 +723,15 @@ class WallRenderer {
 
     if (wallInfo.segTextured) {
       angle =
-        wallInfo.realWallCenterAngle + radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
+        wallInfo.realWallCenterAngle +
+        radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
       textureColumn =
-        wallInfo.realWallOffset - Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance;
+        wallInfo.realWallOffset -
+        Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance;
       inverseScale = 1.0 / wallInfo.realWallScale1;
     }
 
     return { textureColumn, inverseScale };
-
   }
 
   calculateMidUpperWall(pixhigh, x) {
@@ -702,12 +743,7 @@ class WallRenderer {
   }
 
   checkAndDrawMiddleWall(midtexture, wallData) {
-
     if (midtexture) {
-      // if (yl < yh) {
-      // let wallY1 = yl;
-      // let wallY2 = yh;
-
       this.drawColumn(
         wallData.middleTextureAlt,
         wallData.yl,
@@ -723,20 +759,14 @@ class WallRenderer {
 
       // this.upperclip[x] = CANVASHEIGHT;
       // this.lowerclip[x] = -1;
-
-      //  }
     }
-
-
   }
 
   checkAndDrawUpperWall(wallData) {
-
     if (wallData.mid < wallData.yl) {
       this.upperclip[wallData.x] = wallData.yl - 1;
       return;
     }
-
 
     this.drawColumn(
       wallData.upperTextureAlt,
@@ -752,11 +782,9 @@ class WallRenderer {
     );
 
     this.upperclip[wallData.x] = Math.floor(wallData.mid);
-
   }
 
   checkAndDrawLowerWall(wallData) {
-
     if (wallData.mid > wallData.yh + 1) {
       this.lowerclip[wallData.x] = wallData.yh + 1;
       return;
@@ -777,16 +805,11 @@ class WallRenderer {
     );
 
     this.lowerclip[wallData.x] = Math.floor(wallData.mid);
-
   }
 
-
   getTexture(textureName) {
-    let {
-      textureWidth,
-      textureHeight,
-      textureData,
-    } = this.textureManager.getTextureInfo(textureName);
+    let { textureWidth, textureHeight, textureData } =
+      this.textureManager.getTextureInfo(textureName);
     return { textureWidth, textureHeight, textureData };
   }
 
