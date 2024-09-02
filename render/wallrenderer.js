@@ -18,7 +18,6 @@ class WallRenderer {
     this.solidsegs = dependencies.solidSegsManager.initializeSolidsegs();
 
     this.canvas = gameEngine.canvas;
-    // this.canvas = gameEngine.offscreenCanvas;
 
     this.upperclip = new Array(CANVASWIDTH);
     this.lowerclip = new Array(CANVASWIDTH);
@@ -29,9 +28,6 @@ class WallRenderer {
 
     this.textureManager = textureManager;
     this.flatManager = flatManager;
-
-    // this.visplanes = new Map();
-    // this.visplanesArray = [];
 
     this.visplanes = [];
   }
@@ -227,8 +223,6 @@ class WallRenderer {
     let perpendicularDistance =
       distanceToVertex * Math.sin(degreesToRadians(complementaryAngle.angle));
 
-    // let t = screenToXView(xScreenV1, 640);
-
     let visangle = new Angle(
       gameEngine.player.direction.angle +
       radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
@@ -296,10 +290,12 @@ class WallRenderer {
       ceilingTexture = rightSector.ceilingTexture;
       floorTexture = rightSector.floorTexture;
 
-      let indexOfName = (wallTexture !== "-") ? this.textureManager.texturePool.get(wallTexture).textureIndex : -1;
+      let indexOfName =
+        wallTexture !== "-"
+          ? this.textureManager.texturePool.get(wallTexture).textureIndex
+          : -1;
 
       let vTop;
-      // let middleTextureAlt;
       if (line.flag & LOWER_UNPEGGED) {
         vTop =
           rightSector.floorHeight + this.textures[indexOfName].height - 1.0;
@@ -319,7 +315,6 @@ class WallRenderer {
       //world low
       worldBackZ2 = leftSector.floorHeight - gameEngine.player.height;
 
-      // look into fixing this
       if (
         rightSector.ceilingTexture === "F_SKY1" &&
         leftSector.ceilingTexture === "F_SKY1"
@@ -373,16 +368,10 @@ class WallRenderer {
       if (upperWallTexture !== "-") {
         upperTextureIndex =
           this.textureManager.texturePool.get(upperWallTexture).textureIndex;
-        // toptexture = true;
-      }
-      if (lowerWallTexture !== "-") {
-        //  bottomtexture = true;
       }
 
       let topPoint;
-      // let upperTextureAlt;
 
-      // check this !!!
       if (worldBackZ1 < worldFrontZ1) {
         topTexture = upperWallTexture !== "-";
         if (line.flag & UPPER_UNPEGGED) {
@@ -398,10 +387,8 @@ class WallRenderer {
             upperTextureAlt = topPoint - gameEngine.player.height;
           }
         }
-        // upperTextureAlt += side.yOffset;
       }
 
-      // let lowerTextureAlt;
       if (worldBackZ2 > worldFrontZ2) {
         bottomTexture = lowerWallTexture !== "-";
         if (line.flag & LOWER_UNPEGGED) {
@@ -409,7 +396,6 @@ class WallRenderer {
         } else {
           lowerTextureAlt = worldBackZ2;
         }
-        // lowerTextureAlt += side.yOffset;
       }
 
       upperTextureAlt += side.yOffset;
@@ -432,7 +418,6 @@ class WallRenderer {
 
       realWallOffset =
         distanceToVertex * Math.sin(degreesToRadians(angleToPerpendicular));
-      // this line below fixed the door being misaligned in e1m2? but I did make a lot of changes besides this
       realWallOffset = -realWallOffset;
       realWallOffset += seg.offset + side.xOffset;
       realWallCenterAngle = new Angle(
@@ -446,7 +431,6 @@ class WallRenderer {
       this.markfloor = false;
     }
 
-    // need to fix the sky check
     if (
       rightSector.ceilingHeight < gameEngine.player.height &&
       rightSector.ceilingTexture !== "F_SKY1"
@@ -469,7 +453,6 @@ class WallRenderer {
     let pixlow = 0;
     let pixlowstep = 0;
     if (seg.leftSector) {
-      //  if (this.drawUpperWall) {
       if (worldBackZ1 > worldFrontZ2) {
         pixhigh = HALFHEIGHT - worldBackZ1 * realWallScale1;
         pixhighstep = -(worldBackZ1 * rwScaleStep);
@@ -477,8 +460,7 @@ class WallRenderer {
         pixhigh = wallY2;
         pixhighstep = wallY2Step;
       }
-      // }
-      //  if (this.drawLowerWall) {
+
       if (worldBackZ2 < worldFrontZ1) {
         pixlow = HALFHEIGHT - worldBackZ2 * realWallScale1;
         pixlowstep = -(worldBackZ2 * rwScaleStep);
@@ -486,10 +468,8 @@ class WallRenderer {
         pixlow = wallY1;
         pixlowstep = wallY1Step;
       }
-      //  }
     }
 
-    // render planes here?
     if (this.markceiling) {
       ceilingPlane = this.checkPlane(ceilingPlane, xScreenV1, xScreenV2);
     }
@@ -589,29 +569,10 @@ class WallRenderer {
       textureData: textureDataLower,
     } = this.textureManager.getTextureInfo(lowerWallTexture);
 
-    // my goal with renderSegLoop is to render a segment
-    // but it is doing multiple things
-    // it is checking if textures exist,
-    // it is grabbing texture data
-    // it is calculating wall coordinates,
-    // it is setting boundaries
-    // it is calculating angles, textureColumn, and scale
-    // it is making calls to drawColumn
-    // it has nested if and else statements
-    // it is incrementing coordinates and scale
-
-    // rendering a seg is directly drawing a column, not setting data or setting boundaries, not iterating over the screen coordinates
-
-    // TO render a seg, we check to see what type of seg this is, and if so we draw the seg
-    // but if im checking the type of seg, im not really doing the actual rendering?
-    // seems like you could just make the call to drawColumn. Not sure
-
-    // to render a seg, we iterate over all x coordinates for the seg,
     let mid;
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
-
 
       this.processCeiling(yl, x, worldFrontZ1);
       this.processFloor(yh, x, worldFrontZ2);
