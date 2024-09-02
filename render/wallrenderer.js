@@ -671,17 +671,11 @@ class WallRenderer {
   }
 
   processCeiling(yl, x, worldFront) {
-
     let top;
     let bottom;
     if (this.markceiling) {
       top = this.upperclip[x] + 1;
-      bottom = yl;
-
-      if (bottom >= this.lowerclip[x]) {
-        bottom = this.lowerclip[x] - 1;
-      }
-
+      bottom = Math.min(yl, this.lowerclip[x] - 1);
       this.processVisplaneProperties(top, bottom, x, worldFront, ceilingPlane);
     }
   }
