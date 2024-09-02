@@ -295,10 +295,8 @@ class WallRenderer {
       midTexture = wallTexture !== "-";
       ceilingTexture = rightSector.ceilingTexture;
       floorTexture = rightSector.floorTexture;
-      const lightLevel = rightSector.lightLevel;
 
-      let indexOfName =
-        this.textureManager.texturePool.get(wallTexture).textureIndex;
+      let indexOfName = (wallTexture !== "-") ? this.textureManager.texturePool.get(wallTexture).textureIndex : -1;
 
       let vTop;
       // let middleTextureAlt;
@@ -609,15 +607,13 @@ class WallRenderer {
     // seems like you could just make the call to drawColumn. Not sure
 
     // to render a seg, we iterate over all x coordinates for the seg,
-
+    let mid;
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
-
-      let mid;
-      this.processCeiling(yl, x, worldFrontZ1);
-
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
+
+      this.processCeiling(yl, x, worldFrontZ1);
       this.processFloor(yh, x, worldFrontZ2);
 
       let { textureColumn, inverseScale } = this.calculateTextureParams({
