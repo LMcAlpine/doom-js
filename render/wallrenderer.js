@@ -660,12 +660,8 @@ class WallRenderer {
     let top;
     let bottom;
     if (this.markfloor) {
-      top = yh + 1;
+      top = Math.max(yh + 1, this.upperclip[x] + 1);
       bottom = this.lowerclip[x] - 1;
-
-      if (top <= this.upperclip[x]) {
-        top = this.upperclip[x] + 1;
-      }
       this.processVisplaneProperties(top, bottom, x, worldFront, floorPlane);
     }
   }
