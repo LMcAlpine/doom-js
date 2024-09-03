@@ -1,8 +1,7 @@
 // interface
 class Wall {
-  render(wallData, updateClipArrayCallback) {
+  render(wallData) {
     // implemented by the concrete strategies
-    throw new Error("render method must be implemented");
   }
 
   setDrawWallSegmentFlag(canDraw) {}
