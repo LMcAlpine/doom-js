@@ -30,11 +30,6 @@ class WallRenderer {
     this.flatManager = flatManager;
 
     this.visplanes = [];
-
-    this.middleWallStrategy = new MiddleWall();
-    this.lowerWallStrategy = new LowerWall();
-    this.upperWallStrategy = new UpperWall();
-    this.wallContext = new WallSegmentContext(this.middleWallStrategy);
   }
 
   /**
@@ -230,7 +225,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -243,7 +238,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
@@ -591,8 +586,7 @@ class WallRenderer {
         segTextured,
       });
 
-      this.wallContext.setWallStrategy(this.middleWallStrategy);
-      this.wallContext.renderWallSegment({
+      this.checkAndDrawMiddleWall(midtexture, {
         middleTextureAlt,
         yl,
         yh,
@@ -604,21 +598,7 @@ class WallRenderer {
         x,
         lightLevel,
       });
-      // this.checkAndDrawMiddleWall(midtexture, {
-      //   middleTextureAlt,
-      //   yl,
-      //   yh,
-      //   inverseScale,
-      //   textureColumn,
-      //   textureWidth,
-      //   textureHeight,
-      //   textureData,
-      //   x,
-      //   lightLevel,
-      // });
 
-      this.wallContext.setWallStrategy(this.upperWallStrategy);
-      this.wallContext.renderWallSegment();
       if (toptexture) {
         mid = this.calculateMidUpperWall(pixhigh, x);
         pixhigh += pixhighstep;
@@ -637,8 +617,7 @@ class WallRenderer {
       } else if (this.markceiling) {
         this.upperclip[x] = yl - 1;
       }
-      this.wallContext.setWallStrategy(this.lowerWallStrategy);
-      this.wallContext.renderWallSegment();
+
       if (bottomtexture) {
         mid = this.calculateMidLowerWall(pixlow, x);
         pixlow += pixlowstep;
