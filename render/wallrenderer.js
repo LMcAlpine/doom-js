@@ -34,7 +34,7 @@ class WallRenderer {
     this.middleWallStrategy = new MiddleWall();
     this.lowerWallStrategy = new LowerWall();
     this.upperWallStrategy = new UpperWall();
-    this.wallContext = new WallSegmentContext(this.middleWallStrategy);
+    this.wallContext = new WallSegmentContext(null);
   }
 
   /**
@@ -591,8 +591,7 @@ class WallRenderer {
         segTextured,
       });
 
-      this.wallContext.setWallStrategy(this.middleWallStrategy);
-      this.wallContext.renderWallSegment({
+      this.checkAndDrawMiddleWall(midtexture, {
         middleTextureAlt,
         yl,
         yh,
@@ -604,21 +603,7 @@ class WallRenderer {
         x,
         lightLevel,
       });
-      // this.checkAndDrawMiddleWall(midtexture, {
-      //   middleTextureAlt,
-      //   yl,
-      //   yh,
-      //   inverseScale,
-      //   textureColumn,
-      //   textureWidth,
-      //   textureHeight,
-      //   textureData,
-      //   x,
-      //   lightLevel,
-      // });
 
-      this.wallContext.setWallStrategy(this.upperWallStrategy);
-      this.wallContext.renderWallSegment();
       if (toptexture) {
         mid = this.calculateMidUpperWall(pixhigh, x);
         pixhigh += pixhighstep;
@@ -637,8 +622,6 @@ class WallRenderer {
       } else if (this.markceiling) {
         this.upperclip[x] = yl - 1;
       }
-      this.wallContext.setWallStrategy(this.lowerWallStrategy);
-      this.wallContext.renderWallSegment();
       if (bottomtexture) {
         mid = this.calculateMidLowerWall(pixlow, x);
         pixlow += pixlowstep;
