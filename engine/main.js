@@ -112,12 +112,53 @@ document
 
     const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
 
+    const thingObjects = buildThings(levels.things);
+
     const dataObjects = {
       sectorObjects,
       sidedefObjects,
       linedefObjects,
       segObjects,
+      thingObjects,
     };
+
+    // sector needs to have  a thing list of all the things in this sector
+    // build things
+    //
+    //     // Thing definition, position, orientation and type,
+    // // plus skill/visibility flags and attributes.
+    // typedef PACKED_STRUCT (
+    //   {
+    //       short		x;
+    //       short		y;
+    //       short		angle;
+    //       short		type;
+    //       short		options;
+    //   }) mapthing_t;
+
+    // build the thing following this definition above
+    // spawn the thing
+    //  - inside, check if the thing is a player, spawn the player
+    //  - setup gun sprite
+    //  - bunch of player checks and other checks
+    //  - finally, start looking at spawning monsters or other things
+    //  - check to see if the thing is spawn on the ceiling?, else on the floor
+    //  - actually, spawn the thing now by calling P_spawnmobj (spawn map object)
+    //  - there is a map object, mobj, that gets properties set
+    //  - set thing position, where subsector links are set
+    //  - see if this thing is in the subsector? by looping over the number of nodes , and checking the side of where the thing is, return the subsector
+    //  - set the things subsector to the subsector returned.
+    //  - Don't add invisible things to the sector links (    // Don't use the sector links (invisible but touchable). MF_NOSECTOR		= 8,)
+    //  - grab the sector referenced by the subsector?
+    //  - thing is a linkedlist?
+    //  - set thing-> prev to null
+    //  - set thing->next to the sec->thinglist (beginning of list)
+    //  - if the thing list exists, then set this sectors thinglists previous sprite(?) to thing
+    //  - outside the if, set thinglist to thing --- sec->thinglist = thing
+    //  - blockmap related code, ignore for now
+    //  - set the floorz and ceilingz of the mobj, aka the floorheight and ceiling height of this mobj's subsectors floorheight or ceiling height
+    //  - check the z of the mobj if its on the floor or if its on the ceiling
+    //  - thinker related code
 
     const textureManager = new TextureManager(
       texture.maptextures,

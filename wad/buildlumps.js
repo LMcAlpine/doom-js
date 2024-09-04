@@ -127,3 +127,19 @@ function buildSidedefs(sidedefs, sectors) {
   }
   return sidedefObjects;
 }
+
+function buildThings(things) {
+  const thing = {};
+  const thingObjects = [];
+  for (let i = 0; i < things.length; i++) {
+    thing.x = things[i].xPosition;
+    thing.y = things[i].yPosition;
+    thing.angle = things[i].direction;
+    thing.type = things[i].type;
+    thing.flag = things[i].flag;
+
+    const temp = Object.assign({}, thing);
+    thingObjects.push(temp);
+  }
+  return thingObjects;
+}
