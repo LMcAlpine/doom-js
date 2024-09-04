@@ -54,6 +54,7 @@ class LevelManager {
     this.linedefs = levels.linedefs;
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
+    this.things = levels.things;
 
     this.spanstart = [];
     this.spanstop = [];
@@ -73,6 +74,38 @@ class LevelManager {
     this.wallRenderer.initClipHeights();
 
     this.wallRenderer.clearVisplanes();
+
+    let z;
+    for (let i = 0; i < this.things.length; i++) {
+      if (this.things[i].flag & SPAWNCEILING) {
+        z = Number.MAX_SAFE_INTEGER;
+      } else {
+        z = Number.MIN_SAFE_INTEGER;
+      }
+
+      // link into subsector
+      let subsectorID = this.nodes.length - 1;
+
+      while (!this.bspTraversal.isSubsector(subsectorID)) {
+        let isOnLeft = this.bspTraversal.isPointOnLeftSide(
+          this.things[i].x,
+          this.things[i].y,
+          this.nodes[subsectorID]
+        );
+        if (isOnLeft) {
+          subsectorID = this.nodes[subsectorID].leftChild;
+        } else {
+          subsectorID = this.nodes[subsectorID].rightChild;
+        }
+      }
+      let subsector =
+        this.subsectors[this.bspTraversal.getSubsector(subsectorID)];
+
+      if (!(this.things[i].flag & NOSECTOR)) {
+        let sector = subsector.sector;
+        
+      }
+    }
 
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
 

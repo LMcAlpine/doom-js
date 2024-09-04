@@ -33,6 +33,9 @@ let traverseCount = 0;
 
 const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 
+const SPAWNCEILING = 256;
+const NOSECTOR = 8;
+
 // temp
 let floorPlane;
 let ceilingPlane;
