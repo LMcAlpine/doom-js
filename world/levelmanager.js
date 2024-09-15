@@ -74,6 +74,7 @@ class LevelManager {
     this.wallRenderer.initClipHeights();
 
     this.wallRenderer.clearVisplanes();
+    this.wallRenderer.clearDrawSegs();
 
     let z;
     for (let i = 0; i < this.things.length; i++) {
@@ -103,7 +104,6 @@ class LevelManager {
 
       if (!(this.things[i].flag & NOSECTOR)) {
         let sector = subsector.sector;
-        
       }
     }
 
@@ -111,6 +111,8 @@ class LevelManager {
 
     traverseBSP = true;
     traverseCount = 0;
+
+    this.wallRenderer.drawSegments;
 
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];

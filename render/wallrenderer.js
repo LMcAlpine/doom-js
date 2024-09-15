@@ -30,6 +30,7 @@ class WallRenderer {
     this.flatManager = flatManager;
 
     this.visplanes = [];
+    this.drawSegments = [];
   }
 
   /**
@@ -42,6 +43,10 @@ class WallRenderer {
 
   clearVisplanes() {
     this.visplanes = [];
+  }
+
+  clearDrawSegs() {
+    this.drawSegments = [];
   }
 
   addWall(seg, angleV1, angleV2) {
@@ -244,6 +249,7 @@ class WallRenderer {
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
     drawSeg_O.currentLine = line;
+    drawSeg_O.scale1 = realWallScale1;
     let rwx = xScreenV1;
     let rwStopX = xScreenV2 + 1;
 
@@ -258,9 +264,13 @@ class WallRenderer {
         canvasWidth
       );
       rwScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
+      drawSeg_O.scale2 = scale2;
+      drawSeg_O.scaleStep = rwScaleStep;
     } else {
       scale2 = realWallScale1;
       rwScaleStep = 0;
+      drawSeg_O.scale2 = scale2;
+      drawSeg_O.scaleStep = rwScaleStep;
     }
     let rightSector = seg.rightSector;
 
@@ -271,6 +281,9 @@ class WallRenderer {
     let topTexture = false;
     let bottomTexture = false;
     let maskedTexture = false;
+
+    drawSeg_O.maskedTextureCol = [];
+    let maskedtexturecol = [];
 
     let upperWallTexture;
     let lowerWallTexture;
@@ -406,6 +419,8 @@ class WallRenderer {
 
       if (midTexture) {
         maskedTexture = true;
+        // let maskedtexturecol = [];
+        // drawSeg_O.maskedTextureCol = maskedtexturecol;
       }
     }
 
@@ -536,8 +551,11 @@ class WallRenderer {
       drawWallState,
       worldFrontZValues,
       segTextured,
-      lightLevel
+      lightLevel,
+      drawSeg_O
     );
+
+    this.drawSegments.push(Object.assign({}, drawSeg_O));
   }
   renderSegLoop(
     point1,
@@ -551,7 +569,8 @@ class WallRenderer {
     drawWallState,
     worldFrontZValues,
     segTextured,
-    lightLevel
+    lightLevel,
+    drawSeg_O
   ) {
     let { wallTexture, middleTextureAlt } = middleWall;
     let { upperWallTexture, upperTextureAlt } = upperWall;
@@ -590,7 +609,7 @@ class WallRenderer {
     } = this.textureManager.getTextureInfo(lowerWallTexture);
 
     let mid;
-    let maskedtexturecol = [];
+
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
@@ -660,7 +679,7 @@ class WallRenderer {
       }
 
       if (maskedTexture) {
-        maskedtexturecol[x] = textureColumn;
+        drawSeg_O.maskedTextureCol[x] = textureColumn;
       }
 
       // vertically move down
