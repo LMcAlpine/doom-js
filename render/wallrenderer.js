@@ -282,8 +282,7 @@ class WallRenderer {
     let bottomTexture = false;
     let maskedTexture = false;
 
-    drawSeg_O.maskedTextureCol = [];
-    let maskedtexturecol = [];
+    drawSeg_O.maskedTextureCol = null;
 
     let upperWallTexture;
     let lowerWallTexture;
@@ -420,7 +419,7 @@ class WallRenderer {
       if (midTexture) {
         maskedTexture = true;
         // let maskedtexturecol = [];
-        // drawSeg_O.maskedTextureCol = maskedtexturecol;
+        drawSeg_O.maskedTextureCol = [];
       }
     }
 

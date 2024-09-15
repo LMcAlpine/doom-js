@@ -112,8 +112,6 @@ class LevelManager {
     traverseBSP = true;
     traverseCount = 0;
 
-    this.wallRenderer.drawSegments;
-
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];
 
@@ -219,6 +217,12 @@ class LevelManager {
               (a << 24) | (b << 16) | (g << 8) | r;
           }
         }
+      }
+    }
+
+    for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
+      if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
+        console.log("draw masked");
       }
     }
   }
