@@ -225,7 +225,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -238,7 +238,7 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
@@ -270,6 +270,7 @@ class WallRenderer {
     let midTexture = false;
     let topTexture = false;
     let bottomTexture = false;
+    let maskedTexture = false;
 
     let upperWallTexture;
     let lowerWallTexture;
@@ -280,13 +281,15 @@ class WallRenderer {
 
     let worldBackZ1;
     let worldBackZ2;
+    const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
+    midTexture = wallTexture !== "-";
 
     if (!seg.leftSector) {
       this.markfloor = true;
       this.markceiling = true;
 
-      const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
-      midTexture = wallTexture !== "-";
+      // const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
+      // midTexture = wallTexture !== "-";
       ceilingTexture = rightSector.ceilingTexture;
       floorTexture = rightSector.floorTexture;
 
@@ -400,12 +403,16 @@ class WallRenderer {
 
       upperTextureAlt += side.yOffset;
       lowerTextureAlt += side.yOffset;
+
+      if (midTexture) {
+        maskedTexture = true;
+      }
     }
 
     // outside the else
 
     let segTextured = false;
-    if (midTexture || upperWallTexture || lowerWallTexture) {
+    if (midTexture || upperWallTexture || lowerWallTexture || maskedTexture) {
       segTextured = true;
     }
     let realWallCenterAngle;
@@ -436,6 +443,17 @@ class WallRenderer {
       rightSector.ceilingTexture !== "F_SKY1"
     ) {
       this.markceiling = false;
+    }
+
+    if (
+      !midTexture &&
+      !topTexture &&
+      !bottomTexture &&
+      !this.markfloor &&
+      !this.markceiling &&
+      !maskedTexture
+    ) {
+      return;
     }
 
     // stepping values for texture edges
@@ -502,6 +520,7 @@ class WallRenderer {
       midtexture: midTexture,
       toptexture: topTexture,
       bottomtexture: bottomTexture,
+      maskedTexture,
     };
     let worldFrontZValues = { worldFrontZ1, worldFrontZ2 };
 
@@ -549,7 +568,8 @@ class WallRenderer {
     let { pixhigh, pixhighstep } = pixHighProperties;
     let { pixlow, pixlowstep } = pixLowProperties;
     let { worldFrontZ1, worldFrontZ2 } = worldFrontZValues;
-    let { midtexture, toptexture, bottomtexture } = drawWallState;
+    let { midtexture, toptexture, bottomtexture, maskedTexture } =
+      drawWallState;
 
     let {
       textureWidth: textureWidth,
@@ -570,6 +590,7 @@ class WallRenderer {
     } = this.textureManager.getTextureInfo(lowerWallTexture);
 
     let mid;
+    let maskedtexturecol = [];
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
@@ -636,6 +657,10 @@ class WallRenderer {
         });
       } else if (this.markfloor) {
         this.lowerclip[x] = yh + 1;
+      }
+
+      if (maskedTexture) {
+        maskedtexturecol[x] = textureColumn;
       }
 
       // vertically move down
