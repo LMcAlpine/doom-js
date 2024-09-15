@@ -223,6 +223,43 @@ class LevelManager {
     for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
       if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
         console.log("draw masked");
+        let x1 = this.wallRenderer.drawSegments[i].x1;
+        let x2 = this.wallRenderer.drawSegments[i].x2;
+
+        let currentLine = this.wallRenderer.drawSegments[i].currentLine;
+        let frontSector = currentLine.rightSidedef.sector;
+        let backSector = currentLine.leftSidedef.sector;
+
+        let textureName = currentLine.rightSidedef.middleTexture;
+        let maskedTextureCol =
+          this.wallRenderer.drawSegments[i].maskedTextureCol;
+        let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
+        // spryscale
+        //mfloorclip
+        //mceilingclip
+        let textureMid;
+        let indexOfName =
+          textureName !== "-"
+            ? this.wallRenderer.textureManager.texturePool.get(textureName)
+                .textureIndex
+            : -1;
+        let textureHeight = this.wallRenderer.textures[indexOfName].height;
+
+        if (currentLine.flag & 16) {
+          textureMid =
+            frontSector.floorHeight > backSector.floorHeight
+              ? frontSector.floorHeight
+              : backSector.floorHeight;
+          textureMid = textureMid + textureHeight - gameEngine.player.z;
+        } else {
+          textureMid =
+            frontSector.ceilingHeight < backSector.ceilingHeight
+              ? frontSector.ceilingHeight
+              : backSector.ceilingHeight;
+        }
+        textureMid += currentLine.rightSidedef.yOffset;
+
+        for (let x = x1; x <= x2; x++) {}
       }
     }
   }
