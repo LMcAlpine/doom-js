@@ -252,7 +252,7 @@ class LevelManager {
           textureWidth: textureWidth,
           textureHeight: textureHeight,
           textureData: textureData,
-        } = this.textureManager.getTextureInfo(textureName);
+        } = this.wallRenderer.textureManager.getTextureInfo(textureName);
 
         if (currentLine.flag & 16) {
           textureMid =
@@ -268,9 +268,39 @@ class LevelManager {
         }
         textureMid += currentLine.rightSidedef.yOffset;
 
+        let j = x1;
         for (let x = x1; x <= x2; x++) {
           let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
           let inverseScale = 1.0 / spriteYScale;
+
+          while (textureData[j] !== 0) {
+            let topscreen = spritetopscreen + spriteYScale;
+            let bottomscreen = topscreen + spriteYScale;
+
+            let yl = topscreen;
+            let yh = bottomscreen - 1;
+
+            if (yh >= floorClip[x]) {
+              yh = floorClip[x] - 1;
+            }
+            if (yl <= ceilingClip[x]) {
+              yl = ceilingClip[x] + 1;
+            }
+
+            this.wallRenderer.drawColumn(
+              textureMid,
+              yl,
+              yh,
+              inverseScale,
+              maskedTextureCol[x],
+              textureWidth,
+              textureHeight,
+              textureData,
+              x,
+              0
+            );
+            j++;
+          }
 
           spriteYScale += rwScaleStep;
         }

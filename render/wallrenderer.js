@@ -570,12 +570,13 @@ class WallRenderer {
       drawSeg_O
     );
 
-    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
-      drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
-    }
-    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-      drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
-    }
+    // not right
+    // if (maskedTexture && drawSeg_O.spriteTopClip === null) {
+    //   drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+    // }
+    // if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
+    //   drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+    // }
     this.drawSegments.push(Object.assign({}, drawSeg_O));
   }
   renderSegLoop(
