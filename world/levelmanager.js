@@ -237,13 +237,22 @@ class LevelManager {
         // spryscale
         //mfloorclip
         //mceilingclip
+        let spriteYScale = this.wallRenderer.drawSegments[i].scale1;
+        let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
+        let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
         let textureMid;
         let indexOfName =
           textureName !== "-"
             ? this.wallRenderer.textureManager.texturePool.get(textureName)
                 .textureIndex
             : -1;
-        let textureHeight = this.wallRenderer.textures[indexOfName].height;
+        // let textureHeight = this.wallRenderer.textures[indexOfName].height;
+
+        let {
+          textureWidth: textureWidth,
+          textureHeight: textureHeight,
+          textureData: textureData,
+        } = this.textureManager.getTextureInfo(textureName);
 
         if (currentLine.flag & 16) {
           textureMid =
@@ -259,7 +268,12 @@ class LevelManager {
         }
         textureMid += currentLine.rightSidedef.yOffset;
 
-        for (let x = x1; x <= x2; x++) {}
+        for (let x = x1; x <= x2; x++) {
+          let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
+          let inverseScale = 1.0 / spriteYScale;
+
+          spriteYScale += rwScaleStep;
+        }
       }
     }
   }

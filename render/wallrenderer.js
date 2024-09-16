@@ -21,6 +21,10 @@ class WallRenderer {
 
     this.upperclip = new Array(CANVASWIDTH);
     this.lowerclip = new Array(CANVASWIDTH);
+    this.screenHeightArray = new Array(CANVASWIDTH);
+    this.screenHeightArray.fill(CANVASHEIGHT);
+    this.negativeOneArray = new Array(CANVASWIDTH);
+    this.negativeOneArray.fill(-1);
 
     this.textures = gameEngine.textures.maptextures;
 
@@ -319,10 +323,22 @@ class WallRenderer {
         middleTextureAlt = worldFrontZ1;
       }
       middleTextureAlt += side.yOffset;
+
+      drawSeg_O.spriteTopClip = this.screenHeightArray;
+      drawSeg_O.spriteBottomClip = this.negativeOneArray;
     } else {
       // two sided line
+      drawSeg_O.spriteTopClip = null;
+      drawSeg_O.spriteBottomClip = null;
 
       const leftSector = seg.leftSector;
+
+      if (leftSector.ceilingHeight <= rightSector.floorHeight) {
+        drawSeg_O.spriteBottomClip = this.negativeOneArray;
+      }
+      if (leftSector.floorHeight >= rightSector.ceilingHeight) {
+        drawSeg_O.spriteTopClip = this.screenHeightArray;
+      }
 
       // worldhigh
       worldBackZ1 = leftSector.ceilingHeight - gameEngine.player.height;
@@ -554,6 +570,12 @@ class WallRenderer {
       drawSeg_O
     );
 
+    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
+      drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+    }
+    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
+      drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+    }
     this.drawSegments.push(Object.assign({}, drawSeg_O));
   }
   renderSegLoop(
