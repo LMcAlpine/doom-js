@@ -130,8 +130,10 @@ class LevelManager {
             break;
           case 3:
             skyname = "SKY3";
+            break;
           case 4:
             skyname = "SKY4";
+            break;
         }
 
         let r = this.wallRenderer.textureManager.texturePool.get(skyname);
