@@ -785,14 +785,17 @@ class WallRenderer {
     let angle;
     let textureColumn;
     let inverseScale;
-
+    let tanTest;
+    let productTest;
     if (wallInfo.segTextured) {
       angle =
         wallInfo.realWallCenterAngle +
         radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
+      tanTest = Math.tan(degreesToRadians(angle));
+      productTest = tanTest * wallInfo.realWallDistance;
       textureColumn =
-        wallInfo.realWallOffset -
-        Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance;
+        Math.round(wallInfo.realWallOffset) -
+        Math.floor(Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance);
       inverseScale = 1.0 / wallInfo.realWallScale1;
     }
 
@@ -999,15 +1002,14 @@ class WallRenderer {
       let pixelValue = textureData[texPos];
 
       // Apply light level
-      // const alpha = pixelValue >> 24;
-      const alpha = (pixelValue >> 24) & 0xff;
+      const alpha = pixelValue >> 24;
+      // const alpha = (pixelValue >> 24) & 0xff;
 
-
-      if (alpha === 0) {
-        dest += CANVASWIDTH;
-        textureY += inverseScale;
-        continue;
-      }
+      // if (alpha === 0) {
+      //   dest += CANVASWIDTH;
+      //   textureY += inverseScale;
+      //   continue;
+      // }
 
       const blue = adjustColorComponent((pixelValue >> 16) & 0xff, lightLevel);
       const green = adjustColorComponent((pixelValue >> 8) & 0xff, lightLevel);
@@ -1019,10 +1021,6 @@ class WallRenderer {
       textureY += inverseScale;
     }
   }
-
-
-  
-
 }
 
 function hashCode(str) {

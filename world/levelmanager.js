@@ -179,11 +179,14 @@ class LevelManager {
         // Ensure the texture column index is valid
         if (textureColumnIndex != null) {
           // Handle wrapping if necessary
+          // console.log(textureColumnIndex);
+          // console.log(x);
           textureColumnIndex = Math.floor(textureColumnIndex % textureWidth);
 
           // Fetch the corresponding texture column
           const column = columns[textureColumnIndex];
-
+          // console.log(column);
+          // console.log(textureColumnIndex);
           // Process each post in the texture column
           for (let j = 0; j < column.length; j++) {
             const post = column[j];
