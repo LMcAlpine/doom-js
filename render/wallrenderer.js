@@ -35,6 +35,7 @@ class WallRenderer {
 
     this.visplanes = [];
     this.drawSegments = [];
+    this.masked = [];
   }
 
   /**
@@ -571,12 +572,14 @@ class WallRenderer {
     );
 
     // not right
-    // if (maskedTexture && drawSeg_O.spriteTopClip === null) {
-    //   drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
-    // }
-    // if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-    //   drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
-    // }
+    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
+      drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+    }
+    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
+      drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+    }
+    drawSeg_O.point1 = point1;
+    drawSeg_O.point2 = point2;
     this.drawSegments.push(Object.assign({}, drawSeg_O));
   }
   renderSegLoop(
@@ -632,6 +635,28 @@ class WallRenderer {
 
     let mid;
 
+    if (maskedTexture) {
+      this.masked.push({
+        middleTextureAlt,
+        wallY1,
+        wallY2,
+        textureWidth,
+        textureHeight,
+        textureData,
+        xScreenV1,
+        xScreenV2,
+        lightLevel,
+        realWallDistance,
+        realWallCenterAngle,
+        realWallOffset,
+        realWallScale1,
+        rwScaleStep,
+        segTextured,
+        wallY1Step,
+        wallY2Step,
+      });
+    }
+
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
@@ -648,18 +673,35 @@ class WallRenderer {
         segTextured,
       });
 
-      this.checkAndDrawMiddleWall(midtexture, {
-        middleTextureAlt,
-        yl,
-        yh,
-        inverseScale,
-        textureColumn,
-        textureWidth,
-        textureHeight,
-        textureData,
-        x,
-        lightLevel,
-      });
+      if (!maskedTexture) {
+        this.checkAndDrawMiddleWall(midtexture, {
+          middleTextureAlt,
+          yl,
+          yh,
+          inverseScale,
+          textureColumn,
+          textureWidth,
+          textureHeight,
+          textureData,
+          x,
+          lightLevel,
+        });
+      }
+
+      // else {
+      //   this.masked.push({
+      //     middleTextureAlt,
+      //     yl,
+      //     yh,
+      //     inverseScale,
+      //     textureColumn,
+      //     textureWidth,
+      //     textureHeight,
+      //     textureData,
+      //     x,
+      //     lightLevel,
+      //   });
+      // }
 
       if (toptexture) {
         mid = this.calculateMidUpperWall(pixhigh, x);
@@ -957,7 +999,16 @@ class WallRenderer {
       let pixelValue = textureData[texPos];
 
       // Apply light level
-      const alpha = pixelValue >> 24;
+      // const alpha = pixelValue >> 24;
+      const alpha = (pixelValue >> 24) & 0xff;
+
+
+      if (alpha === 0) {
+        dest += CANVASWIDTH;
+        textureY += inverseScale;
+        continue;
+      }
+
       const blue = adjustColorComponent((pixelValue >> 16) & 0xff, lightLevel);
       const green = adjustColorComponent((pixelValue >> 8) & 0xff, lightLevel);
       const red = adjustColorComponent(pixelValue & 0xff, lightLevel);
@@ -968,6 +1019,10 @@ class WallRenderer {
       textureY += inverseScale;
     }
   }
+
+
+  
+
 }
 
 function hashCode(str) {

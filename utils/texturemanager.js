@@ -34,6 +34,7 @@ class TextureManager {
 
     let textureWidth;
     let textureHeight;
+    let columns;
     // cache the texture
     if (!this.texturePool.has(wallTexture)) {
       let result = this.drawTexture(textureIndex);
@@ -41,10 +42,12 @@ class TextureManager {
       textureImageData = result.textureImageData;
       textureWidth = result.textureWidth;
       textureHeight = result.textureHeight;
+      columns = result.columnsArray;
       this.texturePool.set(wallTexture, {
         textureWidth,
         textureHeight,
         textureImageData,
+        columns,
       });
     } else {
       const cachedTexture = this.texturePool.get(wallTexture);
@@ -53,8 +56,15 @@ class TextureManager {
       textureHeight = cachedTexture.textureHeight;
 
       textureImageData = cachedTexture.textureImageData;
+      columns = cachedTexture.columnsArray;
     }
-    return { textureWidth, textureHeight, textureImageData, textureIndex };
+    return {
+      textureWidth,
+      textureHeight,
+      textureImageData,
+      textureIndex,
+      columns,
+    };
   }
 
   // drawPatch(columns, xStart, yStart, textureWidth, textureImageData) {
@@ -126,6 +136,7 @@ class TextureManager {
     let textureImageObj = new ImageData(textureWidth, textureHeight);
     // let textureImageData = textureImageObj.data;
     let textureUint32Array = new Uint32Array(textureImageObj.data.buffer);
+    let columnsArray;
 
     for (let j = 0; j < this.textures[indexOfName].patches.length; j++) {
       const patches = this.textures[indexOfName].patches;
@@ -141,6 +152,8 @@ class TextureManager {
         header,
         gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
       );
+      //columnsArray[j] = columns;
+      columnsArray = columns;
       this.drawPatch(columns, xStart, yStart, textureWidth, textureUint32Array);
     }
 
@@ -148,6 +161,7 @@ class TextureManager {
       textureWidth,
       textureHeight,
       textureImageData: textureUint32Array,
+      columnsArray,
     };
   }
 
@@ -158,10 +172,16 @@ class TextureManager {
         textureWidth: textureInfo.textureWidth,
         textureHeight: textureInfo.textureHeight,
         textureData: textureInfo.textureImageData,
+        columns: textureInfo.columns,
       };
     } else {
       // Return default values or null if the texture doesn't exist
-      return { textureWidth: null, textureHeight: null, textureData: null };
+      return {
+        textureWidth: null,
+        textureHeight: null,
+        textureData: null,
+        columns: null,
+      };
     }
   }
 }

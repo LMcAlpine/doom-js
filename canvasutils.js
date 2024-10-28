@@ -208,13 +208,20 @@ function scaleFromViewAngle(
     RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle)
   );
 
-  let sinea = Math.sin(degreesToRadians(anglea.angle));
-  let sineb = Math.sin(degreesToRadians(angleb.angle));
+  let sinea = Math.abs(Math.sin(degreesToRadians(anglea.angle)));
+  let sineb = Math.abs(Math.sin(degreesToRadians(angleb.angle)));
 
   let p = screenwidth / 2.0;
   let num = p * sineb;
   let den = realWallDistance * sinea;
-  return num / den;
+  let scale = num / den;
+  if (scale > 64) {
+    scale = 64;
+  } else if (scale < 0.0039) {
+    // 256 in fixed-point corresponds to about 0.0039 in floating point
+    scale = 0.0039;
+  }
+  return scale;
 }
 
 function isPowerOfTwo(number) {
