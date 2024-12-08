@@ -24,6 +24,7 @@ class Player {
     this.scaleY = scaleY;
     this.direction = new Angle(location.direction);
     //this.direction = new Angle(277.88437500000066);
+    //this.direction = new Angle(45);
 
     this.fov = fov;
 

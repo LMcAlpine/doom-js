@@ -573,10 +573,15 @@ class WallRenderer {
 
     // not right
     if (maskedTexture && drawSeg_O.spriteTopClip === null) {
-      drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+      // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+      //drawSeg_O.spriteTopClip = this.upperclip;
+
+      drawSeg_O.spriteTopClip = [...this.upperclip];
     }
     if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-      drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+       //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+     // drawSeg_O.spriteBottomClip = this.lowerclip;
+     drawSeg_O.spriteBottomClip = [...this.lowerclip];
     }
     drawSeg_O.point1 = point1;
     drawSeg_O.point2 = point2;
@@ -743,7 +748,46 @@ class WallRenderer {
       }
 
       if (maskedTexture) {
+        // let x = 100;
+        // let yl = 100;
+        // let yh = 200;
+
         drawSeg_O.maskedTextureCol[x] = textureColumn;
+
+        console.log("At x:", x, "mask column:", textureColumn, "textureWidth:", textureWidth);
+
+
+        let debugColor = (255 << 24) | (255 << 16) | (0 << 8) | 255; // ARGB: opaque magenta
+
+        const screenBuffer = this.canvas.screenBuffer;
+
+        // Draw line here as before
+
+        console.log("x:", x, "yl:", yl, "yh:", yh);
+
+        for (let y = yl; y <= yh; y++) {
+          //let dest = this.canvas.ylookup[y] + x;
+          let dest = y * CANVASWIDTH + x;
+          // dest = yl * 320 + x;
+          let alpha = 255;
+
+          let blue = 255;
+          let green = 0;
+          let red = 255;
+
+         // screenBuffer[dest] = debugColor;
+
+          dest += CANVASWIDTH;
+        }
+
+        // let testX = 50;
+        // let testYStart = 100;
+        // let testYEnd = 110;
+
+        // for (let y = testYStart; y <= testYEnd; y++) {
+        //   let dest = this.canvas.ylookup[y] + testX;
+        //   screenBuffer[dest] = debugColor;
+        // }
       }
 
       // vertically move down
@@ -795,7 +839,9 @@ class WallRenderer {
       productTest = tanTest * wallInfo.realWallDistance;
       textureColumn =
         Math.round(wallInfo.realWallOffset) -
-        Math.floor(Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance);
+        Math.floor(
+          Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance
+        );
       inverseScale = 1.0 / wallInfo.realWallScale1;
     }
 

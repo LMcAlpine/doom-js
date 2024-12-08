@@ -114,344 +114,7 @@ class LevelManager {
     traverseBSP = true;
     traverseCount = 0;
 
-    for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
-      if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
-        let x1 = this.wallRenderer.drawSegments[i].x1;
-        let x2 = this.wallRenderer.drawSegments[i].x2;
-  
-        let currentLine = this.wallRenderer.drawSegments[i].currentLine;
-        let frontSector = currentLine.rightSidedef.sector;
-        let backSector = currentLine.leftSidedef.sector;
-  
-        let textureName = currentLine.rightSidedef.middleTexture;
-        let maskedTextureCol = this.wallRenderer.drawSegments[i].maskedTextureCol;
-        let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
-        // spryscale
-        //mfloorclip
-        //mceilingclip
-        let spriteYScale = this.wallRenderer.drawSegments[i].scale1;
-        //console.log(spriteYScale);
-        let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
-        let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
-        let textureMid;
-        let indexOfName =
-          textureName !== "-"
-            ? this.wallRenderer.textureManager.texturePool.get(textureName)
-                .textureIndex
-            : -1;
-        // let textureHeight = this.wallRenderer.textures[indexOfName].height;
-  
-        let {
-          textureWidth: textureWidth,
-          textureHeight: textureHeight,
-          textureData: textureData,
-          columns: columns,
-        } = this.textureManager.getTextureInfo(textureName);
-  
-        if (currentLine.flag & 16) {
-          textureMid =
-            frontSector.floorHeight > backSector.floorHeight
-              ? frontSector.floorHeight
-              : backSector.floorHeight;
-          textureMid = textureMid + textureHeight - gameEngine.player.height;
-        } else {
-          textureMid =
-            frontSector.ceilingHeight < backSector.ceilingHeight
-              ? frontSector.ceilingHeight
-              : backSector.ceilingHeight;
-  
-          textureMid = textureMid - gameEngine.player.height;
-        }
-        textureMid += currentLine.rightSidedef.yOffset;
-  
-        let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
-        let inverseScale = 1.0 / spriteYScale;
-  
-        for (let x = x1; x <= x2; x++) {
-          let textureColumnIndex = maskedTextureCol[x];
-  
-          // Ensure the texture column index is valid
-          if (textureColumnIndex != null) {
-            // Handle wrapping if necessary
-            // console.log(textureColumnIndex);
-            // console.log(x);
-            textureColumnIndex =
-              Math.floor(textureColumnIndex) & (textureWidth - 1);
-            // textureColumnIndex = Math.floor(textureColumnIndex);
-  
-            // Fetch the corresponding texture column
-            const column = columns[textureColumnIndex];
-            // console.log(column);
-            // console.log(textureColumnIndex);
-            // Process each post in the texture column
-            for (let j = 0; j < column.length; j++) {
-              const post = column[j];
-  
-              let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-              let bottomscreen = topscreen + spriteYScale * post.length;
-  
-              let yl = Math.ceil(topscreen);
-              let yh = Math.floor(bottomscreen - 1);
-  
-              // Apply vertical clipping
-              if (yh >= floorClip[x]) {
-                yh = floorClip[x] - 1;
-              }
-              if (yl <= ceilingClip[x]) {
-                yl = ceilingClip[x] + 1;
-              }
-  
-              if (yl <= yh) {
-                // Call drawColumn with the correct texture column index
-                this.wallRenderer.drawColumn(
-                  textureMid - post.topDelta,
-                  yl,
-                  yh,
-                  inverseScale,
-                  textureColumnIndex, // Correct texture column index
-                  textureWidth,
-                  textureHeight,
-                  textureData,
-                  x,
-                  1 // Light level or other parameters
-                );
-              }
-            }
-          }
-        }
-  
-        // for (let x = x1; x <= x2; x++) {
-  
-        //   for (let i = 0; i < columns.length; i++) {
-        //     const column = columns[i];
-        //     for (let j = 0; j < column.length; j++) {
-        //       const post = column[j];
-  
-        //       let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-        //       let bottomscreen = topscreen + spriteYScale * post.length;
-  
-        //       let yl = topscreen;
-        //       let yh = bottomscreen - 1;
-  
-        //       if (yh >= floorClip[x]) {
-        //         yh = floorClip[x] - 1;
-        //       }
-        //       if (yl <= ceilingClip[x]) {
-        //         yl = ceilingClip[x] + 1;
-        //       }
-  
-        //       if (yl <= yh) {
-        //         this.wallRenderer.drawColumn(
-        //           textureMid - post.topDelta,
-        //           yl,
-        //           yh,
-        //           inverseScale,
-        //           maskedTextureCol[x],
-        //           textureWidth,
-        //           textureHeight,
-        //           textureData,
-        //           x,
-        //           0
-        //         );
-        //       }
-        //     }
-        //   }
-  
-        // }
-      }
-    }
-
-    //  }
-
-    let m = this.wallRenderer.masked;
-    //console.log(this.wallRenderer.drawSegments);
-    // if (this.wallRenderer.drawSegments[0].maskedTextureCol) {
-    //   let x1 = this.wallRenderer.drawSegments[0].x1;
-    //   let x2 = this.wallRenderer.drawSegments[0].x2;
-
-    //   let currentLine = this.wallRenderer.drawSegments[0].currentLine;
-    //   let frontSector = currentLine.rightSidedef.sector;
-    //   let backSector = currentLine.leftSidedef.sector;
-
-    //   let textureName = currentLine.rightSidedef.middleTexture;
-    //   let maskedTextureCol = this.wallRenderer.drawSegments[0].maskedTextureCol;
-    //   let rwScaleStep = this.wallRenderer.drawSegments[0].scaleStep;
-    //   // spryscale
-    //   //mfloorclip
-    //   //mceilingclip
-    //   let spriteYScale = this.wallRenderer.drawSegments[0].scale1;
-    //   //console.log(spriteYScale);
-    //   let floorClip = this.wallRenderer.drawSegments[0].spriteBottomClip;
-    //   let ceilingClip = this.wallRenderer.drawSegments[0].spriteTopClip;
-    //   let textureMid;
-    //   let indexOfName =
-    //     textureName !== "-"
-    //       ? this.wallRenderer.textureManager.texturePool.get(textureName)
-    //           .textureIndex
-    //       : -1;
-    //   // let textureHeight = this.wallRenderer.textures[indexOfName].height;
-
-    //   let {
-    //     textureWidth: textureWidth,
-    //     textureHeight: textureHeight,
-    //     textureData: textureData,
-    //     columns: columns,
-    //   } = this.textureManager.getTextureInfo(textureName);
-
-    //   if (currentLine.flag & 16) {
-    //     textureMid =
-    //       frontSector.floorHeight > backSector.floorHeight
-    //         ? frontSector.floorHeight
-    //         : backSector.floorHeight;
-    //     textureMid = textureMid + textureHeight - gameEngine.player.height;
-    //   } else {
-    //     textureMid =
-    //       frontSector.ceilingHeight < backSector.ceilingHeight
-    //         ? frontSector.ceilingHeight
-    //         : backSector.ceilingHeight;
-
-    //     textureMid = textureMid - gameEngine.player.height;
-    //   }
-    //   textureMid += currentLine.rightSidedef.yOffset;
-
-    //   let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
-    //   let inverseScale = 1.0 / spriteYScale;
-
-    //   for (let x = x1; x <= x2; x++) {
-    //     let textureColumnIndex = maskedTextureCol[x];
-
-    //     // Ensure the texture column index is valid
-    //     if (textureColumnIndex != null) {
-    //       // Handle wrapping if necessary
-    //       // console.log(textureColumnIndex);
-    //       // console.log(x);
-    //       textureColumnIndex =
-    //         Math.floor(textureColumnIndex) & (textureWidth - 1);
-    //       // textureColumnIndex = Math.floor(textureColumnIndex);
-
-    //       // Fetch the corresponding texture column
-    //       const column = columns[textureColumnIndex];
-    //       // console.log(column);
-    //       // console.log(textureColumnIndex);
-    //       // Process each post in the texture column
-    //       for (let j = 0; j < column.length; j++) {
-    //         const post = column[j];
-
-    //         let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-    //         let bottomscreen = topscreen + spriteYScale * post.length;
-
-    //         let yl = Math.ceil(topscreen);
-    //         let yh = Math.floor(bottomscreen - 1);
-
-    //         // Apply vertical clipping
-    //         if (yh >= floorClip[x]) {
-    //           yh = floorClip[x] - 1;
-    //         }
-    //         if (yl <= ceilingClip[x]) {
-    //           yl = ceilingClip[x] + 1;
-    //         }
-
-    //         if (yl <= yh) {
-    //           // Call drawColumn with the correct texture column index
-    //           this.wallRenderer.drawColumn(
-    //             textureMid - post.topDelta,
-    //             yl,
-    //             yh,
-    //             inverseScale,
-    //             textureColumnIndex, // Correct texture column index
-    //             textureWidth,
-    //             textureHeight,
-    //             textureData,
-    //             x,
-    //             1 // Light level or other parameters
-    //           );
-    //         }
-    //       }
-    //     }
-    //   }
-
-    //   // for (let x = x1; x <= x2; x++) {
-
-    //   //   for (let i = 0; i < columns.length; i++) {
-    //   //     const column = columns[i];
-    //   //     for (let j = 0; j < column.length; j++) {
-    //   //       const post = column[j];
-
-    //   //       let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-    //   //       let bottomscreen = topscreen + spriteYScale * post.length;
-
-    //   //       let yl = topscreen;
-    //   //       let yh = bottomscreen - 1;
-
-    //   //       if (yh >= floorClip[x]) {
-    //   //         yh = floorClip[x] - 1;
-    //   //       }
-    //   //       if (yl <= ceilingClip[x]) {
-    //   //         yl = ceilingClip[x] + 1;
-    //   //       }
-
-    //   //       if (yl <= yh) {
-    //   //         this.wallRenderer.drawColumn(
-    //   //           textureMid - post.topDelta,
-    //   //           yl,
-    //   //           yh,
-    //   //           inverseScale,
-    //   //           maskedTextureCol[x],
-    //   //           textureWidth,
-    //   //           textureHeight,
-    //   //           textureData,
-    //   //           x,
-    //   //           0
-    //   //         );
-    //   //       }
-    //   //     }
-    //   //   }
-
-    //   // }
-    // }
-
-    // for (let x = x1; x <= x2; x++) {
-    //   let columnIndex = Math.floor(maskedTextureCol[x]) % textureWidth;
-    //   let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
-    //   let inverseScale = 1.0 / spriteYScale;
-    //   //let y = spritetopscreen + spriteYScale;
-    //   //let j = y * textureWidth + Math.floor(maskedTextureCol[x]);
-
-    //   // while (textureData[j] !== 0) {
-    //   // let topscreen = spritetopscreen + spriteYScale;
-    //   // let bottomscreen = topscreen + spriteYScale;
-
-    //   // let yl = Math.max(Math.floor(spritetopscreen), ceilingClip[x] + 1);
-    //   // let yh = Math.min(
-    //   //   Math.floor(spritetopscreen + spriteYScale),
-    //   //   floorClip[x] - 1
-    //   // );
-
-    //   // let yl = topscreen;
-    //   // let yh = bottomscreen - 1;
-
-    //   // if (yh >= floorClip[x]) {
-    //   //   yh = floorClip[x] - 1;
-    //   // }
-    //   // if (yl <= ceilingClip[x]) {
-    //   //   yl = ceilingClip[x] + 1;
-    //   // }
-
-    //   this.wallRenderer.drawColumn(
-    //     textureMid,
-    //     yl,
-    //     yh,
-    //     inverseScale,
-    //     maskedTextureCol[x],
-    //     textureWidth,
-    //     textureHeight,
-    //     textureData,
-    //     x,
-    //     0
-    //   );
-    //   // j++;
-    // }
-
+    // visplanes
     // for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
     //   let visplane = this.wallRenderer.visplanes[i];
 
@@ -648,6 +311,203 @@ class LevelManager {
     //     }
     //   }
     // }
+
+    for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
+      if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
+        let x1 = this.wallRenderer.drawSegments[i].x1;
+        let x2 = this.wallRenderer.drawSegments[i].x2;
+
+        let wallY1 = this.wallRenderer.drawSegments[i].point1.wallY1;
+        let wallY2 = this.wallRenderer.drawSegments[i].point1.wallY2;
+
+        let currentLine = this.wallRenderer.drawSegments[i].currentLine;
+        let frontSector = currentLine.rightSidedef.sector;
+        let backSector = currentLine.leftSidedef.sector;
+
+        let textureName = currentLine.rightSidedef.middleTexture;
+        let maskedTextureCol =
+          this.wallRenderer.drawSegments[i].maskedTextureCol;
+        let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
+        // spryscale
+        //mfloorclip
+        //mceilingclip
+        let spriteYScale = this.wallRenderer.drawSegments[i].scale1;
+        //console.log(spriteYScale);
+        let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
+        let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
+        let textureMid;
+        let indexOfName =
+          textureName !== "-"
+            ? this.wallRenderer.textureManager.texturePool.get(textureName)
+                .textureIndex
+            : -1;
+        // let textureHeight = this.wallRenderer.textures[indexOfName].height;
+
+        let {
+          textureWidth: textureWidth,
+          textureHeight: textureHeight,
+          textureData: textureData,
+          columns: columns,
+        } = this.textureManager.getTextureInfo(textureName);
+
+        if (currentLine.flag & 16) {
+          textureMid =
+            frontSector.floorHeight > backSector.floorHeight
+              ? frontSector.floorHeight
+              : backSector.floorHeight;
+          textureMid = textureMid + textureHeight - gameEngine.player.height;
+        } else {
+          textureMid =
+            frontSector.ceilingHeight < backSector.ceilingHeight
+              ? frontSector.ceilingHeight
+              : backSector.ceilingHeight;
+
+          textureMid = textureMid - gameEngine.player.height;
+        }
+        textureMid += currentLine.rightSidedef.yOffset;
+
+        let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
+        let inverseScale = 1.0 / spriteYScale;
+
+        for (let x = x1; x <= x2; x++) {
+          let textureColumnIndex = maskedTextureCol[x];
+
+          // Ensure the texture column index is valid
+          if (textureColumnIndex != null) {
+            // Handle wrapping if necessary
+            // console.log(textureColumnIndex);
+            // console.log(x);
+            textureColumnIndex =
+              Math.floor(textureColumnIndex) & (textureWidth - 1);
+            // textureColumnIndex = Math.floor(textureColumnIndex);
+
+            
+
+            // Fetch the corresponding texture column
+            const column = columns[textureColumnIndex];
+            // console.log(column);
+            // console.log(textureColumnIndex);
+            // Process each post in the texture column
+            for (let j = 0; j < column.length; j++) {
+              const post = column[j];
+
+              let topscreen = spritetopscreen + spriteYScale * post.topDelta;
+              let bottomscreen = topscreen + spriteYScale * post.length;
+
+              //let topscreen = spritetopscreen;
+              //let bottomscreen = topscreen;
+
+              let yl = Math.ceil(topscreen);
+              let yh = Math.floor(bottomscreen - 1);
+
+              //  let yl = Math.max(Math.floor(wallY1) + 1, this.wallRenderer.upperclip[x] + 1);
+              //  let yh = Math.min(Math.floor(wallY2), this.wallRenderer.lowerclip[x] - 1);
+
+              // let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
+              // let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
+
+              // Apply vertical clipping
+              if (yh >= floorClip[x]) {
+                yh = floorClip[x] - 1;
+              }
+              if (yl <= ceilingClip[x]) {
+                yl = ceilingClip[x] + 1;
+              }
+
+              // if (yl <= yh) {
+              // Call drawColumn with the correct texture column index
+              this.wallRenderer.drawColumn(
+                textureMid - post.topDelta,
+                yl,
+                yh,
+                inverseScale,
+                textureColumnIndex, // Correct texture column index
+                textureWidth,
+                textureHeight,
+                textureData,
+                x,
+                1 // Light level or other parameters
+              );
+
+              let lightLevel = 1;
+
+              let textureColumn =
+                Math.floor(textureColumnIndex) & (textureWidth - 1);
+              const screenBuffer = this.wallRenderer.canvas.screenBuffer;
+
+              let dest = this.wallRenderer.canvas.ylookup[yl] + x;
+              //  dest = yl * 320 + x;
+
+              // let textureY =
+              //   textureMid - post.topDelta + (yl - HALFHEIGHT) * inverseScale;
+
+              //for (let y = yl; y <= yh; y++) {
+              // let texY = isPowerOfTwo(textureHeight)
+              //   ? Math.floor(textureY) & (textureHeight - 1)
+              //   : Math.floor(textureY) % textureHeight;
+
+              // const texPos = texY * textureWidth + textureColumn;
+              // let pixelValue = textureData[texPos];
+
+              // Apply light level
+              // const alpha = pixelValue >> 24;
+              // const alpha = (pixelValue >> 24) & 0xff;
+              let alpha = 255;
+
+              // if (alpha === 0) {
+              //   dest += CANVASWIDTH;
+              //   textureY += inverseScale;
+              //   continue;
+              // }
+
+              // const blue = adjustColorComponent(
+              //   (pixelValue >> 16) & 0xff,
+              //   lightLevel
+              // );
+              // const green = adjustColorComponent(
+              //   (pixelValue >> 8) & 0xff,
+              //   lightLevel
+              // );
+              // const red = adjustColorComponent(pixelValue & 0xff, lightLevel);
+
+              let blue = 0;
+              let green = 0;
+              let red = 255;
+
+              // screenBuffer[dest] =
+              //   (alpha << 24) | (blue << 16) | (green << 8) | red;
+
+            //  dest += CANVASWIDTH;
+              // textureY += inverseScale;
+           //   this.wallRenderer.canvas.updateCanvas();
+
+
+              if (x===x2){
+                const screenBuffer = this.wallRenderer.canvas.screenBuffer;
+                let dest = this.wallRenderer.canvas.ylookup[yl] + x;
+                let alpha = 255;
+
+  
+                let blue = 255;
+                let green = 0;
+                let red = 0;
+  
+                screenBuffer[dest] =
+                  (alpha << 24) | (blue << 16) | (green << 8) | red;
+  
+                dest += CANVASWIDTH;
+                // textureY += inverseScale;
+             //   this.wallRenderer.canvas.updateCanvas();
+              }
+            }
+            // }
+          }
+
+          //}
+          spriteYScale += rwScaleStep;
+        }
+      }
+    }
   }
 
   getPlayerSubsectorHeight() {
