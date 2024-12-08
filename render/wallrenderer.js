@@ -571,7 +571,7 @@ class WallRenderer {
       drawSeg_O
     );
 
-    // not right
+
     if (maskedTexture && drawSeg_O.spriteTopClip === null) {
       // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
       //drawSeg_O.spriteTopClip = this.upperclip;
@@ -669,6 +669,7 @@ class WallRenderer {
       this.processCeiling(yl, x, worldFrontZ1);
       this.processFloor(yh, x, worldFrontZ2);
 
+     
       let { textureColumn, inverseScale } = this.calculateTextureParams({
         realWallCenterAngle,
         realWallOffset,

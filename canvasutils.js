@@ -236,3 +236,18 @@ function adjustColorComponent(component, lightLevel) {
 // function adjustColorComponent(color, lightLevel) {
 //   return Math.min(255, Math.floor(color * lightLevel));
 // }
+
+const debugCanvas = document.getElementById("debugCanvas");
+const debugCtx = debugCanvas.getContext("2d");
+
+function drawDebugText(x, y, text, color) {
+  clearDebugOverlay(); // Clear previous frame
+  debugCtx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  debugCtx.font = "10px Arial";
+  debugCtx.textBaseline = "top"; // Align text properly
+  debugCtx.fillText(text, x, y);
+}
+
+function clearDebugOverlay() {
+  debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+}
