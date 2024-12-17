@@ -317,18 +317,6 @@ class LevelManager {
         let x1 = this.wallRenderer.drawSegments[i].x1;
         let x2 = this.wallRenderer.drawSegments[i].x2;
 
-        let wallY1 = this.wallRenderer.drawSegments[i].point1.wallY1;
-        let wallY2 = this.wallRenderer.drawSegments[i].point2.wallY2;
-
-        wallY1 = Math.max(
-          Math.floor(wallY1) + 1,
-          this.wallRenderer.upperclip[x1] + 1
-        );
-        wallY2 = Math.min(
-          Math.floor(wallY2),
-          this.wallRenderer.lowerclip[x1] - 1
-        );
-
         let currentLine = this.wallRenderer.drawSegments[i].currentLine;
         let frontSector = currentLine.rightSidedef.sector;
         let backSector = currentLine.leftSidedef.sector;
@@ -337,19 +325,11 @@ class LevelManager {
         let maskedTextureCol =
           this.wallRenderer.drawSegments[i].maskedTextureCol;
         let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
-        // spryscale
-        //mfloorclip
-        //mceilingclip
+
         let spriteYScale = this.wallRenderer.drawSegments[i].scale1;
-        //console.log(spriteYScale);
         let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
         let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
         let textureMid;
-        let indexOfName =
-          textureName !== "-"
-            ? this.wallRenderer.textureManager.texturePool.get(textureName)
-                .textureIndex
-            : -1;
 
         let {
           textureWidth: textureWidth,
@@ -380,47 +360,24 @@ class LevelManager {
 
           let textureColumnIndex = maskedTextureCol[x];
 
-          // Ensure the texture column index is valid
           if (textureColumnIndex != null) {
-            // Handle wrapping if necessary
-            // console.log(textureColumnIndex);
-            // console.log(x);
             textureColumnIndex =
               Math.floor(textureColumnIndex) & (textureWidth - 1);
-            // textureColumnIndex = Math.floor(textureColumnIndex);
 
-            // Fetch the corresponding texture column
             let column;
-            //    if (textureColumnIndex > 0) {
-            //   column = columns[textureColumnIndex - 1];
-            // } else {
-            column = columns[textureColumnIndex];
-            // }
 
-            // console.log(column);
-            // console.log(textureColumnIndex);
+            column = columns[textureColumnIndex];
+
             // Process each post in the texture column
             for (let j = 0; j < column.length; j++) {
               const post = column[j];
 
               let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-              // let topscreen = Math.round(spritetopscreen); // floor?
-              // let topscreen = Math.floor(spritetopscreen);
-              let bottomscreen = topscreen + spriteYScale * post.length;
-              // let bottomscreen =
-              //   topscreen + 1 + Math.round(spriteYScale * columns.length);
 
-              //let topscreen = spritetopscreen;
-              //let bottomscreen = topscreen;
+              let bottomscreen = topscreen + spriteYScale * post.length;
 
               let yl = Math.ceil(topscreen);
               let yh = Math.floor(bottomscreen);
-
-              //  let yl = Math.max(Math.floor(wallY1) + 1, this.wallRenderer.upperclip[x] + 1);
-              //  let yh = Math.min(Math.floor(wallY2), this.wallRenderer.lowerclip[x] - 1);
-
-              // let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
-              // let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
               // Apply vertical clipping
               if (yh >= floorClip[x]) {
@@ -431,50 +388,17 @@ class LevelManager {
                 yl = ceilingClip[x] + 1;
               }
 
-              // this.wallRenderer.canvas.drawLine(x, yl, x2, yl, [255, 255, 0]);
-              // this.wallRenderer.canvas.drawLine(x, yh, x2, yh, [255, 0, 255]);
-
-              // this.wallRenderer.canvas.drawLine(x, yl, x, yh, [0, 0, 255]); // Blue for each column
-
-              // if (yl <= yh) {
-              //  Call drawColumn with the correct texture column index
               this.wallRenderer.drawColumn(
                 textureMid,
                 yl,
                 yh,
                 inverseScale,
-                textureColumnIndex, // Correct texture column index
+                textureColumnIndex,
                 textureWidth,
                 textureHeight,
                 textureData,
                 x,
-                1 // Light level or other parameters
-              );
-
-              const uvIndex = textureColumnIndex;
-              // this.wallRenderer.canvas.drawText(
-              //   x,
-              //   yl - 10,
-              //   `U: ${uvIndex}`,
-              //   [255, 255, 255]
-              // ); // White
-              // drawDebugText(
-              //   10,
-              //   20,
-              //   `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}`,
-              //   [255, 255, 255]
-              // );
-
-              const debugLines = [
-                `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}`,
-              ];
-              //drawMultiLineText(10, 20, debugLines, [255, 255, 255]);
-
-              drawDebugTextWrapped(
-                10,
-                20,
-                `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}, spriteyscale: ${spriteYScale}`,
-                [255, 255, 255]
+                1
               );
             }
           }
