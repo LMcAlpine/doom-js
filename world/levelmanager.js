@@ -372,8 +372,8 @@ class LevelManager {
         //   ceilingClip[x1] + 1,
         //   x2,
         //   ceilingClip[x2] + 1,
-        //   [255, 0, 0]
-        // ); // Red for ceiling
+        //   [255, 125, 0]
+        // ); // orange for ceiling
         // this.wallRenderer.canvas.drawLine(
         //   x1,
         //   floorClip[x1] - 1,
@@ -405,10 +405,13 @@ class LevelManager {
         }
         textureMid += currentLine.rightSidedef.yOffset;
 
-        let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
-        let inverseScale = 1.0 / spriteYScale;
+       
 
         for (let x = x1; x <= x2; x++) {
+
+          let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
+          let inverseScale = 1.0 / spriteYScale;
+
           let textureColumnIndex = maskedTextureCol[x];
 
           // Ensure the texture column index is valid
@@ -421,150 +424,173 @@ class LevelManager {
             // textureColumnIndex = Math.floor(textureColumnIndex);
 
             // Fetch the corresponding texture column
-            const column = columns[textureColumnIndex];
+            let column;
+            //    if (textureColumnIndex > 0) {
+            //   column = columns[textureColumnIndex - 1];
+            // } else {
+            column = columns[textureColumnIndex];
+            // }
+
             // console.log(column);
             // console.log(textureColumnIndex);
             // Process each post in the texture column
-            for (let j = 0; j < column.length; j++) {
-              const post = column[j];
+            //for (let j = 0; j < column.length; j++) {
+            //const post = column[j];
 
-              let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-              let bottomscreen = topscreen + spriteYScale * post.length;
+            // let topscreen = spritetopscreen + spriteYScale * post.topDelta;
+            // let topscreen = Math.round(spritetopscreen); // floor?
+            let topscreen = Math.floor(spritetopscreen);
+            // let bottomscreen = topscreen + spriteYScale * post.length;
+            let bottomscreen =
+              topscreen + 1 + Math.round(spriteYScale * columns.length);
 
-              //let topscreen = spritetopscreen;
-              //let bottomscreen = topscreen;
+            //let topscreen = spritetopscreen;
+            //let bottomscreen = topscreen;
 
-              let yl = Math.ceil(topscreen);
-              let yh = Math.floor(bottomscreen - 1);
+            let yl = Math.ceil(topscreen);
+            let yh = Math.floor(bottomscreen);
 
-              //  let yl = Math.max(Math.floor(wallY1) + 1, this.wallRenderer.upperclip[x] + 1);
-              //  let yh = Math.min(Math.floor(wallY2), this.wallRenderer.lowerclip[x] - 1);
+            //  let yl = Math.max(Math.floor(wallY1) + 1, this.wallRenderer.upperclip[x] + 1);
+            //  let yh = Math.min(Math.floor(wallY2), this.wallRenderer.lowerclip[x] - 1);
 
-              // let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
-              // let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
+            // let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
+            // let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
 
-              // Apply vertical clipping
-              if (yh >= floorClip[x]) {
-                yh = floorClip[x] - 1;
-              }
-              if (yl <= ceilingClip[x]) {
-                yl = ceilingClip[x] + 1;
-              }
-
-              // this.wallRenderer.canvas.drawLine(x, yl, x2, yl, [255, 255, 0]);
-              // this.wallRenderer.canvas.drawLine(x, yh, x2, yh, [255, 0, 255]);
-
-              // this.wallRenderer.canvas.drawLine(x, yl, x, yh, [0, 0, 255]); // Blue for each column
-
-              // if (yl <= yh) {
-              // Call drawColumn with the correct texture column index
-              // this.wallRenderer.drawColumn(
-              //   textureMid - post.topDelta,
-              //   yl,
-              //   yh,
-              //   inverseScale,
-              //   textureColumnIndex, // Correct texture column index
-              //   textureWidth,
-              //   textureHeight,
-              //   textureData,
-              //   x,
-              //   1 // Light level or other parameters
-              // );
-
-              const uvIndex = maskedTextureCol[x];
-              // this.wallRenderer.canvas.drawText(
-              //   x,
-              //   yl - 10,
-              //   `U: ${uvIndex}`,
-              //   [255, 255, 255]
-              // ); // White
-              drawDebugText(
-                10,
-                20,
-                `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}`,
-                [255, 255, 255]
-              );
-
-              let lightLevel = 1;
-
-              let textureColumn =
-                Math.floor(textureColumnIndex) & (textureWidth - 1);
-              const screenBuffer = this.wallRenderer.canvas.screenBuffer;
-
-              let dest = this.wallRenderer.canvas.ylookup[yl] + x;
-              //  dest = yl * 320 + x;
-
-              // let textureY =
-              //   textureMid - post.topDelta + (yl - HALFHEIGHT) * inverseScale;
-
-              //for (let y = yl; y <= yh; y++) {
-              // let texY = isPowerOfTwo(textureHeight)
-              //   ? Math.floor(textureY) & (textureHeight - 1)
-              //   : Math.floor(textureY) % textureHeight;
-
-              // const texPos = texY * textureWidth + textureColumn;
-              // let pixelValue = textureData[texPos];
-
-              // Apply light level
-              // const alpha = pixelValue >> 24;
-              // const alpha = (pixelValue >> 24) & 0xff;
-              let alpha = 255;
-
-              // if (alpha === 0) {
-              //   dest += CANVASWIDTH;
-              //   textureY += inverseScale;
-              //   continue;
-              // }
-
-              // const blue = adjustColorComponent(
-              //   (pixelValue >> 16) & 0xff,
-              //   lightLevel
-              // );
-              // const green = adjustColorComponent(
-              //   (pixelValue >> 8) & 0xff,
-              //   lightLevel
-              // );
-              // const red = adjustColorComponent(pixelValue & 0xff, lightLevel);
-
-              let blue = 0;
-              let green = 0;
-              let red = 255;
-
-              screenBuffer[dest] =
-                (alpha << 24) | (blue << 16) | (green << 8) | red;
-
-              dest += CANVASWIDTH;
-              // textureY += inverseScale;
-              this.wallRenderer.canvas.updateCanvas();
-
-              dest = this.wallRenderer.canvas.ylookup[yh] + x;
-
-              blue = 255;
-              green = 255;
-              red = 0;
-
-              screenBuffer[dest] =
-                (alpha << 24) | (blue << 16) | (green << 8) | red;
-
-              this.wallRenderer.canvas.updateCanvas();
-
-              if (x === x2) {
-                const screenBuffer = this.wallRenderer.canvas.screenBuffer;
-                let dest = this.wallRenderer.canvas.ylookup[yl] + x;
-                let alpha = 255;
-
-                let blue = 255;
-                let green = 0;
-                let red = 0;
-
-                screenBuffer[dest] =
-                  (alpha << 24) | (blue << 16) | (green << 8) | red;
-
-                dest += CANVASWIDTH;
-                // textureY += inverseScale;
-                //   this.wallRenderer.canvas.updateCanvas();
-              }
+            // Apply vertical clipping
+            if (yh >= floorClip[x]) {
+              yh = floorClip[x] - 1;
+              // yh = floorClip[x];
             }
+            if (yl <= ceilingClip[x]) {
+              yl = ceilingClip[x] + 1;
+            }
+
+            // this.wallRenderer.canvas.drawLine(x, yl, x2, yl, [255, 255, 0]);
+            // this.wallRenderer.canvas.drawLine(x, yh, x2, yh, [255, 0, 255]);
+
+            // this.wallRenderer.canvas.drawLine(x, yl, x, yh, [0, 0, 255]); // Blue for each column
+
+            // if (yl <= yh) {
+            //  Call drawColumn with the correct texture column index
+            this.wallRenderer.drawColumn(
+              textureMid,
+              yl,
+              yh,
+              inverseScale,
+              textureColumnIndex, // Correct texture column index
+              textureWidth,
+              textureHeight,
+              textureData,
+              x,
+              1 // Light level or other parameters
+            );
+
+            const uvIndex = textureColumnIndex;
+            // this.wallRenderer.canvas.drawText(
+            //   x,
+            //   yl - 10,
+            //   `U: ${uvIndex}`,
+            //   [255, 255, 255]
+            // ); // White
+            // drawDebugText(
+            //   10,
+            //   20,
+            //   `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}`,
+            //   [255, 255, 255]
+            // );
+
+            const debugLines = [
+              `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}`,
+            ];
+            //drawMultiLineText(10, 20, debugLines, [255, 255, 255]);
+
+            drawDebugTextWrapped(
+              10,
+              20,
+              `U: ${uvIndex}, yl: ${yl}, yh: ${yh}, x: ${x}, spritetopscreen: ${spritetopscreen}, topscreen: ${topscreen}, bottomscreen: ${bottomscreen}, spriteyscale: ${spriteYScale}`,
+              [255, 255, 255]
+            );
+
+            let lightLevel = 1;
+
+            let textureColumn =
+              Math.floor(textureColumnIndex) & (textureWidth - 1);
+            const screenBuffer = this.wallRenderer.canvas.screenBuffer;
+
+            let dest = this.wallRenderer.canvas.ylookup[yl] + x;
+            //  dest = yl * 320 + x;
+
+            // let textureY =
+            //   textureMid - post.topDelta + (yl - HALFHEIGHT) * inverseScale;
+
+            //for (let y = yl; y <= yh; y++) {
+            // let texY = isPowerOfTwo(textureHeight)
+            //   ? Math.floor(textureY) & (textureHeight - 1)
+            //   : Math.floor(textureY) % textureHeight;
+
+            // const texPos = texY * textureWidth + textureColumn;
+            // let pixelValue = textureData[texPos];
+
+            // Apply light level
+            // const alpha = pixelValue >> 24;
+            // const alpha = (pixelValue >> 24) & 0xff;
+            let alpha = 255;
+
+            // if (alpha === 0) {
+            //   dest += CANVASWIDTH;
+            //   textureY += inverseScale;
+            //   continue;
+            // }
+
+            // const blue = adjustColorComponent(
+            //   (pixelValue >> 16) & 0xff,
+            //   lightLevel
+            // );
+            // const green = adjustColorComponent(
+            //   (pixelValue >> 8) & 0xff,
+            //   lightLevel
+            // );
+            // const red = adjustColorComponent(pixelValue & 0xff, lightLevel);
+
+            let blue = 0;
+            let green = 0;
+            let red = 255;
+
+            // screenBuffer[dest] =
+            //   (alpha << 24) | (blue << 16) | (green << 8) | red;
+
+            // dest += CANVASWIDTH;
+            // // textureY += inverseScale;
+            // this.wallRenderer.canvas.updateCanvas();
+
+            // dest = this.wallRenderer.canvas.ylookup[yh] + x;
+
+            // blue = 255;
+            // green = 255;
+            // red = 0;
+
+            // screenBuffer[dest] =
+            //   (alpha << 24) | (blue << 16) | (green << 8) | red;
+
+            // this.wallRenderer.canvas.updateCanvas();
+
+            // if (x === x2) {
+            //   const screenBuffer = this.wallRenderer.canvas.screenBuffer;
+            //   let dest = this.wallRenderer.canvas.ylookup[yl] + x;
+            //   let alpha = 255;
+
+            //   let blue = 255;
+            //   let green = 0;
+            //   let red = 0;
+
+            //   screenBuffer[dest] =
+            //     (alpha << 24) | (blue << 16) | (green << 8) | red;
+
+            //   dest += CANVASWIDTH;
+            //   // textureY += inverseScale;
+            //   //   this.wallRenderer.canvas.updateCanvas();
+            // }
+            // }
             // }
           }
 

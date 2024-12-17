@@ -36,6 +36,23 @@ const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 const SPAWNCEILING = 256;
 const NOSECTOR = 8;
 
+const FRACBITS = 16;
+const FRACUNIT = 1 << FRACBITS;
+const TABLE_SIZE = 65536; // full circle in fine angles
+let finetangent = new Int32Array(TABLE_SIZE);
+
+for (let i = 0; i < TABLE_SIZE; i++) {
+  let angleRadians = (i * 2 * Math.PI) / TABLE_SIZE;
+  let t = Math.tan(angleRadians);
+  let fixedT = Math.floor(t * FRACUNIT);
+  finetangent[i] = fixedT;
+}
+
+function degreesToFineAngle(deg) {
+  return Math.floor((deg / 360) * TABLE_SIZE) & (TABLE_SIZE - 1);
+}
+
+
 // temp
 let floorPlane;
 let ceilingPlane;
@@ -246,6 +263,31 @@ function drawDebugText(x, y, text, color) {
   debugCtx.font = "10px Arial";
   debugCtx.textBaseline = "top"; // Align text properly
   debugCtx.fillText(text, x, y);
+}
+
+function drawDebugTextWrapped(x, y, text, color) {
+  clearDebugOverlay();
+  const maxWidth = 300;
+  const lineHeight = 12;
+  const words = text.split(" ");
+  let line = "";
+
+  debugCtx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  debugCtx.font = "10px Arial";
+  debugCtx.textBaseline = "top";
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const testWidth = debugCtx.measureText(testLine).width;
+    if (testWidth > maxWidth && i > 0) {
+      debugCtx.fillText(line, x, y); // Draw the current line
+      line = words[i] + " "; // Start a new line
+      y += lineHeight; // Move to the next vertical position
+    } else {
+      line = testLine;
+    }
+  }
+  debugCtx.fillText(line, x, y); // Draw the last line
 }
 
 function clearDebugOverlay() {

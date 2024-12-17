@@ -22,9 +22,9 @@ class Player {
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-   // this.direction = new Angle(location.direction);
-    //this.direction = new Angle(277.88437500000066);
-    this.direction = new Angle(45);
+    //this.direction = new Angle(location.direction);
+    this.direction = new Angle(344.531250000184);
+    //this.direction = new Angle(45);
 
     this.fov = fov;
 
