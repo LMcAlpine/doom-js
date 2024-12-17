@@ -241,9 +241,23 @@ class LevelManager {
           let textureColumnIndex = maskedTextureCol[x];
 
           if (textureColumnIndex != null) {
-            textureColumnIndex =
-              Math.floor(textureColumnIndex) & (textureHeight - 1); // height not width
+            console.log("Before Wrapping:", textureColumnIndex);
+            console.log(
+              "Columns Length:",
+              columns.length,
+              "TextureWidth:",
+              textureWidth
+            );
 
+            // textureColumnIndex =
+            //   Math.floor(textureColumnIndex) & (textureWidth - 1);
+
+            textureColumnIndex %= columns.length;
+            if (textureColumnIndex < 0) {
+              textureColumnIndex += columns.length; // Fix negative indices
+            }
+
+            console.log("After Wrapping:", textureColumnIndex);
             let column;
 
             column = columns[textureColumnIndex];
