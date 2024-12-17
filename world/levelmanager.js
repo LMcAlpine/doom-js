@@ -242,7 +242,7 @@ class LevelManager {
 
           if (textureColumnIndex != null) {
             textureColumnIndex =
-              Math.floor(textureColumnIndex) & (textureWidth - 1);
+              Math.floor(textureColumnIndex) & (textureHeight - 1); // height not width
 
             let column;
 
