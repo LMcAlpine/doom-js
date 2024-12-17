@@ -409,8 +409,8 @@ class WallRenderer {
         if (line.flag & UPPER_UNPEGGED) {
           upperTextureAlt = worldFrontZ1;
         } else {
-          console.log(upperTextureIndex);
-          console.log(upperWallTexture);
+          // console.log(upperTextureIndex);
+          // console.log(upperWallTexture);
           if (upperTextureIndex !== undefined) {
             topPoint =
               leftSector.ceilingHeight +
@@ -748,60 +748,7 @@ class WallRenderer {
       }
 
       if (maskedTexture) {
-        // let x = 100;
-        // let yl = 100;
-        // let yh = 200;
-
-        let fixedX = Math.floor(x * 65536);
-        // Perform the same kind of truncation Doom would
-        let doomX = fixedX >> 16; // simulating Doom’s truncation
-
-        //if (x > 0) {
-        //drawSeg_O.maskedTextureCol[x - 1] = textureColumn;
-        // } else {
         drawSeg_O.maskedTextureCol[x] = textureColumn;
-        //  }
-
-        console.log(
-          "At x:",
-          x,
-          "mask column:",
-          textureColumn,
-          "textureWidth:",
-          textureWidth
-        );
-
-        let debugColor = (255 << 24) | (255 << 16) | (0 << 8) | 255; // ARGB: opaque magenta
-
-        const screenBuffer = this.canvas.screenBuffer;
-
-        // Draw line here as before
-
-        console.log("x:", x, "yl:", yl, "yh:", yh);
-
-        for (let y = yl; y <= yh; y++) {
-          //let dest = this.canvas.ylookup[y] + x;
-          let dest = y * CANVASWIDTH + x;
-          // dest = yl * 320 + x;
-          let alpha = 255;
-
-          let blue = 255;
-          let green = 0;
-          let red = 255;
-
-          // screenBuffer[dest] = debugColor;
-
-          dest += CANVASWIDTH;
-        }
-
-        // let testX = 50;
-        // let testYStart = 100;
-        // let testYEnd = 110;
-
-        // for (let y = testYStart; y <= testYEnd; y++) {
-        //   let dest = this.canvas.ylookup[y] + testX;
-        //   screenBuffer[dest] = debugColor;
-        // }
       }
 
       // vertically move down
@@ -851,33 +798,13 @@ class WallRenderer {
         radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
       tanTest = Math.tan(degreesToRadians(angle));
       productTest = tanTest * wallInfo.realWallDistance;
-      // textureColumn =
-      //   Math.round(wallInfo.realWallOffset) -
-      //   Math.floor(
-      //     Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance
-      //   );
+
       textureColumn = Math.floor(
         wallInfo.realWallOffset -
           Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance
       );
 
       inverseScale = 1.0 / wallInfo.realWallScale1;
-
-      // let angleRadians = degreesToRadians(angle);
-      // let tanValue = Math.tan(angleRadians);
-
-      // // Convert to fixed point
-      // let fixedOffset = Math.floor(wallInfo.realWallOffset * FRACUNIT);
-      // let fixedDistance = Math.floor(wallInfo.realWallDistance * FRACUNIT);
-      // let fixedTan = Math.floor(tanValue * FRACUNIT);
-
-      // // fixed multiplication (truncation)
-      // let fixedMulResult = (fixedDistance * fixedTan) >> FRACBITS;
-
-      // // Combine and shift (if Doom does so)
-      // let fixedTextureColumn = (fixedOffset + fixedMulResult) >> FRACBITS;
-
-      // textureColumn = fixedTextureColumn; // now truncated like Doom
     }
 
     return { textureColumn, inverseScale };
