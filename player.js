@@ -12,18 +12,18 @@ class Player {
    */
   constructor(location, { minX, minY }, { scaleX, scaleY }, fov, height) {
     this.location = location;
-    // this.x = location.xPosition;
-    // this.y = location.yPosition;
+    this.x = location.xPosition;
+    this.y = location.yPosition;
 
-    this.x = 3255;
-    this.y = -4254;
+    // this.x = 3255;
+    // this.y = -4254;
 
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    //this.direction = new Angle(location.direction);
-    this.direction = new Angle(178);
+    this.direction = new Angle(location.direction);
+    // this.direction = new Angle(178);
     //this.direction = new Angle(45);
 
     this.fov = fov;
@@ -97,9 +97,9 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
-    console.log("x: " + this.x);
-    console.log("y ;" + this.y);
-    console.log("angle: " + this.direction.angle);
+    // console.log("x: " + this.x);
+    // console.log("y ;" + this.y);
+    // console.log("angle: " + this.direction.angle);
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 

@@ -204,7 +204,7 @@ class WallRenderer {
   storeWallRange(seg, xScreenV1, xScreenV2) {
     let line = seg.linedef;
     //  let side = seg.linedef.rightSidedef;
-    let side = seg.sidedef;
+    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures. 
 
     // Taking the angle of the seg in the worldspace and adding 90 degrees to it
     // this results in a perpendicular line (the normal)
@@ -256,7 +256,7 @@ class WallRenderer {
     drawSeg_O.x2 = xScreenV2;
     drawSeg_O.currentLine = line;
 
-    drawSeg_O.sidedef = side;
+    drawSeg_O.sidedef = side; // store the sidedef
 
     drawSeg_O.scale1 = realWallScale1;
     let rwx = xScreenV1;

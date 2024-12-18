@@ -208,32 +208,8 @@ class LevelManager {
         // need to somehow know which side the player is on
 
         let textureName;
-        // need to check if a back sector (left) exists?
-        // if (backSector) {
-        //   textureName = currentLine.leftSidedef.middleTexture;
-        // } else {
-        //   textureName = currentLine.rightSidedef.middleTexture;
-        // }
+
         textureName = this.wallRenderer.drawSegments[i].sidedef.middleTexture;
-
-        // let textureName;
-        // // bit of a hack
-        // // TODO refactor this out to a function (maybe) this causes a performance drop
-        // const dx = gameEngine.player.x - currentLine.startVertex.x;
-
-        // const dy = gameEngine.player.y - currentLine.startVertex.y;
-
-        // const result = Math.round(
-        //   dx * (currentLine.endVertex.y - currentLine.startVertex.y) -
-        //     dy * (currentLine.endVertex.x - currentLine.startVertex.x)
-        // );
-
-        // if (result <= 0) {
-        //   textureName = currentLine.leftSidedef.middleTexture;
-        // } else {
-        //   textureName = currentLine.rightSidedef.middleTexture;
-        // }
-        // // end TODO
 
         let maskedTextureCol =
           this.wallRenderer.drawSegments[i].maskedTextureCol;
@@ -268,7 +244,7 @@ class LevelManager {
           textureMid = textureMid - gameEngine.player.height;
         }
         textureMid += currentLine.rightSidedef.yOffset;
-        console.log(textureName);
+       // console.log(textureName);
 
         for (let x = x1; x <= x2; x++) {
           let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
