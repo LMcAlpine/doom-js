@@ -198,10 +198,34 @@ class LevelManager {
         let x2 = this.wallRenderer.drawSegments[i].x2;
 
         let currentLine = this.wallRenderer.drawSegments[i].currentLine;
+        // console.log(`Left Texture: ${currentLine.leftSidedef.middleTexture}`);
+        // console.log(`Right Texture: ${currentLine.rightSidedef.middleTexture}`);
         let frontSector = currentLine.rightSidedef.sector;
         let backSector = currentLine.leftSidedef.sector;
 
-        let textureName = currentLine.rightSidedef.middleTexture;
+        // let textureName = currentLine.rightSidedef.middleTexture; // wrong sides because I am only getting the rightSidedef texture....
+        // for example, if the right side is a left texture and then the left side is the right texture.
+        // need to somehow know which side the player is on
+
+        let textureName;
+        // bit of a hack
+        // TODO refactor this out to a function (maybe) this causes a performance drop
+        const dx = gameEngine.player.x - currentLine.startVertex.x;
+
+        const dy = gameEngine.player.y - currentLine.startVertex.y;
+
+        const result = Math.round(
+          dx * (currentLine.endVertex.y - currentLine.startVertex.y) -
+            dy * (currentLine.endVertex.x - currentLine.startVertex.x)
+        );
+
+        if (result <= 0) {
+          textureName = currentLine.leftSidedef.middleTexture;
+        } else {
+          textureName = currentLine.rightSidedef.middleTexture;
+        }
+        // end TODO
+
         let maskedTextureCol =
           this.wallRenderer.drawSegments[i].maskedTextureCol;
         let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
@@ -210,6 +234,8 @@ class LevelManager {
         let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
         let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
         let textureMid;
+
+       // console.log(`Segment X1=${x1}, X2=${x2}, Texture=${textureName}`);
 
         let {
           textureWidth: textureWidth,
@@ -233,21 +259,29 @@ class LevelManager {
           textureMid = textureMid - gameEngine.player.height;
         }
         textureMid += currentLine.rightSidedef.yOffset;
+        console.log(textureName);
 
         for (let x = x1; x <= x2; x++) {
           let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
           let inverseScale = 1.0 / spriteYScale;
 
           let textureColumnIndex = maskedTextureCol[x];
+          // console.log("Y Offset:", currentLine.rightSidedef.yOffset);
+          // console.log(
+          //   `x=${x}, maskedTextureCol=${textureColumnIndex}, textureMid=${textureMid}`
+          // );
+          // console.log(
+          //   `X=${x}, spriteYScale=${spriteYScale}, rwScaleStep=${rwScaleStep}`
+          // );
 
           if (textureColumnIndex != null) {
-            console.log("Before Wrapping:", textureColumnIndex);
-            console.log(
-              "Columns Length:",
-              columns.length,
-              "TextureWidth:",
-              textureWidth
-            );
+            // console.log("Before Wrapping:", textureColumnIndex);
+            // console.log(
+            //   "Columns Length:",
+            //   columns.length,
+            //   "TextureWidth:",
+            //   textureWidth
+            // );
 
             // textureColumnIndex =
             //   Math.floor(textureColumnIndex) & (textureWidth - 1);
@@ -257,7 +291,7 @@ class LevelManager {
               textureColumnIndex += columns.length; // Fix negative indices
             }
 
-            console.log("After Wrapping:", textureColumnIndex);
+            // console.log("After Wrapping:", textureColumnIndex);
             let column;
 
             column = columns[textureColumnIndex];
@@ -294,11 +328,14 @@ class LevelManager {
                 x,
                 1
               );
+
+              this.wallRenderer.canvas.updateCanvas();
             }
           }
 
           spriteYScale += rwScaleStep;
         }
+        //console.log("");
       }
     }
   }
