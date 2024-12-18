@@ -73,6 +73,7 @@ function buildSegs(segs, vertices, linedefs) {
     seg.sidedef = sidedef;
     seg.frontsector = frontsector;
 
+    // 1 == true, 0 == false
     if (seg.direction) {
       // opposite, when direction is 1, or opposite the linedef
       rightSidedef = seg.linedef.leftSidedef;

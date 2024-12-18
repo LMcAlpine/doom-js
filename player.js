@@ -15,15 +15,15 @@ class Player {
     // this.x = location.xPosition;
     // this.y = location.yPosition;
 
-    this.x = 3255.4548162076826;
-    this.y = -4254.073804038118;
+    this.x = 3255;
+    this.y = -4254;
 
     this.minX = minX;
     this.minY = minY;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     //this.direction = new Angle(location.direction);
-    this.direction = new Angle(178.18312500184427);
+    this.direction = new Angle(178);
     //this.direction = new Angle(45);
 
     this.fov = fov;
