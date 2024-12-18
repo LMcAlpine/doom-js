@@ -244,7 +244,7 @@ class LevelManager {
           textureMid = textureMid - gameEngine.player.height;
         }
         textureMid += currentLine.rightSidedef.yOffset;
-       // console.log(textureName);
+        // console.log(textureName);
 
         for (let x = x1; x <= x2; x++) {
           let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
@@ -311,7 +311,7 @@ class LevelManager {
                 textureHeight,
                 textureData,
                 x,
-                1
+                this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
               );
 
               this.wallRenderer.canvas.updateCanvas();
