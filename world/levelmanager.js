@@ -314,7 +314,7 @@ class LevelManager {
                 this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
               );
 
-              this.wallRenderer.canvas.updateCanvas();
+              
             }
           }
 
