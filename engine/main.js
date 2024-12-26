@@ -92,6 +92,8 @@ document
       41
     );
 
+    // let troop = lumpData.find((lump) => lump.name === "TROOA1");
+
     gameEngine.addEntity(player);
     gameEngine.player = player;
 
@@ -165,6 +167,35 @@ document
       palette.palettes[0]
     );
     const flatManager = new FlatManager(lumpData, palette.palettes[0]);
+
+    let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
+
+    let troop = lumpData.find((lump) => lump.name === "TROOA1");
+
+    // let spriteName = sprites.find((sprite) =>
+    //   sprite.name.startsWith(spriteNames[0])
+    // );
+
+    let spriteName;
+    let frame;
+    let rotation;
+    for (let sprite of sprites) {
+      if (sprite.name.startsWith(spriteNames[0])) {
+        spriteName = sprite;
+        frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
+        rotation = sprite.name[5] - "0";
+      }
+
+      // install sprite
+
+      if (sprite.name.length > 6) {
+        if (sprite.name[6]) {
+          frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
+          rotation = sprite.name[7] - "0";
+          // install sprite
+        }
+      }
+    }
 
     const levelManager = new LevelManager(
       levels,

@@ -16,6 +16,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 const FOV = 90;
 const HALFFOV = FOV / 2;
 
+
+let spriteNames = ["TROO"];
+
 // const FRACBITS = 16;
 // const FRACUNIT = 1 << FRACBITS;
 
@@ -293,3 +296,6 @@ function drawDebugTextWrapped(x, y, text, color) {
 function clearDebugOverlay() {
   debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
 }
+
+
+function getSpriteData(){}
