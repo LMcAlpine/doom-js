@@ -219,10 +219,11 @@ document
     endIndex++;
 
     for (let i = 0; i < spriteNames.length; i++) {
+      maxFrame = -1;
       for (let j = startIndex + 1; j < endIndex; j++) {
         let sprite = lumpData[j].name;
         console.log(sprite);
-        if (sprite.startsWith(spriteNames[0])) {
+        if (sprite.startsWith(spriteNames[i])) {
           spriteName = sprite;
           frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
           rotation = sprite[5] - "0";
