@@ -170,6 +170,20 @@ document
 
     let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
 
+    startIndex = lumpData.findIndex((lump) => lump.name === "S_START") + 1;
+    endIndex = lumpData.findIndex((lump) => lump.name === "S_END") - 1;
+
+    let patch;
+    let spriteWidth = [];
+    let spriteOffset = [];
+    let spriteTopOffset = [];
+    for (let i = 0; i < sprites.length; i++) {
+      patch = patchNames.parsePatchHeader(sprites[i].name);
+      spriteWidth[i] = patch.width;
+      spriteOffset[i] = patch.leftOffset;
+      spriteTopOffset[i] = patch.topOffset;
+    }
+
     let troop = lumpData.find((lump) => lump.name === "TROOA1");
 
     // let spriteName = sprites.find((sprite) =>
@@ -179,22 +193,59 @@ document
     let spriteName;
     let frame;
     let rotation;
-    for (let sprite of sprites) {
-      if (sprite.name.startsWith(spriteNames[0])) {
-        spriteName = sprite;
-        frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
-        rotation = sprite.name[5] - "0";
-      }
+    // for (let sprite of sprites) {
+    //   if (sprite.name.startsWith(spriteNames[0])) {
+    //     spriteName = sprite;
+    //     frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
+    //     rotation = sprite.name[5] - "0";
 
-      // install sprite
+    //     // install sprite
 
-      if (sprite.name.length > 6) {
-        if (sprite.name[6]) {
-          frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
-          rotation = sprite.name[7] - "0";
+    //     installSpriteLump(sprite, frame, rotation, false);
+
+    //     if (sprite.name.length > 6) {
+    //       if (sprite.name[6]) {
+    //         frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
+    //         rotation = sprite.name[7] - "0";
+    //         // install sprite
+
+    //         installSpriteLump(sprite, frame, rotation, true);
+    //       }
+    //     }
+    //   }
+    // }
+
+    startIndex--;
+    endIndex++;
+
+    for (let i = 0; i < spriteNames.length; i++) {
+      for (let j = startIndex + 1; j < endIndex; j++) {
+        let sprite = lumpData[j].name;
+        console.log(sprite);
+        if (sprite.startsWith(spriteNames[0])) {
+          spriteName = sprite;
+          frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
+          rotation = sprite[5] - "0";
+
           // install sprite
+
+          installSpriteLump(j, frame, rotation, false);
+
+          if (sprite.length > 6) {
+            if (sprite[6]) {
+              frame = sprite[6].charCodeAt(0) - "A".charCodeAt(0);
+              rotation = sprite[7] - "0";
+              // install sprite
+
+              installSpriteLump(j, frame, rotation, true);
+            }
+          }
         }
       }
+      maxFrame++;
+
+      theSprites[i].framesCount = maxFrame;
+      theSprites[i].spriteFrames = spriteTemp;
     }
 
     const levelManager = new LevelManager(

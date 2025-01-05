@@ -16,8 +16,148 @@ const HALFHEIGHT = this.canvasHeight / 2;
 const FOV = 90;
 const HALFFOV = FOV / 2;
 
+// let spriteNames = ["TROO"];
 
-let spriteNames = ["TROO"];
+const spriteNames = [
+  "TROO",
+  "SHTG",
+  "PUNG",
+  "PISG",
+  "PISF",
+  "SHTF",
+  "SHT2",
+  "CHGG",
+  "CHGF",
+  "MISG",
+  "MISF",
+  "SAWG",
+  "PLSG",
+  "PLSF",
+  "BFGG",
+  "BFGF",
+  "BLUD",
+  "PUFF",
+  "BAL1",
+  "BAL2",
+  "PLSS",
+  "PLSE",
+  "MISL",
+  "BFS1",
+  "BFE1",
+  "BFE2",
+  "TFOG",
+  "IFOG",
+  "PLAY",
+  "POSS",
+  "SPOS",
+  "VILE",
+  "FIRE",
+  "FATB",
+  "FBXP",
+  "SKEL",
+  "MANF",
+  "FATT",
+  "CPOS",
+  "SARG",
+  "HEAD",
+  "BAL7",
+  "BOSS",
+  "BOS2",
+  "SKUL",
+  "SPID",
+  "BSPI",
+  "APLS",
+  "APBX",
+  "CYBR",
+  "PAIN",
+  "SSWV",
+  "KEEN",
+  "BBRN",
+  "BOSF",
+  "ARM1",
+  "ARM2",
+  "BAR1",
+  "BEXP",
+  "FCAN",
+  "BON1",
+  "BON2",
+  "BKEY",
+  "RKEY",
+  "YKEY",
+  "BSKU",
+  "RSKU",
+  "YSKU",
+  "STIM",
+  "MEDI",
+  "SOUL",
+  "PINV",
+  "PSTR",
+  "PINS",
+  "MEGA",
+  "SUIT",
+  "PMAP",
+  "PVIS",
+  "CLIP",
+  "AMMO",
+  "ROCK",
+  "BROK",
+  "CELL",
+  "CELP",
+  "SHEL",
+  "SBOX",
+  "BPAK",
+  "BFUG",
+  "MGUN",
+  "CSAW",
+  "LAUN",
+  "PLAS",
+  "SHOT",
+  "SGN2",
+  "COLU",
+  "SMT2",
+  "GOR1",
+  "POL2",
+  "POL5",
+  "POL4",
+  "POL3",
+  "POL1",
+  "POL6",
+  "GOR2",
+  "GOR3",
+  "GOR4",
+  "GOR5",
+  "SMIT",
+  "COL1",
+  "COL2",
+  "COL3",
+  "COL4",
+  "CAND",
+  "CBRA",
+  "COL6",
+  "TRE1",
+  "TRE2",
+  "ELEC",
+  "CEYE",
+  "FSKU",
+  "COL5",
+  "TBLU",
+  "TGRN",
+  "TRED",
+  "SMBT",
+  "SMGT",
+  "SMRT",
+  "HDB1",
+  "HDB2",
+  "HDB3",
+  "HDB4",
+  "HDB5",
+  "HDB6",
+  "POB1",
+  "POB2",
+  "BRS1",
+  "TLMP",
+  "TLP2",
+];
 
 // const FRACBITS = 16;
 // const FRACUNIT = 1 << FRACBITS;
@@ -54,7 +194,6 @@ for (let i = 0; i < TABLE_SIZE; i++) {
 function degreesToFineAngle(deg) {
   return Math.floor((deg / 360) * TABLE_SIZE) & (TABLE_SIZE - 1);
 }
-
 
 // temp
 let floorPlane;
@@ -297,5 +436,65 @@ function clearDebugOverlay() {
   debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
 }
 
+function getSpriteData() {}
 
-function getSpriteData(){}
+let startIndex;
+let endIndex;
+let maxFrame = -1;
+
+let theSprites = [];
+
+for (let i = 0; i < spriteNames.length; i++) {
+  theSprites[i] = new SpriteDef();
+}
+let spriteTemp = [];
+
+for (let i = 0; i < 29; i++) {
+  spriteTemp[i] = new SpriteFrame();
+}
+
+function installSpriteLump(lump, frame, rotation, flipped) {
+  if (frame >= 29 || rotation > 8) {
+    console.log("Bad frame characters");
+    return;
+  }
+
+  if (frame > maxFrame) {
+    maxFrame = frame;
+  }
+
+  if (rotation === 0) {
+    if (spriteTemp[frame].rotate === false) {
+      console.log(`frame ${frame} has multiple rotation=0 lump`);
+      return;
+    }
+    if (spriteTemp[frame].rotate === true) {
+      console.log(`frame ${frame} has rotations and a rotation=0 lump`);
+      return;
+    }
+
+    spriteTemp[frame].rotate = false;
+    for (let i = 0; i < 8; i++) {
+      spriteTemp[frame].lump[i] = lump;
+      spriteTemp[frame].flip[i] = flipped;
+    }
+    return;
+  }
+
+  if (spriteTemp[frame].rotate === false) {
+    console.log(`frame ${frame} has rotations and a rotation=0 lump`);
+    return;
+  }
+
+  spriteTemp[frame].rotate = true;
+
+  // make rotation 0 based
+  rotation--;
+  if (spriteTemp[frame].lump[rotation] != -1) {
+    console.log(`Sprite has two lumps mapped to it`);
+    return;
+  }
+
+  spriteTemp[frame].lump[rotation] = lump - startIndex;
+  spriteTemp[frame].flip[rotation] = flipped;
+}
