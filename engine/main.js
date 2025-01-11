@@ -56,18 +56,7 @@ function setupGameEngine(levels, lumpData) {
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
   // Initialize canvas and player
-  const canvas = new Canvas("myCanvas");
-  const player = new Player(
-    levels.things[0],
-    { minX: minX, minY: minY },
-    { scaleX: scaleX, scaleY: scaleY },
-    90,
-    41
-  );
-  gameEngine.addEntity(player);
-  gameEngine.player = player;
-  gameEngine.canvas = canvas;
-  gameEngine.ctx = canvas.ctx;
+  initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY);
 
   // Setup game data objects
   const dataObjects = setupLevelData(levels);
@@ -128,4 +117,19 @@ function setupLevelData(levels) {
     segObjects,
     thingObjects,
   };
+}
+
+function initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY) {
+  const canvas = new Canvas("myCanvas");
+  const player = new Player(
+    levels.things[0],
+    { minX: minX, minY: minY },
+    { scaleX: scaleX, scaleY: scaleY },
+    90,
+    41
+  );
+  gameEngine.addEntity(player);
+  gameEngine.player = player;
+  gameEngine.canvas = canvas;
+  gameEngine.ctx = canvas.ctx;
 }
