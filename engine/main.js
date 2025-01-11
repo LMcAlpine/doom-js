@@ -1,6 +1,8 @@
 const gameEngine = new GameEngine("myCanvas", 50);
 
 const ENDIAN = (() => {
+  // Determines the system's endianness (little-endian or big-endian).
+  // This is necessary for correctly interpreting binary data, such as WAD files.
   const buffer = new ArrayBuffer(2);
   new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
   return new Int16Array(buffer)[0] === 256;
@@ -56,7 +58,7 @@ document
 
     // *** need to more setup before regarding the file reading, parsing, lump loading, etc
 
-    gameEngine.entities = [];
+    // gameEngine.entities = [];
 
     gameEngine.skyTextureName = "SKY1";
 
@@ -222,7 +224,7 @@ document
       maxFrame = -1;
       for (let j = startIndex + 1; j < endIndex; j++) {
         let sprite = lumpData[j].name;
-        console.log(sprite);
+       // console.log(sprite);
         if (sprite.startsWith(spriteNames[i])) {
           spriteName = sprite;
           frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
