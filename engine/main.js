@@ -72,17 +72,55 @@ function setupGameEngine(levels, lumpData) {
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
 
+  // Setup game data objects
+  const dataObjects = setupLevelData(levels);
+
   const patchNames = new PatchNames(lumpData);
   gameEngine.patchNames = patchNames;
 
-  const dataObjects = setupLevelData(levels);
-
+  // Setup texture managers
   const textureManager = new TextureManager(
     texture.maptextures,
     palette.palettes[0]
   );
   const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
+  // Process sprites
+  processSprites(flatManager, lumpData);
+
+  const levelManager = new LevelManager(
+    levels,
+    dataObjects,
+    textureManager,
+    flatManager
+  );
+  gameEngine.levelManager = levelManager;
+  gameEngine.init();
+
+  gameEngine.start();
+}
+
+function setupLevelData(levels) {
+  const sectorObjects = buildSectors(levels.sectors);
+  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+  const linedefObjects = buildLinedefs(
+    levels.linedefs,
+    levels.vertices,
+    sidedefObjects
+  );
+  const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
+  const thingObjects = buildThings(levels.things);
+
+  return {
+    sectorObjects,
+    sidedefObjects,
+    linedefObjects,
+    segObjects,
+    thingObjects,
+  };
+}
+
+function processSprites(flatManager, lumpData) {
   let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
 
   startIndex = lumpData.findIndex((lump) => lump.name === "S_START") + 1;
@@ -92,8 +130,9 @@ function setupGameEngine(levels, lumpData) {
   let spriteWidth = [];
   let spriteOffset = [];
   let spriteTopOffset = [];
+
   for (let i = 0; i < sprites.length; i++) {
-    patch = patchNames.parsePatchHeader(sprites[i].name);
+    patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
     spriteWidth[i] = patch.width;
     spriteOffset[i] = patch.leftOffset;
     spriteTopOffset[i] = patch.topOffset;
@@ -136,35 +175,4 @@ function setupGameEngine(levels, lumpData) {
     theSprites[i].framesCount = maxFrame;
     theSprites[i].spriteFrames = spriteTemp;
   }
-
-  const levelManager = new LevelManager(
-    levels,
-    dataObjects,
-    textureManager,
-    flatManager
-  );
-  gameEngine.levelManager = levelManager;
-  gameEngine.init();
-
-  gameEngine.start();
-}
-
-function setupLevelData(levels) {
-  const sectorObjects = buildSectors(levels.sectors);
-  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
-  const linedefObjects = buildLinedefs(
-    levels.linedefs,
-    levels.vertices,
-    sidedefObjects
-  );
-  const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
-  const thingObjects = buildThings(levels.things);
-
-  return {
-    sectorObjects,
-    sidedefObjects,
-    linedefObjects,
-    segObjects,
-    thingObjects,
-  };
 }
