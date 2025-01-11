@@ -86,8 +86,10 @@ function setupGameEngine(levels, lumpData) {
   );
   const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
+  const spriteManager = new SpriteManager(lumpData);
+
   // Process sprites
-  processSprites(flatManager, lumpData);
+  processSprites(spriteManager, lumpData);
 
   const levelManager = new LevelManager(
     levels,
@@ -121,11 +123,11 @@ function setupLevelData(levels) {
   };
 }
 
-function processSprites(flatManager, lumpData) {
-  let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
+function processSprites(spriteManager, lumpData) {
+  let sprites = spriteManager.getSprites("S_START", "S_END");
 
-  startIndex = lumpData.findIndex((lump) => lump.name === "S_START") + 1;
-  endIndex = lumpData.findIndex((lump) => lump.name === "S_END") - 1;
+  startIndex = spriteManager.getIndex("S_START") + 1;
+  endIndex = spriteManager.getIndex("S_END") - 1;
 
   let patch;
   let spriteWidth = [];
