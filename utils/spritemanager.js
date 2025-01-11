@@ -20,17 +20,19 @@ class SpriteManager {
     startIndex = this.getIndex("S_START") + 1;
     endIndex = this.getIndex("S_END") - 1;
 
-    let patch;
-    let spriteWidth = [];
-    let spriteOffset = [];
-    let spriteTopOffset = [];
+    // let patch;
+    // let spriteWidth = [];
+    // let spriteOffset = [];
+    // let spriteTopOffset = [];
 
-    for (let i = 0; i < sprites.length; i++) {
-      patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
-      spriteWidth[i] = patch.width;
-      spriteOffset[i] = patch.leftOffset;
-      spriteTopOffset[i] = patch.topOffset;
-    }
+    // for (let i = 0; i < sprites.length; i++) {
+    //   patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
+    //   spriteWidth[i] = patch.width;
+    //   spriteOffset[i] = patch.leftOffset;
+    //   spriteTopOffset[i] = patch.topOffset;
+    // }
+    const { spriteWidth, spriteOffset, spriteTopOffset } =
+      this.calculateOffsets(sprites);
 
     this.installSprites(spriteNames, startIndex, endIndex);
   }
@@ -70,5 +72,21 @@ class SpriteManager {
       theSprites[i].framesCount = maxFrame;
       theSprites[i].spriteFrames = spriteTemp;
     }
+  }
+
+  calculateOffsets(sprites) {
+    let patch;
+    let spriteWidth = [];
+    let spriteOffset = [];
+    let spriteTopOffset = [];
+
+    for (let i = 0; i < sprites.length; i++) {
+      patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
+      spriteWidth[i] = patch.width;
+      spriteOffset[i] = patch.leftOffset;
+      spriteTopOffset[i] = patch.topOffset;
+    }
+
+    return { spriteWidth, spriteOffset, spriteTopOffset };
   }
 }
