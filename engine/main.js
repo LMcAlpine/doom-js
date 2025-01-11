@@ -1,12 +1,13 @@
 const gameEngine = new GameEngine("myCanvas", 50);
 
-const ENDIAN = (() => {
-  // Determines the system's endianness (little-endian or big-endian).
-  // This is necessary for correctly interpreting binary data, such as WAD files.
+// Check system endianness
+function getSystemEndianness() {
   const buffer = new ArrayBuffer(2);
   new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
   return new Int16Array(buffer)[0] === 256;
-})();
+}
+
+const ENDIAN = getSystemEndianness();
 
 // DOM Elements
 let levelSelect = document.getElementById("levels");
