@@ -67,9 +67,37 @@ class LevelManager {
   }
 
   draw() {
-    this.wallRenderer.solidsegs = this.solidSegsManager.clearSolidsegs(
-      this.wallRenderer.solidsegs
-    );
+    let i;
+    for (let j = 0; j < this.things.length; j++) {
+      for (i = 0; i < arr.length; i++) {
+        // map maybe instead?
+        if (this.things[j].type == mapinfo[i].doomednum) {
+          break;
+        }
+      }
+    }
+
+    let t = this.things[0];
+    let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
+    t.subsector = subsec;
+    // t.flagsHardcode = 33554432;
+    // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
+    t.flagsHardcode = mapinfo[i].flags;
+    let sec;
+    if (!(t.flagsHardcode & 8)) {
+      sec = subsec.sector;
+
+      t.sprev = null;
+      t.snext = sec.thingList;
+
+      if (sec.thingList) {
+        sec.thingList.sprev = t;
+      }
+      sec.thingList = t;
+    }
+
+    let ss = (this.wallRenderer.solidsegs =
+      this.solidSegsManager.clearSolidsegs(this.wallRenderer.solidsegs));
     this.wallRenderer.initClipHeights();
 
     this.wallRenderer.clearVisplanes();
@@ -313,8 +341,6 @@ class LevelManager {
                 x,
                 this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
               );
-
-              
             }
           }
 
@@ -344,5 +370,25 @@ class LevelManager {
       this.subsectors[this.bspTraversal.getSubsector(subsectorID)];
     let seg = this.segs[subsector.firstSegNumber];
     return seg.rightSector.floorHeight;
+  }
+
+  pointInSubsector(x, y) {
+    let subsectorID = this.nodes.length - 1;
+
+    while (!this.bspTraversal.isSubsector(subsectorID)) {
+      let isOnLeft = this.bspTraversal.isPointOnLeftSide(
+        x,
+        y,
+        this.nodes[subsectorID]
+      );
+      if (isOnLeft) {
+        subsectorID = this.nodes[subsectorID].leftChild;
+      } else {
+        subsectorID = this.nodes[subsectorID].rightChild;
+      }
+    }
+    let subsector =
+      this.linkedSubsectors[this.bspTraversal.getSubsector(subsectorID)];
+    return subsector;
   }
 }
