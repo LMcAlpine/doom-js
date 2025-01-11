@@ -46,13 +46,9 @@ async function initializeGameData(file) {
 }
 
 function setupGameEngine(levels, lumpData) {
-  // Setup palette and textures
-  const palette = new ReadPalette(lumpData);
-  const texture = new Textures(lumpData);
-
   gameEngine.lumpData = lumpData;
-  gameEngine.palette = palette;
-  gameEngine.textures = texture;
+  // Setup palette and textures
+  const { palette, texture } = setupTextureAndPalettes(lumpData);
 
   // Setup vertices and scaling
   let vertices = levels.vertices;
@@ -102,6 +98,16 @@ function setupGameEngine(levels, lumpData) {
   gameEngine.init();
 
   gameEngine.start();
+}
+
+function setupTextureAndPalettes(lumpData) {
+  const palette = new ReadPalette(lumpData);
+  const texture = new Textures(lumpData);
+
+  gameEngine.palette = palette;
+  gameEngine.textures = texture;
+
+  return { palette, texture };
 }
 
 function setupLevelData(levels) {
