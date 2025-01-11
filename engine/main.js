@@ -8,8 +8,8 @@ const ENDIAN = (() => {
   return new Int16Array(buffer)[0] === 256;
 })();
 
+// DOM Elements
 let levelSelect = document.getElementById("levels");
-
 let selectedValue = "E1M1";
 levelSelect.addEventListener("change", function () {
   selectedValue = this.value;
@@ -18,247 +18,250 @@ levelSelect.addEventListener("change", function () {
 
 document
   .getElementById("fileInput")
-  .addEventListener("change", async (event) => {
-    const file = event.target.files[0];
-    if (!file) {
-      console.error("No file selected.");
-      return;
-    }
+  .addEventListener("change", handleFileInput);
 
-    // identify version
-    let gameMission = GameMission.doom;
-    let gameMode = "";
-    if (gameMission === GameMission.doom) {
-      gameMode = GameMode.shareware;
-    }
-    let startMap = 1;
-    let startEpisode = 1;
+async function handleFileInput(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    console.error("No file selected.");
+    return;
+  }
+  initializeGameData(file);
+}
 
-    // need to setup the framebuffer/video buffer
+async function initializeGameData(file) {
+  // identify version
+  let gameMission = GameMission.doom;
+  let gameMode = "";
+  if (gameMission === GameMission.doom) {
+    gameMode = GameMode.shareware;
+  }
+  let startMap = 1;
+  let startEpisode = 1;
 
-    // ...
+  // need to setup the framebuffer/video buffer
 
-    // loop has started but still initializing
+  // ...
 
-    // checking the gamemode
-    // if gamemmode === commercial
-    // else
-    // switch gameepisode
-    // case 1
-    // these comments need to be changed into code but only doing SKY1 for now
-    let skyTextureName = "SKY1";
-    // might need a texture number for this name
+  // loop has started but still initializing
 
-    // G_DoLoadLevel
-    //skyflatenum = R_FlatNumForName(SKYFLATNAME)
+  // checking the gamemode
+  // if gamemmode === commercial
+  // else
+  // switch gameepisode
+  // case 1
+  // these comments need to be changed into code but only doing SKY1 for now
+  let skyTextureName = "SKY1";
+  // might need a texture number for this name
 
-    // ....
+  // G_DoLoadLevel
+  //skyflatenum = R_FlatNumForName(SKYFLATNAME)
 
-    // setup level P_SetupLevel
+  // ....
 
-    // *** need to more setup before regarding the file reading, parsing, lump loading, etc
+  // setup level P_SetupLevel
 
-    // gameEngine.entities = [];
+  // *** need to more setup before regarding the file reading, parsing, lump loading, etc
 
-    gameEngine.skyTextureName = "SKY1";
+  // gameEngine.entities = [];
 
-    const wadFileReader = new WADFileReader(file);
-    const arrayBuffer = await wadFileReader.readFile();
-    const wadParser = new WADParser(arrayBuffer);
-    const lumpData = await wadParser.parse();
-    const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse(selectedValue);
+  gameEngine.skyTextureName = "SKY1";
 
-    gameEngine.lumpData = lumpData;
+  const wadFileReader = new WADFileReader(file);
+  const arrayBuffer = await wadFileReader.readFile();
+  const wadParser = new WADParser(arrayBuffer);
+  const lumpData = await wadParser.parse();
+  const levelParser = new LevelParser(lumpData);
+  const levels = levelParser.parse(selectedValue);
 
-    const palette = new ReadPalette(lumpData);
+  gameEngine.lumpData = lumpData;
 
-    gameEngine.palette = palette;
+  const palette = new ReadPalette(lumpData);
 
-    const texture = new Textures(lumpData);
+  gameEngine.palette = palette;
 
-    gameEngine.textures = texture;
+  const texture = new Textures(lumpData);
 
-    let vertices = levels.vertices;
-    let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
+  gameEngine.textures = texture;
 
-    const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+  let vertices = levels.vertices;
+  let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
 
-    const canvas = new Canvas("myCanvas");
+  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
-    const player = new Player(
-      levels.things[0],
-      { minX: minX, minY: minY },
-      { scaleX: scaleX, scaleY: scaleY },
-      90,
-      41
-    );
+  const canvas = new Canvas("myCanvas");
 
-    // let troop = lumpData.find((lump) => lump.name === "TROOA1");
+  const player = new Player(
+    levels.things[0],
+    { minX: minX, minY: minY },
+    { scaleX: scaleX, scaleY: scaleY },
+    90,
+    41
+  );
 
-    gameEngine.addEntity(player);
-    gameEngine.player = player;
+  // let troop = lumpData.find((lump) => lump.name === "TROOA1");
 
-    gameEngine.canvas = canvas;
-    gameEngine.ctx = canvas.ctx;
+  gameEngine.addEntity(player);
+  gameEngine.player = player;
 
-    const patchNames = new PatchNames(lumpData);
-    gameEngine.patchNames = patchNames;
+  gameEngine.canvas = canvas;
+  gameEngine.ctx = canvas.ctx;
 
-    const sectorObjects = buildSectors(levels.sectors);
-    const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+  const patchNames = new PatchNames(lumpData);
+  gameEngine.patchNames = patchNames;
 
-    const linedefObjects = buildLinedefs(
-      levels.linedefs,
-      vertices,
-      sidedefObjects
-    );
+  const sectorObjects = buildSectors(levels.sectors);
+  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
 
-    const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
+  const linedefObjects = buildLinedefs(
+    levels.linedefs,
+    vertices,
+    sidedefObjects
+  );
 
-    const thingObjects = buildThings(levels.things);
+  const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
 
-    const dataObjects = {
-      sectorObjects,
-      sidedefObjects,
-      linedefObjects,
-      segObjects,
-      thingObjects,
-    };
+  const thingObjects = buildThings(levels.things);
 
-    // sector needs to have  a thing list of all the things in this sector
-    // build things
-    //
-    //     // Thing definition, position, orientation and type,
-    // // plus skill/visibility flags and attributes.
-    // typedef PACKED_STRUCT (
-    //   {
-    //       short		x;
-    //       short		y;
-    //       short		angle;
-    //       short		type;
-    //       short		options;
-    //   }) mapthing_t;
+  const dataObjects = {
+    sectorObjects,
+    sidedefObjects,
+    linedefObjects,
+    segObjects,
+    thingObjects,
+  };
 
-    // build the thing following this definition above
-    // spawn the thing
-    //  - inside, check if the thing is a player, spawn the player
-    //  - setup gun sprite
-    //  - bunch of player checks and other checks
-    //  - finally, start looking at spawning monsters or other things
-    //  - check to see if the thing is spawn on the ceiling?, else on the floor
-    //  - actually, spawn the thing now by calling P_spawnmobj (spawn map object)
-    //  - there is a map object, mobj, that gets properties set
-    //  - set thing position, where subsector links are set
-    //  - see if this thing is in the subsector? by looping over the number of nodes , and checking the side of where the thing is, return the subsector
-    //  - set the things subsector to the subsector returned.
-    //  - Don't add invisible things to the sector links (    // Don't use the sector links (invisible but touchable). MF_NOSECTOR		= 8,)
-    //  - grab the sector referenced by the subsector?
-    //  - thing is a linkedlist?
-    //  - set thing-> prev to null
-    //  - set thing->next to the sec->thinglist (beginning of list)
-    //  - if the thing list exists, then set this sectors thinglists previous sprite(?) to thing
-    //  - outside the if, set thinglist to thing --- sec->thinglist = thing
-    //  - blockmap related code, ignore for now
-    //  - set the floorz and ceilingz of the mobj, aka the floorheight and ceiling height of this mobj's subsectors floorheight or ceiling height
-    //  - check the z of the mobj if its on the floor or if its on the ceiling
-    //  - thinker related code
+  // sector needs to have  a thing list of all the things in this sector
+  // build things
+  //
+  //     // Thing definition, position, orientation and type,
+  // // plus skill/visibility flags and attributes.
+  // typedef PACKED_STRUCT (
+  //   {
+  //       short		x;
+  //       short		y;
+  //       short		angle;
+  //       short		type;
+  //       short		options;
+  //   }) mapthing_t;
 
-    const textureManager = new TextureManager(
-      texture.maptextures,
-      palette.palettes[0]
-    );
-    const flatManager = new FlatManager(lumpData, palette.palettes[0]);
+  // build the thing following this definition above
+  // spawn the thing
+  //  - inside, check if the thing is a player, spawn the player
+  //  - setup gun sprite
+  //  - bunch of player checks and other checks
+  //  - finally, start looking at spawning monsters or other things
+  //  - check to see if the thing is spawn on the ceiling?, else on the floor
+  //  - actually, spawn the thing now by calling P_spawnmobj (spawn map object)
+  //  - there is a map object, mobj, that gets properties set
+  //  - set thing position, where subsector links are set
+  //  - see if this thing is in the subsector? by looping over the number of nodes , and checking the side of where the thing is, return the subsector
+  //  - set the things subsector to the subsector returned.
+  //  - Don't add invisible things to the sector links (    // Don't use the sector links (invisible but touchable). MF_NOSECTOR		= 8,)
+  //  - grab the sector referenced by the subsector?
+  //  - thing is a linkedlist?
+  //  - set thing-> prev to null
+  //  - set thing->next to the sec->thinglist (beginning of list)
+  //  - if the thing list exists, then set this sectors thinglists previous sprite(?) to thing
+  //  - outside the if, set thinglist to thing --- sec->thinglist = thing
+  //  - blockmap related code, ignore for now
+  //  - set the floorz and ceilingz of the mobj, aka the floorheight and ceiling height of this mobj's subsectors floorheight or ceiling height
+  //  - check the z of the mobj if its on the floor or if its on the ceiling
+  //  - thinker related code
 
-    let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
+  const textureManager = new TextureManager(
+    texture.maptextures,
+    palette.palettes[0]
+  );
+  const flatManager = new FlatManager(lumpData, palette.palettes[0]);
 
-    startIndex = lumpData.findIndex((lump) => lump.name === "S_START") + 1;
-    endIndex = lumpData.findIndex((lump) => lump.name === "S_END") - 1;
+  let sprites = flatManager.getFlatData(lumpData, "S_START", "S_END");
 
-    let patch;
-    let spriteWidth = [];
-    let spriteOffset = [];
-    let spriteTopOffset = [];
-    for (let i = 0; i < sprites.length; i++) {
-      patch = patchNames.parsePatchHeader(sprites[i].name);
-      spriteWidth[i] = patch.width;
-      spriteOffset[i] = patch.leftOffset;
-      spriteTopOffset[i] = patch.topOffset;
-    }
+  startIndex = lumpData.findIndex((lump) => lump.name === "S_START") + 1;
+  endIndex = lumpData.findIndex((lump) => lump.name === "S_END") - 1;
 
-    let troop = lumpData.find((lump) => lump.name === "TROOA1");
+  let patch;
+  let spriteWidth = [];
+  let spriteOffset = [];
+  let spriteTopOffset = [];
+  for (let i = 0; i < sprites.length; i++) {
+    patch = patchNames.parsePatchHeader(sprites[i].name);
+    spriteWidth[i] = patch.width;
+    spriteOffset[i] = patch.leftOffset;
+    spriteTopOffset[i] = patch.topOffset;
+  }
 
-    // let spriteName = sprites.find((sprite) =>
-    //   sprite.name.startsWith(spriteNames[0])
-    // );
+  // let spriteName = sprites.find((sprite) =>
+  //   sprite.name.startsWith(spriteNames[0])
+  // );
 
-    let spriteName;
-    let frame;
-    let rotation;
-    // for (let sprite of sprites) {
-    //   if (sprite.name.startsWith(spriteNames[0])) {
-    //     spriteName = sprite;
-    //     frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
-    //     rotation = sprite.name[5] - "0";
+  let spriteName;
+  let frame;
+  let rotation;
+  // for (let sprite of sprites) {
+  //   if (sprite.name.startsWith(spriteNames[0])) {
+  //     spriteName = sprite;
+  //     frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
+  //     rotation = sprite.name[5] - "0";
 
-    //     // install sprite
+  //     // install sprite
 
-    //     installSpriteLump(sprite, frame, rotation, false);
+  //     installSpriteLump(sprite, frame, rotation, false);
 
-    //     if (sprite.name.length > 6) {
-    //       if (sprite.name[6]) {
-    //         frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
-    //         rotation = sprite.name[7] - "0";
-    //         // install sprite
+  //     if (sprite.name.length > 6) {
+  //       if (sprite.name[6]) {
+  //         frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
+  //         rotation = sprite.name[7] - "0";
+  //         // install sprite
 
-    //         installSpriteLump(sprite, frame, rotation, true);
-    //       }
-    //     }
-    //   }
-    // }
+  //         installSpriteLump(sprite, frame, rotation, true);
+  //       }
+  //     }
+  //   }
+  // }
 
-    startIndex--;
-    endIndex++;
+  startIndex--;
+  endIndex++;
 
-    for (let i = 0; i < spriteNames.length; i++) {
-      maxFrame = -1;
-      for (let j = startIndex + 1; j < endIndex; j++) {
-        let sprite = lumpData[j].name;
-       // console.log(sprite);
-        if (sprite.startsWith(spriteNames[i])) {
-          spriteName = sprite;
-          frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
-          rotation = sprite[5] - "0";
+  for (let i = 0; i < spriteNames.length; i++) {
+    maxFrame = -1;
+    for (let j = startIndex + 1; j < endIndex; j++) {
+      let sprite = lumpData[j].name;
+      // console.log(sprite);
+      if (sprite.startsWith(spriteNames[i])) {
+        spriteName = sprite;
+        frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
+        rotation = sprite[5] - "0";
 
-          // install sprite
+        // install sprite
 
-          installSpriteLump(j, frame, rotation, false);
+        installSpriteLump(j, frame, rotation, false);
 
-          if (sprite.length > 6) {
-            if (sprite[6]) {
-              frame = sprite[6].charCodeAt(0) - "A".charCodeAt(0);
-              rotation = sprite[7] - "0";
-              // install sprite
+        if (sprite.length > 6) {
+          if (sprite[6]) {
+            frame = sprite[6].charCodeAt(0) - "A".charCodeAt(0);
+            rotation = sprite[7] - "0";
+            // install sprite
 
-              installSpriteLump(j, frame, rotation, true);
-            }
+            installSpriteLump(j, frame, rotation, true);
           }
         }
       }
-      maxFrame++;
-
-      theSprites[i].framesCount = maxFrame;
-      theSprites[i].spriteFrames = spriteTemp;
     }
+    maxFrame++;
 
-    const levelManager = new LevelManager(
-      levels,
-      dataObjects,
-      textureManager,
-      flatManager
-    );
-    gameEngine.levelManager = levelManager;
-    gameEngine.init();
+    theSprites[i].framesCount = maxFrame;
+    theSprites[i].spriteFrames = spriteTemp;
+  }
 
-    gameEngine.start();
-  });
+  const levelManager = new LevelManager(
+    levels,
+    dataObjects,
+    textureManager,
+    flatManager
+  );
+  gameEngine.levelManager = levelManager;
+  gameEngine.init();
+
+  gameEngine.start();
+}
