@@ -21,6 +21,10 @@ class WallRenderer {
 
     this.upperclip = new Array(CANVASWIDTH);
     this.lowerclip = new Array(CANVASWIDTH);
+    this.screenHeightArray = new Array(CANVASWIDTH);
+    this.screenHeightArray.fill(CANVASHEIGHT);
+    this.negativeOneArray = new Array(CANVASWIDTH);
+    this.negativeOneArray.fill(-1);
 
     this.textures = gameEngine.textures.maptextures;
 
@@ -30,6 +34,8 @@ class WallRenderer {
     this.flatManager = flatManager;
 
     this.visplanes = [];
+    this.drawSegments = [];
+    this.masked = [];
   }
 
   /**
@@ -42,6 +48,10 @@ class WallRenderer {
 
   clearVisplanes() {
     this.visplanes = [];
+  }
+
+  clearDrawSegs() {
+    this.drawSegments = [];
   }
 
   addWall(seg, angleV1, angleV2) {
@@ -193,7 +203,8 @@ class WallRenderer {
 
   storeWallRange(seg, xScreenV1, xScreenV2) {
     let line = seg.linedef;
-    let side = seg.linedef.rightSidedef;
+    //  let side = seg.linedef.rightSidedef;
+    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures. 
 
     // Taking the angle of the seg in the worldspace and adding 90 degrees to it
     // this results in a perpendicular line (the normal)
@@ -225,7 +236,7 @@ class WallRenderer {
 
     let visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV1, canvasWidth))
     ).angle;
 
     let realWallScale1 = scaleFromViewAngle(
@@ -238,12 +249,16 @@ class WallRenderer {
 
     visangle = new Angle(
       gameEngine.player.direction.angle +
-      radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
+        radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
     drawSeg_O.currentLine = line;
+
+    drawSeg_O.sidedef = side; // store the sidedef
+
+    drawSeg_O.scale1 = realWallScale1;
     let rwx = xScreenV1;
     let rwStopX = xScreenV2 + 1;
 
@@ -258,9 +273,13 @@ class WallRenderer {
         canvasWidth
       );
       rwScaleStep = (scale2 - realWallScale1) / (xScreenV2 - xScreenV1);
+      drawSeg_O.scale2 = scale2;
+      drawSeg_O.scaleStep = rwScaleStep;
     } else {
       scale2 = realWallScale1;
       rwScaleStep = 0;
+      drawSeg_O.scale2 = scale2;
+      drawSeg_O.scaleStep = rwScaleStep;
     }
     let rightSector = seg.rightSector;
 
@@ -270,6 +289,9 @@ class WallRenderer {
     let midTexture = false;
     let topTexture = false;
     let bottomTexture = false;
+    let maskedTexture = false;
+
+    drawSeg_O.maskedTextureCol = null;
 
     let upperWallTexture;
     let lowerWallTexture;
@@ -280,13 +302,15 @@ class WallRenderer {
 
     let worldBackZ1;
     let worldBackZ2;
+    const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
+    midTexture = wallTexture !== "-";
 
     if (!seg.leftSector) {
       this.markfloor = true;
       this.markceiling = true;
 
-      const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
-      midTexture = wallTexture !== "-";
+      // const wallTexture = seg.linedef.rightSidedef.middleTexture.toUpperCase();
+      // midTexture = wallTexture !== "-";
       ceilingTexture = rightSector.ceilingTexture;
       floorTexture = rightSector.floorTexture;
 
@@ -304,10 +328,22 @@ class WallRenderer {
         middleTextureAlt = worldFrontZ1;
       }
       middleTextureAlt += side.yOffset;
+
+      drawSeg_O.spriteTopClip = this.screenHeightArray;
+      drawSeg_O.spriteBottomClip = this.negativeOneArray;
     } else {
       // two sided line
+      drawSeg_O.spriteTopClip = null;
+      drawSeg_O.spriteBottomClip = null;
 
       const leftSector = seg.leftSector;
+
+      if (leftSector.ceilingHeight <= rightSector.floorHeight) {
+        drawSeg_O.spriteBottomClip = this.negativeOneArray;
+      }
+      if (leftSector.floorHeight >= rightSector.ceilingHeight) {
+        drawSeg_O.spriteTopClip = this.screenHeightArray;
+      }
 
       // worldhigh
       worldBackZ1 = leftSector.ceilingHeight - gameEngine.player.height;
@@ -377,8 +413,8 @@ class WallRenderer {
         if (line.flag & UPPER_UNPEGGED) {
           upperTextureAlt = worldFrontZ1;
         } else {
-          console.log(upperTextureIndex);
-          console.log(upperWallTexture);
+          // console.log(upperTextureIndex);
+          // console.log(upperWallTexture);
           if (upperTextureIndex !== undefined) {
             topPoint =
               leftSector.ceilingHeight +
@@ -400,12 +436,18 @@ class WallRenderer {
 
       upperTextureAlt += side.yOffset;
       lowerTextureAlt += side.yOffset;
+
+      if (midTexture) {
+        maskedTexture = true;
+        // let maskedtexturecol = [];
+        drawSeg_O.maskedTextureCol = [];
+      }
     }
 
     // outside the else
 
     let segTextured = false;
-    if (midTexture || upperWallTexture || lowerWallTexture) {
+    if (midTexture || upperWallTexture || lowerWallTexture || maskedTexture) {
       segTextured = true;
     }
     let realWallCenterAngle;
@@ -436,6 +478,17 @@ class WallRenderer {
       rightSector.ceilingTexture !== "F_SKY1"
     ) {
       this.markceiling = false;
+    }
+
+    if (
+      !midTexture &&
+      !topTexture &&
+      !bottomTexture &&
+      !this.markfloor &&
+      !this.markceiling &&
+      !maskedTexture
+    ) {
+      return;
     }
 
     // stepping values for texture edges
@@ -502,6 +555,7 @@ class WallRenderer {
       midtexture: midTexture,
       toptexture: topTexture,
       bottomtexture: bottomTexture,
+      maskedTexture,
     };
     let worldFrontZValues = { worldFrontZ1, worldFrontZ2 };
 
@@ -517,8 +571,25 @@ class WallRenderer {
       drawWallState,
       worldFrontZValues,
       segTextured,
-      lightLevel
+      lightLevel,
+      drawSeg_O
     );
+
+    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
+      // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
+      //drawSeg_O.spriteTopClip = this.upperclip;
+
+      drawSeg_O.spriteTopClip = [...this.upperclip];
+    }
+    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
+      //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+      // drawSeg_O.spriteBottomClip = this.lowerclip;
+      drawSeg_O.spriteBottomClip = [...this.lowerclip];
+    }
+    drawSeg_O.point1 = point1;
+    drawSeg_O.point2 = point2;
+    drawSeg_O.seg = seg;
+    this.drawSegments.push(Object.assign({}, drawSeg_O));
   }
   renderSegLoop(
     point1,
@@ -532,7 +603,8 @@ class WallRenderer {
     drawWallState,
     worldFrontZValues,
     segTextured,
-    lightLevel
+    lightLevel,
+    drawSeg_O
   ) {
     let { wallTexture, middleTextureAlt } = middleWall;
     let { upperWallTexture, upperTextureAlt } = upperWall;
@@ -549,7 +621,8 @@ class WallRenderer {
     let { pixhigh, pixhighstep } = pixHighProperties;
     let { pixlow, pixlowstep } = pixLowProperties;
     let { worldFrontZ1, worldFrontZ2 } = worldFrontZValues;
-    let { midtexture, toptexture, bottomtexture } = drawWallState;
+    let { midtexture, toptexture, bottomtexture, maskedTexture } =
+      drawWallState;
 
     let {
       textureWidth: textureWidth,
@@ -570,9 +643,33 @@ class WallRenderer {
     } = this.textureManager.getTextureInfo(lowerWallTexture);
 
     let mid;
+
+    if (maskedTexture) {
+      this.masked.push({
+        middleTextureAlt,
+        wallY1,
+        wallY2,
+        textureWidth,
+        textureHeight,
+        textureData,
+        xScreenV1,
+        xScreenV2,
+        lightLevel,
+        realWallDistance,
+        realWallCenterAngle,
+        realWallOffset,
+        realWallScale1,
+        rwScaleStep,
+        segTextured,
+        wallY1Step,
+        wallY2Step,
+      });
+    }
+
     for (let x = xScreenV1; x < xScreenV2; x++) {
       let yl = Math.max(Math.floor(wallY1) + 1, this.upperclip[x] + 1);
       let yh = Math.min(Math.floor(wallY2), this.lowerclip[x] - 1);
+      // let yh = Math.min(Math.floor(wallY2), this.lowerclip[x]);
 
       this.processCeiling(yl, x, worldFrontZ1);
       this.processFloor(yh, x, worldFrontZ2);
@@ -586,18 +683,35 @@ class WallRenderer {
         segTextured,
       });
 
-      this.checkAndDrawMiddleWall(midtexture, {
-        middleTextureAlt,
-        yl,
-        yh,
-        inverseScale,
-        textureColumn,
-        textureWidth,
-        textureHeight,
-        textureData,
-        x,
-        lightLevel,
-      });
+      if (!maskedTexture) {
+        this.checkAndDrawMiddleWall(midtexture, {
+          middleTextureAlt,
+          yl,
+          yh,
+          inverseScale,
+          textureColumn,
+          textureWidth,
+          textureHeight,
+          textureData,
+          x,
+          lightLevel,
+        });
+      }
+
+      // else {
+      //   this.masked.push({
+      //     middleTextureAlt,
+      //     yl,
+      //     yh,
+      //     inverseScale,
+      //     textureColumn,
+      //     textureWidth,
+      //     textureHeight,
+      //     textureData,
+      //     x,
+      //     lightLevel,
+      //   });
+      // }
 
       if (toptexture) {
         mid = this.calculateMidUpperWall(pixhigh, x);
@@ -636,6 +750,10 @@ class WallRenderer {
         });
       } else if (this.markfloor) {
         this.lowerclip[x] = yh + 1;
+      }
+
+      if (maskedTexture) {
+        drawSeg_O.maskedTextureCol[x] = textureColumn;
       }
 
       // vertically move down
@@ -677,14 +795,20 @@ class WallRenderer {
     let angle;
     let textureColumn;
     let inverseScale;
-
+    let tanTest;
+    let productTest;
     if (wallInfo.segTextured) {
       angle =
         wallInfo.realWallCenterAngle +
         radiansToDegrees(screenToXView(wallInfo.x, CANVASWIDTH));
-      textureColumn =
+      tanTest = Math.tan(degreesToRadians(angle));
+      productTest = tanTest * wallInfo.realWallDistance;
+
+      textureColumn = Math.floor(
         wallInfo.realWallOffset -
-        Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance;
+          Math.tan(degreesToRadians(angle)) * wallInfo.realWallDistance
+      );
+
       inverseScale = 1.0 / wallInfo.realWallScale1;
     }
 
@@ -892,6 +1016,14 @@ class WallRenderer {
 
       // Apply light level
       const alpha = pixelValue >> 24;
+      // const alpha = (pixelValue >> 24) & 0xff;
+
+      // if (alpha === 0) {
+      //   dest += CANVASWIDTH;
+      //   textureY += inverseScale;
+      //   continue;
+      // }
+
       const blue = adjustColorComponent((pixelValue >> 16) & 0xff, lightLevel);
       const green = adjustColorComponent((pixelValue >> 8) & 0xff, lightLevel);
       const red = adjustColorComponent(pixelValue & 0xff, lightLevel);

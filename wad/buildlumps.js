@@ -9,6 +9,7 @@ function buildSectors(sectors) {
     sector.lightLevel = sectors[i].lightLevel / 255;
     sector.specialType = sectors[i].specialType;
     sector.tag = sectors[i].tag;
+    sector.thingsList = null;
     const temp = Object.assign({}, sector);
     sectorObjects.push(temp);
   }
@@ -73,6 +74,7 @@ function buildSegs(segs, vertices, linedefs) {
     seg.sidedef = sidedef;
     seg.frontsector = frontsector;
 
+    // 1 == true, 0 == false
     if (seg.direction) {
       // opposite, when direction is 1, or opposite the linedef
       rightSidedef = seg.linedef.leftSidedef;
@@ -126,4 +128,20 @@ function buildSidedefs(sidedefs, sectors) {
     sidedefObjects.push(temp);
   }
   return sidedefObjects;
+}
+
+function buildThings(things) {
+  const thing = {};
+  const thingObjects = [];
+  for (let i = 0; i < things.length; i++) {
+    thing.x = things[i].xPosition;
+    thing.y = things[i].yPosition;
+    thing.angle = things[i].direction;
+    thing.type = things[i].type;
+    thing.flag = things[i].flag;
+
+    const temp = Object.assign({}, thing);
+    thingObjects.push(temp);
+  }
+  return thingObjects;
 }

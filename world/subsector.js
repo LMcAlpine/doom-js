@@ -43,7 +43,9 @@ class Subsector {
       );
     }
 
-    // check ceiling visibility
+    // add sprites
+
+
 
     for (let i = 0; i < subsector.segCount; i++) {
       const seg = this.segs[subsector.firstSegNumber + i];

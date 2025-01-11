@@ -59,6 +59,7 @@ class GameEngine {
 
   draw() {
     // clear the canvas each frame
+    //clearDebugOverlay();
     this.canvas.clearCanvas();
 
     // Draw latest things first
@@ -69,6 +70,8 @@ class GameEngine {
     this.levelManager.draw();
 
     this.canvas.updateCanvas();
+    //clearDebugOverlay();
+    // drawDebugText(10, 20, "Debug Info: Segment X1", [255, 255, 255]);
   }
 
   update() {
