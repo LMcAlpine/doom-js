@@ -45,23 +45,21 @@ async function initializeGameData(file) {
 }
 
 function setupGameEngine(levels, lumpData) {
-  gameEngine.lumpData = lumpData;
-
+  // Setup palette and textures
   const palette = new ReadPalette(lumpData);
-
-  gameEngine.palette = palette;
-
   const texture = new Textures(lumpData);
 
+  gameEngine.lumpData = lumpData;
+  gameEngine.palette = palette;
   gameEngine.textures = texture;
 
+  // Setup vertices and scaling
   let vertices = levels.vertices;
   let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
-
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
+  // Initialize canvas and player
   const canvas = new Canvas("myCanvas");
-
   const player = new Player(
     levels.things[0],
     { minX: minX, minY: minY },
@@ -69,76 +67,15 @@ function setupGameEngine(levels, lumpData) {
     90,
     41
   );
-
-  // let troop = lumpData.find((lump) => lump.name === "TROOA1");
-
   gameEngine.addEntity(player);
   gameEngine.player = player;
-
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
 
   const patchNames = new PatchNames(lumpData);
   gameEngine.patchNames = patchNames;
 
-  const sectorObjects = buildSectors(levels.sectors);
-  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
-
-  const linedefObjects = buildLinedefs(
-    levels.linedefs,
-    vertices,
-    sidedefObjects
-  );
-
-  const segObjects = buildSegs(levels.segs, vertices, linedefObjects);
-
-  const thingObjects = buildThings(levels.things);
-
-  const dataObjects = {
-    sectorObjects,
-    sidedefObjects,
-    linedefObjects,
-    segObjects,
-    thingObjects,
-  };
-
-  // sector needs to have  a thing list of all the things in this sector
-  // build things
-  //
-  //     // Thing definition, position, orientation and type,
-  // // plus skill/visibility flags and attributes.
-  // typedef PACKED_STRUCT (
-  //   {
-  //       short		x;
-  //       short		y;
-  //       short		angle;
-  //       short		type;
-  //       short		options;
-  //   }) mapthing_t;
-
-  // build the thing following this definition above
-  // spawn the thing
-  //  - inside, check if the thing is a player, spawn the player
-  //  - setup gun sprite
-  //  - bunch of player checks and other checks
-  //  - finally, start looking at spawning monsters or other things
-  //  - check to see if the thing is spawn on the ceiling?, else on the floor
-  //  - actually, spawn the thing now by calling P_spawnmobj (spawn map object)
-  //  - there is a map object, mobj, that gets properties set
-  //  - set thing position, where subsector links are set
-  //  - see if this thing is in the subsector? by looping over the number of nodes , and checking the side of where the thing is, return the subsector
-  //  - set the things subsector to the subsector returned.
-  //  - Don't add invisible things to the sector links (    // Don't use the sector links (invisible but touchable). MF_NOSECTOR		= 8,)
-  //  - grab the sector referenced by the subsector?
-  //  - thing is a linkedlist?
-  //  - set thing-> prev to null
-  //  - set thing->next to the sec->thinglist (beginning of list)
-  //  - if the thing list exists, then set this sectors thinglists previous sprite(?) to thing
-  //  - outside the if, set thinglist to thing --- sec->thinglist = thing
-  //  - blockmap related code, ignore for now
-  //  - set the floorz and ceilingz of the mobj, aka the floorheight and ceiling height of this mobj's subsectors floorheight or ceiling height
-  //  - check the z of the mobj if its on the floor or if its on the ceiling
-  //  - thinker related code
+  const dataObjects = setupLevelData(levels);
 
   const textureManager = new TextureManager(
     texture.maptextures,
@@ -162,34 +99,9 @@ function setupGameEngine(levels, lumpData) {
     spriteTopOffset[i] = patch.topOffset;
   }
 
-  // let spriteName = sprites.find((sprite) =>
-  //   sprite.name.startsWith(spriteNames[0])
-  // );
-
   let spriteName;
   let frame;
   let rotation;
-  // for (let sprite of sprites) {
-  //   if (sprite.name.startsWith(spriteNames[0])) {
-  //     spriteName = sprite;
-  //     frame = sprite.name[4].charCodeAt(0) - "A".charCodeAt(0);
-  //     rotation = sprite.name[5] - "0";
-
-  //     // install sprite
-
-  //     installSpriteLump(sprite, frame, rotation, false);
-
-  //     if (sprite.name.length > 6) {
-  //       if (sprite.name[6]) {
-  //         frame = sprite.name[6].charCodeAt(0) - "A".charCodeAt(0);
-  //         rotation = sprite.name[7] - "0";
-  //         // install sprite
-
-  //         installSpriteLump(sprite, frame, rotation, true);
-  //       }
-  //     }
-  //   }
-  // }
 
   startIndex--;
   endIndex++;
@@ -198,7 +110,7 @@ function setupGameEngine(levels, lumpData) {
     maxFrame = -1;
     for (let j = startIndex + 1; j < endIndex; j++) {
       let sprite = lumpData[j].name;
-      // console.log(sprite);
+
       if (sprite.startsWith(spriteNames[i])) {
         spriteName = sprite;
         frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
@@ -235,4 +147,24 @@ function setupGameEngine(levels, lumpData) {
   gameEngine.init();
 
   gameEngine.start();
+}
+
+function setupLevelData(levels) {
+  const sectorObjects = buildSectors(levels.sectors);
+  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+  const linedefObjects = buildLinedefs(
+    levels.linedefs,
+    levels.vertices,
+    sidedefObjects
+  );
+  const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
+  const thingObjects = buildThings(levels.things);
+
+  return {
+    sectorObjects,
+    sidedefObjects,
+    linedefObjects,
+    segObjects,
+    thingObjects,
+  };
 }
