@@ -139,6 +139,10 @@ function processSprites(flatManager, lumpData) {
     spriteTopOffset[i] = patch.topOffset;
   }
 
+  installSprites(spriteNames, lumpData, startIndex, endIndex);
+}
+
+function installSprites(spriteNames, lumpData, startIndex, endIndex) {
   let spriteName;
   let frame;
   let rotation;
