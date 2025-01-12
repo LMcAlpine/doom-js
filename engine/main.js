@@ -12,14 +12,14 @@ function onFileSelected(file) {
   initializeGameData(file);
 }
 
-function onLevelSelected(levelName) {
+function onLevelBtnClicked(levelName) {
   if (!fileCheck) {
     return;
   }
   loadLevel(levelName);
 }
 
-initDOM(onFileSelected, onLevelSelected);
+initDOM(onFileSelected, onLevelBtnClicked);
 
 async function initializeGameData(file) {
   const wadFileReader = new WADFileReader(file);
@@ -55,6 +55,7 @@ async function initializeGameData(file) {
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
   gameEngine.init();
+  gameEngine.start();
 }
 
 function loadLevel(levelName) {
@@ -74,7 +75,8 @@ function loadLevel(levelName) {
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
 
   // can I start now? forgot to load player
-  gameEngine.start();
+  // dont want to start the loop for each level
+  // gameEngine.start();
 }
 
 function setupTextureAndPalettes(lumpData) {
