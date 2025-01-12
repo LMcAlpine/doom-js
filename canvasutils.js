@@ -1,4 +1,8 @@
-const gameEngine = new GameEngine("myCanvas", 50);
+// const gameEngine = new GameEngine("myCanvas", 50);
+let gameEngine = null;
+let textureManager = null;
+let flatManager = null;
+let spriteManager = null;
 
 // Check system endianness
 function getSystemEndianness() {
