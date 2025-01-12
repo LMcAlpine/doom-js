@@ -117,9 +117,10 @@ class LevelManager {
       let textureHeightSky;
       let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
-        let ep = gameEngine.level[1];
+        let { episode, map, game } = gameEngine.currentLevelInfo;
         let skyname;
-        switch (Number(ep)) {
+
+        switch (episode) {
           case 1:
             skyname = "SKY1";
             break;

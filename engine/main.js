@@ -61,10 +61,13 @@ function loadLevel(levelName) {
   const levelParser = new LevelParser(lumpData);
   const levelData = levelParser.parse(levelName);
 
+  const parsedLevelNum = parseLevelName(levelName);
+  gameEngine.currentLevelInfo = parsedLevelNum;
+
   gameEngine.loadLevel(levelData);
 
   // *** BIT OF A HACK *** SHOULD PROBABLY CHANGE THIS
-  gameEngine.level = levelName;
+  // gameEngine.level = levelName;
 
   let vertices = levelData.vertices;
   let { maxX, minX, maxY, minY } = calculateMinMax(vertices);

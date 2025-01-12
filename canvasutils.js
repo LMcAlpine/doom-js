@@ -661,3 +661,35 @@ function installSpriteLump(lump, frame, rotation, flipped) {
   spriteTemp[frame].lump[rotation] = lump - startIndex;
   spriteTemp[frame].flip[rotation] = flipped;
 }
+
+function parseLevelName(levelName) {
+  const doom1Regex = /^E(\d)+M(\d+)$/i;
+
+  let match = levelName.match(doom1Regex);
+  if (match) {
+    return {
+      game: "DOOM1",
+      episode: parseInt(match[1], 10),
+      map: parseInt(match[2], 10),
+      originalName: levelName,
+    };
+  }
+
+  // const doom2Regex = /^MAP(\d+)$/i;
+  // match = levelName.match(doom2Regex);
+  // if (match) {
+  //   return {
+  //     game: "DOOM2",
+  //     episode: null,
+  //     map: parseInt(match[1], 10),
+  //     originalName: levelName,
+  //   };
+  // }
+
+  return {
+    game: "UNKNOWN",
+    episode: null,
+    map: null,
+    originalName: levelName,
+  };
+}
