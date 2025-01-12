@@ -1,3 +1,14 @@
+const gameEngine = new GameEngine("myCanvas", 50);
+
+// Check system endianness
+function getSystemEndianness() {
+  const buffer = new ArrayBuffer(2);
+  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
+  return new Int16Array(buffer)[0] === 256;
+}
+
+const ENDIAN = getSystemEndianness();
+
 this.canvasWidth = document.getElementById("myCanvas").width;
 this.canvasHeight = document.getElementById("myCanvas").height;
 
@@ -304,7 +315,6 @@ const mapObjectTypes = arr.reduce((obj, name, index) => {
   obj[name] = index;
   return obj;
 }, {});
-
 
 // mapObjectTypes might be unneeded? **************
 console.log(mapObjectTypes);

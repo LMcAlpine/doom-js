@@ -116,7 +116,7 @@ class LevelManager {
       let textureHeightSky;
       let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
-        let ep = selectedValue[1];
+        let ep = gameEngine.level[1];
         let skyname;
         switch (Number(ep)) {
           case 1:

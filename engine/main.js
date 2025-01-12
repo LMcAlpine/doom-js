@@ -1,125 +1,115 @@
-const gameEngine = new GameEngine("myCanvas", 50);
-const ENDIAN = getSystemEndianness();
+import { initDOM } from "../uimanager.js";
 
-// Check system endianness
-function getSystemEndianness() {
-  const buffer = new ArrayBuffer(2);
-  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
-  return new Int16Array(buffer)[0] === 256;
+function onFileSelected(file) {
+  // console.log("File selected in main:", file.name);
+  initializeGameData(file);
 }
 
-(function () {
-  let selectedValue = "E1M1";
+let selectedValue = "E1M1";
+function onLevelSelected(value) {
+  selectedValue = value;
+}
 
-  function onFileSelected(file) {
-    // console.log("File selected in main:", file.name);
-    initializeGameData(file);
-  }
+initDOM(onFileSelected, onLevelSelected);
 
-  function onLevelSelected(value) {
-    selectedValue = value;
-  }
+async function initializeGameData(file) {
+  let skyTextureName = "SKY1";
 
-  DOMUI.init(onFileSelected, onLevelSelected);
+  gameEngine.skyTextureName = skyTextureName;
+  gameEngine.level = selectedValue;
 
-  async function initializeGameData(file) {
-    let skyTextureName = "SKY1";
+  const wadFileReader = new WADFileReader(file);
+  const arrayBuffer = await wadFileReader.readFile();
+  const wadParser = new WADParser(arrayBuffer);
+  const lumpData = await wadParser.parse();
+  const levelParser = new LevelParser(lumpData);
+  const levels = levelParser.parse(selectedValue);
 
-    gameEngine.skyTextureName = skyTextureName;
+  setupGameEngine(levels, lumpData);
+}
 
-    const wadFileReader = new WADFileReader(file);
-    const arrayBuffer = await wadFileReader.readFile();
-    const wadParser = new WADParser(arrayBuffer);
-    const lumpData = await wadParser.parse();
-    const levelParser = new LevelParser(lumpData);
-    const levels = levelParser.parse(selectedValue);
+function setupGameEngine(levels, lumpData) {
+  gameEngine.lumpData = lumpData;
+  // Setup palette and textures
+  const { palette, texture } = setupTextureAndPalettes(lumpData);
 
-    setupGameEngine(levels, lumpData);
-  }
+  // Setup vertices and scaling
+  let vertices = levels.vertices;
+  let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
+  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
-  function setupGameEngine(levels, lumpData) {
-    gameEngine.lumpData = lumpData;
-    // Setup palette and textures
-    const { palette, texture } = setupTextureAndPalettes(lumpData);
+  // Initialize canvas and player
+  initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY);
 
-    // Setup vertices and scaling
-    let vertices = levels.vertices;
-    let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
-    const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+  // Setup game data objects
+  const dataObjects = setupLevelData(levels);
 
-    // Initialize canvas and player
-    initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY);
+  const patchNames = new PatchNames(lumpData);
+  gameEngine.patchNames = patchNames;
 
-    // Setup game data objects
-    const dataObjects = setupLevelData(levels);
+  // Setup texture managers
+  const textureManager = new TextureManager(
+    texture.maptextures,
+    palette.palettes[0]
+  );
+  const flatManager = new FlatManager(lumpData, palette.palettes[0]);
+  const spriteManager = new SpriteManager(lumpData);
 
-    const patchNames = new PatchNames(lumpData);
-    gameEngine.patchNames = patchNames;
+  // Process sprites
+  spriteManager.processSprites();
 
-    // Setup texture managers
-    const textureManager = new TextureManager(
-      texture.maptextures,
-      palette.palettes[0]
-    );
-    const flatManager = new FlatManager(lumpData, palette.palettes[0]);
-    const spriteManager = new SpriteManager(lumpData);
+  const levelManager = new LevelManager(
+    levels,
+    dataObjects,
+    textureManager,
+    flatManager
+  );
+  gameEngine.levelManager = levelManager;
+  gameEngine.init();
+  gameEngine.start();
+}
 
-    // Process sprites
-    spriteManager.processSprites();
+function setupTextureAndPalettes(lumpData) {
+  const palette = new ReadPalette(lumpData);
+  const texture = new Textures(lumpData);
 
-    const levelManager = new LevelManager(
-      levels,
-      dataObjects,
-      textureManager,
-      flatManager
-    );
-    gameEngine.levelManager = levelManager;
-    gameEngine.init();
-    gameEngine.start();
-  }
+  gameEngine.palette = palette;
+  gameEngine.textures = texture;
 
-  function setupTextureAndPalettes(lumpData) {
-    const palette = new ReadPalette(lumpData);
-    const texture = new Textures(lumpData);
+  return { palette, texture };
+}
 
-    gameEngine.palette = palette;
-    gameEngine.textures = texture;
+function setupLevelData(levels) {
+  const sectorObjects = buildSectors(levels.sectors);
+  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+  const linedefObjects = buildLinedefs(
+    levels.linedefs,
+    levels.vertices,
+    sidedefObjects
+  );
+  const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
+  const thingObjects = buildThings(levels.things);
 
-    return { palette, texture };
-  }
+  return {
+    sectorObjects,
+    sidedefObjects,
+    linedefObjects,
+    segObjects,
+    thingObjects,
+  };
+}
 
-  function setupLevelData(levels) {
-    const sectorObjects = buildSectors(levels.sectors);
-    const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
-    const linedefObjects = buildLinedefs(
-      levels.linedefs,
-      levels.vertices,
-      sidedefObjects
-    );
-    const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
-    const thingObjects = buildThings(levels.things);
-
-    return {
-      sectorObjects,
-      sidedefObjects,
-      linedefObjects,
-      segObjects,
-      thingObjects,
-    };
-  }
-
-  function initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY) {
-    const canvas = new Canvas("myCanvas");
-    const player = new Player(
-      levels.things[0],
-      { minX: minX, minY: minY },
-      { scaleX: scaleX, scaleY: scaleY },
-      90,
-      41
-    );
-    gameEngine.addEntity(player);
-    gameEngine.player = player;
-    gameEngine.canvas = canvas;
-    gameEngine.ctx = canvas.ctx;
-  }
-})();
+function initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY) {
+  const canvas = new Canvas("myCanvas");
+  const player = new Player(
+    levels.things[0],
+    { minX: minX, minY: minY },
+    { scaleX: scaleX, scaleY: scaleY },
+    90,
+    41
+  );
+  gameEngine.addEntity(player);
+  gameEngine.player = player;
+  gameEngine.canvas = canvas;
+  gameEngine.ctx = canvas.ctx;
+}
