@@ -67,34 +67,35 @@ class LevelManager {
   }
 
   draw() {
-    let i;
-    for (let j = 0; j < this.things.length; j++) {
-      for (i = 0; i < arr.length; i++) {
-        // map maybe instead?
-        if (this.things[j].type == mapinfo[i].doomednum) {
-          break;
-        }
-      }
-    }
+    // this block is a WIP
+    // let i;
+    // for (let j = 0; j < this.things.length; j++) {
+    //   for (i = 0; i < arr.length; i++) {
+    //     // map maybe instead?
+    //     if (this.things[j].type == mapinfo[i].doomednum) {
+    //       break;
+    //     }
+    //   }
+    // }
 
-    let t = this.things[0];
-    let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
-    t.subsector = subsec;
-    // t.flagsHardcode = 33554432;
-    // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
-    t.flagsHardcode = mapinfo[i].flags;
-    let sec;
-    if (!(t.flagsHardcode & 8)) {
-      sec = subsec.sector;
+    // let t = this.things[0];
+    // let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
+    // t.subsector = subsec;
+    // // t.flagsHardcode = 33554432;
+    // // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
+    // t.flagsHardcode = mapinfo[i].flags;
+    // let sec;
+    // if (!(t.flagsHardcode & 8)) {
+    //   sec = subsec.sector;
 
-      t.sprev = null;
-      t.snext = sec.thingList;
+    //   t.sprev = null;
+    //   t.snext = sec.thingList;
 
-      if (sec.thingList) {
-        sec.thingList.sprev = t;
-      }
-      sec.thingList = t;
-    }
+    //   if (sec.thingList) {
+    //     sec.thingList.sprev = t;
+    //   }
+    //   sec.thingList = t;
+    // }
 
     let ss = (this.wallRenderer.solidsegs =
       this.solidSegsManager.clearSolidsegs(this.wallRenderer.solidsegs));
@@ -116,9 +117,10 @@ class LevelManager {
       let textureHeightSky;
       let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
-        let ep = selectedValue[1];
+        let { episode, map, game } = gameEngine.currentLevelInfo;
         let skyname;
-        switch (Number(ep)) {
+
+        switch (episode) {
           case 1:
             skyname = "SKY1";
             break;
@@ -391,4 +393,6 @@ class LevelManager {
       this.linkedSubsectors[this.bspTraversal.getSubsector(subsectorID)];
     return subsector;
   }
+
+  reset(levelData, dataObjects) {}
 }

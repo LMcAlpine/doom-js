@@ -1,185 +1,81 @@
-const gameEngine = new GameEngine("myCanvas", 50);
+import { initDOM } from "../uimanager.js";
 
-// Check system endianness
-function getSystemEndianness() {
-  const buffer = new ArrayBuffer(2);
-  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
-  return new Int16Array(buffer)[0] === 256;
-}
+let lumpData = null;
+let patchNames = null;
+let paletteField = null;
+let textureField = null;
+let fileCheck = null;
 
-const ENDIAN = getSystemEndianness();
-
-// DOM Elements
-let levelSelect = document.getElementById("levels");
-let selectedValue = "E1M1";
-levelSelect.addEventListener("change", function () {
-  selectedValue = this.value;
-  console.log("Selected level:", selectedValue);
-});
-
-document
-  .getElementById("fileInput")
-  .addEventListener("change", handleFileInput);
-
-async function handleFileInput(event) {
-  const file = event.target.files[0];
-  if (!file) {
-    console.error("No file selected.");
-    return;
-  }
+function onFileSelected(file) {
+  // console.log("File selected in main:", file.name);
+  fileCheck = file;
   initializeGameData(file);
 }
 
+function onLoadLevelClicked(levelName) {
+  if (!fileCheck) {
+    return;
+  }
+  loadLevel(levelName);
+}
+
+initDOM(onFileSelected, onLoadLevelClicked);
+
 async function initializeGameData(file) {
-  let skyTextureName = "SKY1";
-
-  gameEngine.skyTextureName = skyTextureName;
-
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
   const wadParser = new WADParser(arrayBuffer);
-  const lumpData = await wadParser.parse();
-  const levelParser = new LevelParser(lumpData);
-  const levels = levelParser.parse(selectedValue);
+  lumpData = await wadParser.parse();
 
-  setupGameEngine(levels, lumpData);
-}
-
-function setupGameEngine(levels, lumpData) {
-  // Setup palette and textures
-  const palette = new ReadPalette(lumpData);
-  const texture = new Textures(lumpData);
-
-  gameEngine.lumpData = lumpData;
-  gameEngine.palette = palette;
-  gameEngine.textures = texture;
-
-  // Setup vertices and scaling
-  let vertices = levels.vertices;
-  let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
-  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
-
-  // Initialize canvas and player
-  const canvas = new Canvas("myCanvas");
-  const player = new Player(
-    levels.things[0],
-    { minX: minX, minY: minY },
-    { scaleX: scaleX, scaleY: scaleY },
-    90,
-    41
-  );
-  gameEngine.addEntity(player);
-  gameEngine.player = player;
-  gameEngine.canvas = canvas;
-  gameEngine.ctx = canvas.ctx;
-
-  // Setup game data objects
-  const dataObjects = setupLevelData(levels);
-
-  const patchNames = new PatchNames(lumpData);
-  gameEngine.patchNames = patchNames;
+  const { palette, texture } = setupTextureAndPalettes(lumpData);
+  paletteField = palette;
+  textureField = texture;
+  patchNames = new PatchNames(lumpData, palette);
 
   // Setup texture managers
-  const textureManager = new TextureManager(
+  textureManager = new TextureManager(
     texture.maptextures,
-    palette.palettes[0]
+    palette.palettes[0],
+    patchNames
   );
-  const flatManager = new FlatManager(lumpData, palette.palettes[0]);
+  flatManager = new FlatManager(lumpData, palette.palettes[0]);
+  spriteManager = new SpriteManager(lumpData, patchNames);
 
-  const spriteManager = new SpriteManager(lumpData);
+  if (spriteManager) {
+    spriteManager.processSprites();
+  }
 
-  // Process sprites
-  processSprites(spriteManager, lumpData);
-
-  const levelManager = new LevelManager(
-    levels,
-    dataObjects,
-    textureManager,
-    flatManager
-  );
-  gameEngine.levelManager = levelManager;
+  gameEngine = new GameEngine("myCanvas", 50);
+  gameEngine.patchNames = patchNames;
+  gameEngine.palette = paletteField;
+  gameEngine.textures = textureField;
+  const canvas = new Canvas("myCanvas");
+  gameEngine.canvas = canvas;
+  gameEngine.ctx = canvas.ctx;
   gameEngine.init();
-
   gameEngine.start();
 }
 
-function setupLevelData(levels) {
-  const sectorObjects = buildSectors(levels.sectors);
-  const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
-  const linedefObjects = buildLinedefs(
-    levels.linedefs,
-    levels.vertices,
-    sidedefObjects
-  );
-  const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
-  const thingObjects = buildThings(levels.things);
+function loadLevel(levelName) {
+  // load lumps just for this level
+  const levelParser = new LevelParser(lumpData);
+  const levelData = levelParser.parse(levelName);
 
-  return {
-    sectorObjects,
-    sidedefObjects,
-    linedefObjects,
-    segObjects,
-    thingObjects,
-  };
+  const parsedLevelNum = parseLevelName(levelName);
+  gameEngine.currentLevelInfo = parsedLevelNum;
+
+  gameEngine.loadLevel(levelData);
+
+  let vertices = levelData.vertices;
+  let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
+  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+
+  gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
 }
 
-function processSprites(spriteManager, lumpData) {
-  let sprites = spriteManager.getSprites("S_START", "S_END");
+function setupTextureAndPalettes(lumpData) {
+  const palette = new ReadPalette(lumpData);
+  const texture = new Textures(lumpData);
 
-  startIndex = spriteManager.getIndex("S_START") + 1;
-  endIndex = spriteManager.getIndex("S_END") - 1;
-
-  let patch;
-  let spriteWidth = [];
-  let spriteOffset = [];
-  let spriteTopOffset = [];
-
-  for (let i = 0; i < sprites.length; i++) {
-    patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
-    spriteWidth[i] = patch.width;
-    spriteOffset[i] = patch.leftOffset;
-    spriteTopOffset[i] = patch.topOffset;
-  }
-
-  installSprites(spriteNames, lumpData, startIndex, endIndex);
-}
-
-function installSprites(spriteNames, lumpData, startIndex, endIndex) {
-  let spriteName;
-  let frame;
-  let rotation;
-
-  startIndex--;
-  endIndex++;
-
-  for (let i = 0; i < spriteNames.length; i++) {
-    maxFrame = -1;
-    for (let j = startIndex + 1; j < endIndex; j++) {
-      let sprite = lumpData[j].name;
-
-      if (sprite.startsWith(spriteNames[i])) {
-        spriteName = sprite;
-        frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
-        rotation = sprite[5] - "0";
-
-        // install sprite
-
-        installSpriteLump(j, frame, rotation, false);
-
-        if (sprite.length > 6) {
-          if (sprite[6]) {
-            frame = sprite[6].charCodeAt(0) - "A".charCodeAt(0);
-            rotation = sprite[7] - "0";
-            // install sprite
-
-            installSpriteLump(j, frame, rotation, true);
-          }
-        }
-      }
-    }
-    maxFrame++;
-
-    theSprites[i].framesCount = maxFrame;
-    theSprites[i].spriteFrames = spriteTemp;
-  }
+  return { palette, texture };
 }

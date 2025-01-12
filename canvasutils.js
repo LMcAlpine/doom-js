@@ -1,3 +1,18 @@
+// const gameEngine = new GameEngine("myCanvas", 50);
+let gameEngine = null;
+let textureManager = null;
+let flatManager = null;
+let spriteManager = null;
+
+// Check system endianness
+function getSystemEndianness() {
+  const buffer = new ArrayBuffer(2);
+  new DataView(buffer).setInt16(0, 256, true /* littleEndian */);
+  return new Int16Array(buffer)[0] === 256;
+}
+
+const ENDIAN = getSystemEndianness();
+
 this.canvasWidth = document.getElementById("myCanvas").width;
 this.canvasHeight = document.getElementById("myCanvas").height;
 
@@ -304,7 +319,6 @@ const mapObjectTypes = arr.reduce((obj, name, index) => {
   obj[name] = index;
   return obj;
 }, {});
-
 
 // mapObjectTypes might be unneeded? **************
 console.log(mapObjectTypes);
@@ -646,4 +660,36 @@ function installSpriteLump(lump, frame, rotation, flipped) {
 
   spriteTemp[frame].lump[rotation] = lump - startIndex;
   spriteTemp[frame].flip[rotation] = flipped;
+}
+
+function parseLevelName(levelName) {
+  const doom1Regex = /^E(\d)+M(\d+)$/i;
+
+  let match = levelName.match(doom1Regex);
+  if (match) {
+    return {
+      game: "DOOM1",
+      episode: parseInt(match[1], 10),
+      map: parseInt(match[2], 10),
+      originalName: levelName,
+    };
+  }
+
+  // const doom2Regex = /^MAP(\d+)$/i;
+  // match = levelName.match(doom2Regex);
+  // if (match) {
+  //   return {
+  //     game: "DOOM2",
+  //     episode: null,
+  //     map: parseInt(match[1], 10),
+  //     originalName: levelName,
+  //   };
+  // }
+
+  return {
+    game: "UNKNOWN",
+    episode: null,
+    map: null,
+    originalName: levelName,
+  };
 }

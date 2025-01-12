@@ -1,8 +1,8 @@
 class PatchNames {
-  constructor(lumps) {
+  constructor(lumps, palette) {
     this.lumps = lumps;
 
-    this.palette = gameEngine.palette.palettes[0];
+    this.palette = palette.palettes[0];
 
     const pnamesLump = lumps.find((lump) => lump.name === "PNAMES");
     const names = this.parsePatchNames(pnamesLump);

@@ -1,7 +1,8 @@
 class TextureManager {
-  constructor(textures, palette) {
+  constructor(textures, palette, patchNames) {
     this.textures = textures;
     this.palette = palette;
+    this.patchNames = patchNames;
     this.texturesMap = new Map();
     this.textures.forEach((texture, index) => {
       this.texturesMap.set(texture.name, index);
@@ -143,14 +144,14 @@ class TextureManager {
       const xStart = this.textures[indexOfName].patches[j].originX;
       const yStart = this.textures[indexOfName].patches[j].originY;
 
-      const header = gameEngine.patchNames.parsePatchHeader(
-        gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
+      const header = this.patchNames.parsePatchHeader(
+        this.patchNames.names[patches[j].patchNumber].toUpperCase()
       );
 
-      const columns = gameEngine.patchNames.parsePatchColumns(
+      const columns = this.patchNames.parsePatchColumns(
         header.columnOffsets,
         header,
-        gameEngine.patchNames.names[patches[j].patchNumber].toUpperCase()
+        this.patchNames.names[patches[j].patchNumber].toUpperCase()
       );
       //columnsArray[j] = columns;
       columnsArray = columns;

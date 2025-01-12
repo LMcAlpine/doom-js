@@ -67,7 +67,9 @@ class GameEngine {
       this.entities[i].draw(this.canvas, this);
     }
 
-    this.levelManager.draw();
+    if (this.levelManager) {
+      this.levelManager.draw();
+    }
 
     this.canvas.updateCanvas();
     //clearDebugOverlay();
@@ -90,6 +92,62 @@ class GameEngine {
         this.entities.splice(i, 1);
       }
     }
+  }
+
+  loadLevel(levelData) {
+    const dataObjects = this.setupLevelData(levelData);
+
+    this.entities = [];
+    if (!this.levelManager && textureManager && flatManager) {
+      this.levelManager = new LevelManager(
+        levelData,
+        dataObjects,
+        textureManager,
+        flatManager
+      );
+    } else {
+      //this.levelManager.reset(levelData, dataObjects);
+
+      // create new instance for now....
+      this.levelManager = new LevelManager(
+        levelData,
+        dataObjects,
+        textureManager,
+        flatManager
+      );
+    }
+  }
+
+  initializePlayer(levels, scaleX, scaleY, minX, minY) {
+    const player = new Player(
+      levels.things[0],
+      { minX: minX, minY: minY },
+      { scaleX: scaleX, scaleY: scaleY },
+      90,
+      41
+    );
+    this.addEntity(player);
+    this.player = player;
+  }
+
+  setupLevelData(levels) {
+    const sectorObjects = buildSectors(levels.sectors);
+    const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
+    const linedefObjects = buildLinedefs(
+      levels.linedefs,
+      levels.vertices,
+      sidedefObjects
+    );
+    const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
+    const thingObjects = buildThings(levels.things);
+
+    return {
+      sectorObjects,
+      sidedefObjects,
+      linedefObjects,
+      segObjects,
+      thingObjects,
+    };
   }
 
   loop() {
