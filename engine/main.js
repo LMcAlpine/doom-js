@@ -12,14 +12,14 @@ function onFileSelected(file) {
   initializeGameData(file);
 }
 
-function onLevelBtnClicked(levelName) {
+function onLoadLevelClicked(levelName) {
   if (!fileCheck) {
     return;
   }
   loadLevel(levelName);
 }
 
-initDOM(onFileSelected, onLevelBtnClicked);
+initDOM(onFileSelected, onLoadLevelClicked);
 
 async function initializeGameData(file) {
   const wadFileReader = new WADFileReader(file);
