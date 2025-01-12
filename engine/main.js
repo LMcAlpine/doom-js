@@ -12,7 +12,7 @@ function onFileSelected(file) {
   initializeGameData(file);
 }
 
-let selectedValue = "E1M1";
+let selectedValue = "";
 // function onLevelSelected(value) {
 //   selectedValue = value;
 // }
@@ -27,6 +27,8 @@ function onLevelSelected(levelName) {
     return;
   }
 
+  // const levelSelect = document.getElementById("levels");
+  // const levelName = levelSelect.value;
   selectedValue = levelName;
   if (!gameEngine) {
     gameEngine = new GameEngine("myCanvas", 50);

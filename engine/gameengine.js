@@ -67,6 +67,8 @@ class GameEngine {
       this.entities[i].draw(this.canvas, this);
     }
 
+
+    //**** */ maybe take the logic out of draw but might be hard cause the bsp is tied to rendering...
     this.levelManager.draw();
 
     this.canvas.updateCanvas();

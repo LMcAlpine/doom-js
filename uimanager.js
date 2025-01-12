@@ -1,13 +1,11 @@
 export function initDOM(onFileSelected, onLevelSelected) {
-  let selectedValue = "E1M1";
-
   // Setup the level dropdown
   const levelSelect = document.getElementById("levels");
-  levelSelect.addEventListener("change", function () {
-    selectedValue = this.value;
-    console.log("Selected level:", selectedValue);
+
+  const loadLevelBtn = document.getElementById("loadLevelBtn");
+  loadLevelBtn.addEventListener("click", function () {
     if (onLevelSelected) {
-      onLevelSelected(selectedValue);
+      onLevelSelected(levelSelect.value);
     }
   });
 
