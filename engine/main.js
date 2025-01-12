@@ -66,9 +66,6 @@ function loadLevel(levelName) {
 
   gameEngine.loadLevel(levelData);
 
-  // *** BIT OF A HACK *** SHOULD PROBABLY CHANGE THIS
-  // gameEngine.level = levelName;
-
   let vertices = levelData.vertices;
   let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);

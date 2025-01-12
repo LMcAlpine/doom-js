@@ -67,7 +67,6 @@ class GameEngine {
       this.entities[i].draw(this.canvas, this);
     }
 
-    //**** */ maybe take the logic out of draw but might be hard cause the bsp is tied to rendering...
     if (this.levelManager) {
       this.levelManager.draw();
     }
@@ -96,12 +95,6 @@ class GameEngine {
   }
 
   loadLevel(levelData) {
-    // unload old level
-
-    // if (spriteManager) {
-    //   spriteManager.processSprites();
-    // }
-
     const dataObjects = this.setupLevelData(levelData);
 
     this.entities = [];
@@ -123,8 +116,6 @@ class GameEngine {
         flatManager
       );
     }
-
-    //this.levelManager.load(levelData);
   }
 
   initializePlayer(levels, scaleX, scaleY, minX, minY) {
