@@ -104,13 +104,6 @@ class GameEngine {
 
     const dataObjects = this.setupLevelData(levelData);
 
-    // const levelManager = new LevelManager(
-    //   levels,
-    //   dataObjects,
-    //   textureManager,
-    //   flatManager
-    // );
-
     this.entities = [];
     if (!this.levelManager && textureManager && flatManager) {
       this.levelManager = new LevelManager(
@@ -135,7 +128,6 @@ class GameEngine {
   }
 
   initializePlayer(levels, scaleX, scaleY, minX, minY) {
-    // const canvas = new Canvas("myCanvas");
     const player = new Player(
       levels.things[0],
       { minX: minX, minY: minY },
@@ -145,8 +137,6 @@ class GameEngine {
     );
     this.addEntity(player);
     this.player = player;
-    // this.canvas = canvas;
-    // this.ctx = canvas.ctx;
   }
 
   setupLevelData(levels) {

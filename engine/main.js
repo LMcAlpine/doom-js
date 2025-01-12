@@ -45,8 +45,6 @@ async function initializeGameData(file) {
     spriteManager.processSprites();
   }
 
-  // create the game engine but dont start it...?
-
   gameEngine = new GameEngine("myCanvas", 50);
   gameEngine.patchNames = patchNames;
   gameEngine.palette = paletteField;
@@ -73,10 +71,6 @@ function loadLevel(levelName) {
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
-
-  // can I start now? forgot to load player
-  // dont want to start the loop for each level
-  // gameEngine.start();
 }
 
 function setupTextureAndPalettes(lumpData) {
