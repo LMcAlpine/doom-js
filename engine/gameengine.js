@@ -117,7 +117,15 @@ class GameEngine {
         flatManager
       );
     } else {
-      // this.levelManager.reset();
+      //this.levelManager.reset(levelData, dataObjects);
+
+      // create new instance for now....
+      this.levelManager = new LevelManager(
+        levelData,
+        dataObjects,
+        textureManager,
+        flatManager
+      );
     }
 
     //this.levelManager.load(levelData);

@@ -115,6 +115,12 @@ function loadLevel(levelName) {
   // .... YES! it is always staying at the first level selected (well, I have to do a level change event...
   // for ex, select the wad, (it's at e1m1 by default) change to e1m2 and then change back to e1m1 or some other level)
 
+  // I need to go through and see what is going on with the level data...
+  // compare it to slade
+
+  // the reason is because the level manager data is not getting reset between each level change
+  // temporarily create new levelmanager instances to fix...
+
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
 
   // can I start now? forgot to load player
