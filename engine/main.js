@@ -13,9 +13,6 @@ function onFileSelected(file) {
 }
 
 let selectedValue = "";
-// function onLevelSelected(value) {
-//   selectedValue = value;
-// }
 
 function onLevelSelected(levelName) {
   // how do i make sure it is required to select a file FIRST? before the level
@@ -23,12 +20,11 @@ function onLevelSelected(levelName) {
   // wait no, i just had to remove the breakpoint in onFileSelected? wait no this line is wrong too
   // i need to select the file and then change the level..
   // somehow i need to change it from being on e1m1 by default because then it doesnt register a level change since it wasnt clicked.
+  // fixed by adding a load level button. Dont load the selected level until load leve button is clicked.
   if (!fileCheck) {
     return;
   }
 
-  // const levelSelect = document.getElementById("levels");
-  // const levelName = levelSelect.value;
   selectedValue = levelName;
   if (!gameEngine) {
     gameEngine = new GameEngine("myCanvas", 50);
@@ -49,23 +45,11 @@ function onLevelSelected(levelName) {
 initDOM(onFileSelected, onLevelSelected);
 
 async function initializeGameData(file) {
-  let skyTextureName = "SKY1";
-
-  //gameEngine.skyTextureName = skyTextureName;
-
-  // this only sets the level name once...
-  // gameEngine.level = selectedValue;
-
-  // I want this info below to be loaded once and then reuse it.
-  // I need to somehow get the level name if it changes
-
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
   const wadParser = new WADParser(arrayBuffer);
   lumpData = await wadParser.parse();
-  // gameEngine.lumpData = lumpData;
-  // const levelParser = new LevelParser(lumpData);
-  // const levels = levelParser.parse(selectedValue);
+
   const { palette, texture } = setupTextureAndPalettes(lumpData);
   paletteField = palette;
   textureField = texture;
@@ -79,22 +63,7 @@ async function initializeGameData(file) {
   );
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
   spriteManager = new SpriteManager(lumpData);
-
-  // setupGameEngine(levels, lumpData);
 }
-
-// function onLevelSelected(levelName) {
-//   if (!gameEngine) {
-//     gameEngine = new GameEngine("myCanvas", 50);
-//     gameEngine.patchNames = patchNames;
-//     gameEngine.palette = palette;
-//     gameEngine.textures = texture;
-//     gameEngine.init();
-//     gameEngine.start();
-//   }
-
-//   loadLevel(levelName);
-// }
 
 function loadLevel(levelName) {
   // load lumps just for this level
@@ -127,92 +96,11 @@ function loadLevel(levelName) {
 
   // can I start now? forgot to load player
   gameEngine.start();
-
-  //setupGameEngine(levels, gameEngine.lumpData);
-}
-
-function setupGameEngine(levels, lumpData) {
-  gameEngine.lumpData = lumpData;
-  // Setup palette and textures
-  const { palette, texture } = setupTextureAndPalettes(lumpData);
-
-  // Setup vertices and scaling
-  let vertices = levels.vertices;
-  let { maxX, minX, maxY, minY } = calculateMinMax(vertices);
-  const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
-
-  // Initialize canvas and player
-  initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY);
-
-  // Setup game data objects
-  const dataObjects = setupLevelData(levels);
-
-  const patchNames = new PatchNames(lumpData);
-  gameEngine.patchNames = patchNames;
-
-  // // Setup texture managers
-  // const textureManager = new TextureManager(
-  //   texture.maptextures,
-  //   palette.palettes[0]
-  // );
-  // const flatManager = new FlatManager(lumpData, palette.palettes[0]);
-  // const spriteManager = new SpriteManager(lumpData);
-
-  // Process sprites
-  spriteManager.processSprites();
-
-  const levelManager = new LevelManager(
-    levels,
-    dataObjects,
-    textureManager,
-    flatManager
-  );
-  gameEngine.levelManager = levelManager;
-  gameEngine.init();
-  gameEngine.start();
 }
 
 function setupTextureAndPalettes(lumpData) {
   const palette = new ReadPalette(lumpData);
   const texture = new Textures(lumpData);
 
-  // gameEngine.palette = palette;
-  // gameEngine.textures = texture;
-
   return { palette, texture };
 }
-
-// function setupLevelData(levels) {
-//   const sectorObjects = buildSectors(levels.sectors);
-//   const sidedefObjects = buildSidedefs(levels.sidedefs, sectorObjects);
-//   const linedefObjects = buildLinedefs(
-//     levels.linedefs,
-//     levels.vertices,
-//     sidedefObjects
-//   );
-//   const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
-//   const thingObjects = buildThings(levels.things);
-
-//   return {
-//     sectorObjects,
-//     sidedefObjects,
-//     linedefObjects,
-//     segObjects,
-//     thingObjects,
-//   };
-// }
-
-// function initializeCanvasAndPlayer(levels, scaleX, scaleY, minX, minY) {
-//   const canvas = new Canvas("myCanvas");
-//   const player = new Player(
-//     levels.things[0],
-//     { minX: minX, minY: minY },
-//     { scaleX: scaleX, scaleY: scaleY },
-//     90,
-//     41
-//   );
-//   gameEngine.addEntity(player);
-//   gameEngine.player = player;
-//   gameEngine.canvas = canvas;
-//   gameEngine.ctx = canvas.ctx;
-// }
