@@ -26,18 +26,18 @@ function onLevelSelected(levelName) {
   }
 
   selectedValue = levelName;
-  if (!gameEngine) {
-    gameEngine = new GameEngine("myCanvas", 50);
-    gameEngine.patchNames = patchNames;
-    gameEngine.palette = paletteField;
-    gameEngine.textures = textureField;
-    const canvas = new Canvas("myCanvas");
-    gameEngine.canvas = canvas;
-    gameEngine.ctx = canvas.ctx;
-    gameEngine.init();
-    // not ready to start. It starts the drawing loop
-    //gameEngine.start();
-  }
+  //  if (!gameEngine) {
+  // gameEngine = new GameEngine("myCanvas", 50);
+  // gameEngine.patchNames = patchNames;
+  // gameEngine.palette = paletteField;
+  // gameEngine.textures = textureField;
+  // const canvas = new Canvas("myCanvas");
+  // gameEngine.canvas = canvas;
+  // gameEngine.ctx = canvas.ctx;
+  // gameEngine.init();
+  // not ready to start. It starts the drawing loop
+  //gameEngine.start();
+  // }
 
   loadLevel(levelName);
 }
@@ -62,11 +62,22 @@ async function initializeGameData(file) {
     patchNames
   );
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
-  spriteManager = new SpriteManager(lumpData);
+  spriteManager = new SpriteManager(lumpData, patchNames);
 
   if (spriteManager) {
     spriteManager.processSprites();
   }
+
+  // create the game engine but dont start it...?
+
+  gameEngine = new GameEngine("myCanvas", 50);
+  gameEngine.patchNames = patchNames;
+  gameEngine.palette = paletteField;
+  gameEngine.textures = textureField;
+  const canvas = new Canvas("myCanvas");
+  gameEngine.canvas = canvas;
+  gameEngine.ctx = canvas.ctx;
+  gameEngine.init();
 }
 
 function loadLevel(levelName) {

@@ -1,6 +1,7 @@
 class SpriteManager {
-  constructor(lumpData) {
+  constructor(lumpData, patchNames) {
     this.lumpData = lumpData;
+    this.patchNames = patchNames;
   }
 
   getSprites(startMarker, endMarker) {
@@ -81,7 +82,7 @@ class SpriteManager {
     let spriteTopOffset = [];
 
     for (let i = 0; i < sprites.length; i++) {
-      patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
+      patch = this.patchNames.parsePatchHeader(sprites[i].name);
       spriteWidth[i] = patch.width;
       spriteOffset[i] = patch.leftOffset;
       spriteTopOffset[i] = patch.topOffset;
