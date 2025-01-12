@@ -63,6 +63,10 @@ async function initializeGameData(file) {
   );
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
   spriteManager = new SpriteManager(lumpData);
+
+  if (spriteManager) {
+    spriteManager.processSprites();
+  }
 }
 
 function loadLevel(levelName) {

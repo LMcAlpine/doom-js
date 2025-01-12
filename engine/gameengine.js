@@ -97,9 +97,9 @@ class GameEngine {
   loadLevel(levelData) {
     // unload old level
 
-    if (spriteManager) {
-      spriteManager.processSprites();
-    }
+    // if (spriteManager) {
+    //   spriteManager.processSprites();
+    // }
 
     const dataObjects = this.setupLevelData(levelData);
 
