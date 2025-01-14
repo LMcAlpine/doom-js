@@ -31,6 +31,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 const FOV = 90;
 const HALFFOV = FOV / 2;
 
+const ONFLOORZ = Number.MIN_SAFE_INTEGER;
+const ONCEILINGZ = Number.MAX_SAFE_INTEGER;
+
 // let spriteNames = ["TROO"];
 
 const spriteNames = [

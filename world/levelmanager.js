@@ -67,35 +67,70 @@ class LevelManager {
   }
 
   draw() {
+    this.loadThings();
+
     // this block is a WIP
-    // let i;
-    // for (let j = 0; j < this.things.length; j++) {
-    //   for (i = 0; i < arr.length; i++) {
-    //     // map maybe instead?
-    //     if (this.things[j].type == mapinfo[i].doomednum) {
-    //       break;
-    //     }
-    //   }
-    // }
 
-    // let t = this.things[0];
-    // let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
-    // t.subsector = subsec;
-    // // t.flagsHardcode = 33554432;
-    // // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
-    // t.flagsHardcode = mapinfo[i].flags;
-    // let sec;
-    // if (!(t.flagsHardcode & 8)) {
-    //   sec = subsec.sector;
+    const doomednumMap = new Map(
+      mapinfo.map((item, index) => [Number(item.doomednum), index])
+    );
+    let i;
+    for (let j = 0; j < this.things.length; j++) {
+      // for (i = 0; i < arr.length; i++) {
+      //   // map maybe instead?
+      //   if (this.things[j].type == mapinfo[i].doomednum) {
+      //     break;
+      //   }
+      // }
+      if (j === 0) {
+        // handle/spawn player
+        continue;
+      }
+      i = doomednumMap.get(this.things[j].type);
+      if (i !== undefined) {
+        break;
+      }
+    }
 
-    //   t.sprev = null;
-    //   t.snext = sec.thingList;
+    let spawnThing = this.things[1];
+    t.numIndex = i;
+    let x = t.xPosition;
+    let y = t.yPosition;
 
-    //   if (sec.thingList) {
-    //     sec.thingList.sprev = t;
-    //   }
-    //   sec.thingList = t;
-    // }
+    let z;
+    if (mapinfo[i].flags & MF_SPAWNCEILING) {
+      z = ONCEILINGZ;
+    } else {
+      z = ONFLOORZ;
+    }
+    let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
+    t.subsector = subsec;
+    // t.flagsHardcode = 33554432;
+    // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
+    t.flagsHardcode = mapinfo[i].flags;
+    let sec;
+    if (!(t.flagsHardcode & 8)) {
+      sec = subsec.sector;
+
+      t.sprev = null;
+      t.snext = sec.thingList;
+
+      if (sec.thingList) {
+        sec.thingList.sprev = t;
+      }
+      sec.thingList = t;
+    }
+
+    t.floorz = t.subsector.sector.floorHeight;
+    t.ceilingz = t.subsector.sector.ceilingHeight;
+
+    if (z == ONFLOORZ) {
+      t.z = t.floorz;
+    } else if (z == ONCEILINGZ) {
+      t.z = t.ceilingz - mapinfo[i].height;
+    } else {
+      t.z = z;
+    }
 
     let ss = (this.wallRenderer.solidsegs =
       this.solidSegsManager.clearSolidsegs(this.wallRenderer.solidsegs));
@@ -392,6 +427,80 @@ class LevelManager {
     let subsector =
       this.linkedSubsectors[this.bspTraversal.getSubsector(subsectorID)];
     return subsector;
+  }
+
+  loadThings() {
+    let mapThing;
+    let spawnThing;
+    for (let i = 0; i < this.things.length; i++) {
+      mapThing = this.things[i];
+
+      spawnThing = mapThing;
+
+      this.spawnMapThing(spawnThing);
+    }
+  }
+
+  spawnMapThing(mapThing) {
+    let i;
+    let mapObject;
+    let x;
+    let y;
+    let z;
+
+    if (mapThing.type <= 4) {
+      this.spawnPlayer(mapThing);
+      return;
+    }
+
+    // find which type to spawn
+    for (i = 0; i < arr.length; i++) {
+      // map maybe instead?
+      if (mapThing.type == mapinfo[i].doomednum) {
+        break;
+      }
+    }
+
+    x = mapThing.xPosition;
+    y = mapThing.yPosition;
+
+    if (mapinfo[i].flags & 8) {
+      z = ONCEILINGZ;
+    } else {
+      z = ONFLOORZ;
+    }
+
+    mapObject = this.spawnMapObject(x,y,z,i);
+  }
+
+  spawnPlayer(mapThing) {
+    console.log(mapThing + "player: do nothing");
+    return;
+  }
+
+  spawnMapObject(x,y,z,type){
+
+    let mapObject;
+    let info = mapinfo[type];
+
+    mapObject.type = type;
+    mapObject.info = info;
+    mapObject.x = x;
+    mapObject.y = y;
+    mapObject.radius = info.radius;
+    mapObject.height = info.height;
+    mapObject.flags = info.flags;
+    mapObject.health = info.spawnhealth;
+
+    // set a temporary state...
+
+    
+
+
+
+
+
+
   }
 
   reset(levelData, dataObjects) {}

@@ -45,7 +45,44 @@ class Subsector {
 
     // add sprites
 
+    let thing = subsector.sector.thingList;
 
+    while (thing !== undefined) {
+      let tr_x = thing.xPosition - gameEngine.player.x;
+      let tr_y = thing.yPosition - gameEngine.player.y;
+
+      let gxt =
+        tr_x * Math.cos(degreesToRadians(gameEngine.player.direction.angle));
+      let gyt = -(
+        tr_y * Math.sin(degreesToRadians(gameEngine.player.direction.angle))
+      );
+
+      let tz = gxt - gyt;
+
+      if (tz < 4) {
+        break;
+      }
+
+      let xscale = HALFWIDTH / tz;
+
+      gxt = -(
+        tr_x * Math.sin(degreesToRadians(gameEngine.player.direction.angle))
+      );
+      gyt =
+        tr_y * Math.cos(degreesToRadians(gameEngine.player.direction.angle));
+
+      let tx = -(gyt + gxt);
+
+      if (Math.abs(tx) > Math.abs(tz)) {
+        break;
+      }
+
+      let spriteDef = theSprites[thing.numIndex];
+
+     // let spriteFrame = theSprites.spriteFrame[thing.frame]
+
+      thing = thing.snext;
+    }
 
     for (let i = 0; i < subsector.segCount; i++) {
       const seg = this.segs[subsector.firstSegNumber + i];
