@@ -48,8 +48,8 @@ class Subsector {
     let thing = subsector.sector.thingList;
 
     while (thing !== undefined) {
-      let tr_x = thing.xPosition - gameEngine.player.x;
-      let tr_y = thing.yPosition - gameEngine.player.y;
+      let tr_x = thing.x - gameEngine.player.x;
+      let tr_y = thing.y - gameEngine.player.y;
 
       let gxt =
         tr_x * Math.cos(degreesToRadians(gameEngine.player.direction.angle));
@@ -77,9 +77,9 @@ class Subsector {
         break;
       }
 
-      let spriteDef = theSprites[thing.numIndex];
+      let spriteDef = theSprites[thing.type];
 
-     // let spriteFrame = theSprites.spriteFrame[thing.frame]
+      let spriteFrame = spriteDef.spriteFrames[thing.frame];
 
       thing = thing.snext;
     }

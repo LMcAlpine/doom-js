@@ -71,66 +71,66 @@ class LevelManager {
 
     // this block is a WIP
 
-    const doomednumMap = new Map(
-      mapinfo.map((item, index) => [Number(item.doomednum), index])
-    );
-    let i;
-    for (let j = 0; j < this.things.length; j++) {
-      // for (i = 0; i < arr.length; i++) {
-      //   // map maybe instead?
-      //   if (this.things[j].type == mapinfo[i].doomednum) {
-      //     break;
-      //   }
-      // }
-      if (j === 0) {
-        // handle/spawn player
-        continue;
-      }
-      i = doomednumMap.get(this.things[j].type);
-      if (i !== undefined) {
-        break;
-      }
-    }
+    // const doomednumMap = new Map(
+    //   mapinfo.map((item, index) => [Number(item.doomednum), index])
+    // );
+    // let i;
+    // for (let j = 0; j < this.things.length; j++) {
+    //   // for (i = 0; i < arr.length; i++) {
+    //   //   // map maybe instead?
+    //   //   if (this.things[j].type == mapinfo[i].doomednum) {
+    //   //     break;
+    //   //   }
+    //   // }
+    //   if (j === 0) {
+    //     // handle/spawn player
+    //     continue;
+    //   }
+    //   i = doomednumMap.get(this.things[j].type);
+    //   if (i !== undefined) {
+    //     break;
+    //   }
+    // }
 
-    let spawnThing = this.things[1];
-    t.numIndex = i;
-    let x = t.xPosition;
-    let y = t.yPosition;
+    // let spawnThing = this.things[1];
+    // t.numIndex = i;
+    // let x = t.xPosition;
+    // let y = t.yPosition;
 
-    let z;
-    if (mapinfo[i].flags & MF_SPAWNCEILING) {
-      z = ONCEILINGZ;
-    } else {
-      z = ONFLOORZ;
-    }
-    let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
-    t.subsector = subsec;
-    // t.flagsHardcode = 33554432;
-    // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
-    t.flagsHardcode = mapinfo[i].flags;
-    let sec;
-    if (!(t.flagsHardcode & 8)) {
-      sec = subsec.sector;
+    // let z;
+    // if (mapinfo[i].flags & MF_SPAWNCEILING) {
+    //   z = ONCEILINGZ;
+    // } else {
+    //   z = ONFLOORZ;
+    // }
+    // let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
+    // t.subsector = subsec;
+    // // t.flagsHardcode = 33554432;
+    // // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
+    // t.flagsHardcode = mapinfo[i].flags;
+    // let sec;
+    // if (!(t.flagsHardcode & 8)) {
+    //   sec = subsec.sector;
 
-      t.sprev = null;
-      t.snext = sec.thingList;
+    //   t.sprev = null;
+    //   t.snext = sec.thingList;
 
-      if (sec.thingList) {
-        sec.thingList.sprev = t;
-      }
-      sec.thingList = t;
-    }
+    //   if (sec.thingList) {
+    //     sec.thingList.sprev = t;
+    //   }
+    //   sec.thingList = t;
+    // }
 
-    t.floorz = t.subsector.sector.floorHeight;
-    t.ceilingz = t.subsector.sector.ceilingHeight;
+    // t.floorz = t.subsector.sector.floorHeight;
+    // t.ceilingz = t.subsector.sector.ceilingHeight;
 
-    if (z == ONFLOORZ) {
-      t.z = t.floorz;
-    } else if (z == ONCEILINGZ) {
-      t.z = t.ceilingz - mapinfo[i].height;
-    } else {
-      t.z = z;
-    }
+    // if (z == ONFLOORZ) {
+    //   t.z = t.floorz;
+    // } else if (z == ONCEILINGZ) {
+    //   t.z = t.ceilingz - mapinfo[i].height;
+    // } else {
+    //   t.z = z;
+    // }
 
     let ss = (this.wallRenderer.solidsegs =
       this.solidSegsManager.clearSolidsegs(this.wallRenderer.solidsegs));
@@ -443,7 +443,7 @@ class LevelManager {
 
   spawnMapThing(mapThing) {
     let i;
-    let mapObject;
+    let mapObject = {};
     let x;
     let y;
     let z;
@@ -470,7 +470,7 @@ class LevelManager {
       z = ONFLOORZ;
     }
 
-    mapObject = this.spawnMapObject(x,y,z,i);
+    mapObject = this.spawnMapObject(x, y, z, i);
   }
 
   spawnPlayer(mapThing) {
@@ -478,9 +478,8 @@ class LevelManager {
     return;
   }
 
-  spawnMapObject(x,y,z,type){
-
-    let mapObject;
+  spawnMapObject(x, y, z, type) {
+    let mapObject = {};
     let info = mapinfo[type];
 
     mapObject.type = type;
@@ -494,13 +493,54 @@ class LevelManager {
 
     // set a temporary state...
 
-    
+    let state = {
+      sprite: spriteMarkersNums.SPR_TROO,
+      frame: 0,
+      tics: 10,
+      action: null,
+      nextState: 0,
+    };
 
+    mapObject.state = state;
 
+    mapObject.tics = state.tics;
 
+    mapObject.sprite = state.sprite;
 
+    mapObject.frame = state.frame;
 
+    this.setThingPosition(mapObject);
 
+    mapObject.floorz = mapObject.subsector.sector.floorHeight;
+    mapObject.ceilingz = mapObject.subsector.sector.ceilingHeight;
+
+    if (z == ONFLOORZ) {
+      mapObject.z = mapObject.floorz;
+    } else if (z == ONCEILINGZ) {
+      mapObject.z = mapObject.ceilingz - mapinfo[i].height;
+    } else {
+      mapObject.z = z;
+    }
+
+    return mapObject;
+  }
+
+  setThingPosition(thing) {
+    let subsec = this.pointInSubsector(thing.xPosition, thing.yPosition);
+    thing.subsector = subsec;
+
+    let sec;
+    if (!(thing.flags & 8)) {
+      sec = subsec.sector;
+
+      thing.sprev = null;
+      thing.snext = sec.thingList;
+
+      if (sec.thingList) {
+        sec.thingList.sprev = thing;
+      }
+      sec.thingList = thing;
+    }
   }
 
   reset(levelData, dataObjects) {}
