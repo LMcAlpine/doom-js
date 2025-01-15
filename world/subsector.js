@@ -77,9 +77,40 @@ class Subsector {
         break;
       }
 
-      let spriteDef = theSprites[thing.type];
+      let spriteDef = theSprites[thing.sprite];
 
       let spriteFrame = spriteDef.spriteFrames[thing.frame];
+
+      let angle;
+      let lump;
+      let rotation;
+      let flip;
+      if (spriteFrame.rotate) {
+        angle = gameEngine.player.angleTowardsVertex(thing);
+        let tempAngle = angle.subtract(thing.angle);
+        rotation = Math.floor(((tempAngle.add(45 / 2).angle * 9) / 45) % 8);
+        lump = spriteFrame.lump[rotation];
+        flip = spriteFrame.flip[rotation];
+
+        //lump = spriteFrame.lump[rotation];
+      }
+
+      tx -= gameEngine.spriteOffset[lump];
+
+      let x1 = Math.floor(HALFWIDTH + tx * xscale);
+
+      if (x1 > CANVASWIDTH) {
+        break;
+      }
+      tx += gameEngine.spriteWidth[lump];
+
+      let x2 = Math.floor(HALFWIDTH + tx * xscale - 1);
+
+      if (x2 < 0) {
+        break;
+      }
+
+      // continue back here
 
       thing = thing.snext;
     }

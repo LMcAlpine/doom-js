@@ -471,6 +471,8 @@ class LevelManager {
     }
 
     mapObject = this.spawnMapObject(x, y, z, i);
+
+    mapObject.angle = Math.floor((mapThing.direction / 45) * 45);
   }
 
   spawnPlayer(mapThing) {
@@ -491,11 +493,13 @@ class LevelManager {
     mapObject.flags = info.flags;
     mapObject.health = info.spawnhealth;
 
+    mapObject.angle;
+
     // set a temporary state...
 
     let state = {
       sprite: spriteMarkersNums.SPR_TROO,
-      frame: 0,
+      frame: 1,
       tics: 10,
       action: null,
       nextState: 0,

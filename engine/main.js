@@ -41,14 +41,19 @@ async function initializeGameData(file) {
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
   spriteManager = new SpriteManager(lumpData, patchNames);
 
-  if (spriteManager) {
-    spriteManager.processSprites();
-  }
-
   gameEngine = new GameEngine("myCanvas", 50);
   gameEngine.patchNames = patchNames;
   gameEngine.palette = paletteField;
   gameEngine.textures = textureField;
+
+  if (spriteManager) {
+    const { spriteWidth, spriteOffset, spriteTopOffset } =
+      spriteManager.processSprites();
+    gameEngine.spriteWidth = spriteWidth;
+    gameEngine.spriteOffset = spriteOffset;
+    gameEngine.spriteTopOffset = spriteTopOffset;
+  }
+
   const canvas = new Canvas("myCanvas");
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;

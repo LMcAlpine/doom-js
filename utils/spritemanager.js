@@ -36,6 +36,8 @@ class SpriteManager {
       this.calculateOffsets(sprites);
 
     this.installSprites(spriteNames, startIndex, endIndex);
+
+    return { spriteWidth, spriteOffset, spriteTopOffset };
   }
 
   installSprites(spriteNames, startIndex, endIndex) {
