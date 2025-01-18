@@ -9,7 +9,6 @@ function buildSectors(sectors) {
     sector.lightLevel = sectors[i].lightLevel / 255;
     sector.specialType = sectors[i].specialType;
     sector.tag = sectors[i].tag;
-    sector.thingsList = null;
     const temp = Object.assign({}, sector);
     sectorObjects.push(temp);
   }
