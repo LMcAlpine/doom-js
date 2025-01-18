@@ -76,6 +76,9 @@ function loadLevel(levelName) {
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
+
+  // player needs to be initialized before
+  gameEngine.levelManager.loadThings();
 }
 
 function setupTextureAndPalettes(lumpData) {

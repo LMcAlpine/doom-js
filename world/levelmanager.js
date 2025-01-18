@@ -30,7 +30,11 @@ class LevelManager {
     for (let i = 0; i < levelsData.subsectors.length; i++) {
       const subsector = levelsData.subsectors[i];
       const seg = segmentData.segs[subsector.firstSegNumber];
-      const modifiedFrontsector = { ...seg.frontsector, validCount: 0 ,thingList:null};
+      const modifiedFrontsector = {
+        ...seg.frontsector,
+        validCount: 0,
+        thingList: null,
+      };
 
       this.linkedSubsectors[i] = {
         sector: modifiedFrontsector,
@@ -74,72 +78,9 @@ class LevelManager {
 
     // wrong place
     // needs to be done out of this loop
-    this.loadThings();
+    // this.loadThings();
 
     vissprites = [];
-
-    // this block is a WIP
-
-    // const doomednumMap = new Map(
-    //   mapinfo.map((item, index) => [Number(item.doomednum), index])
-    // );
-    // let i;
-    // for (let j = 0; j < this.things.length; j++) {
-    //   // for (i = 0; i < arr.length; i++) {
-    //   //   // map maybe instead?
-    //   //   if (this.things[j].type == mapinfo[i].doomednum) {
-    //   //     break;
-    //   //   }
-    //   // }
-    //   if (j === 0) {
-    //     // handle/spawn player
-    //     continue;
-    //   }
-    //   i = doomednumMap.get(this.things[j].type);
-    //   if (i !== undefined) {
-    //     break;
-    //   }
-    // }
-
-    // let spawnThing = this.things[1];
-    // t.numIndex = i;
-    // let x = t.xPosition;
-    // let y = t.yPosition;
-
-    // let z;
-    // if (mapinfo[i].flags & MF_SPAWNCEILING) {
-    //   z = ONCEILINGZ;
-    // } else {
-    //   z = ONFLOORZ;
-    // }
-    // let subsec = this.pointInSubsector(t.xPosition, t.yPosition);
-    // t.subsector = subsec;
-    // // t.flagsHardcode = 33554432;
-    // // FIX FROM BEING A STRING TO THE ACTUAL VALUES...
-    // t.flagsHardcode = mapinfo[i].flags;
-    // let sec;
-    // if (!(t.flagsHardcode & 8)) {
-    //   sec = subsec.sector;
-
-    //   t.sprev = null;
-    //   t.snext = sec.thingList;
-
-    //   if (sec.thingList) {
-    //     sec.thingList.sprev = t;
-    //   }
-    //   sec.thingList = t;
-    // }
-
-    // t.floorz = t.subsector.sector.floorHeight;
-    // t.ceilingz = t.subsector.sector.ceilingHeight;
-
-    // if (z == ONFLOORZ) {
-    //   t.z = t.floorz;
-    // } else if (z == ONCEILINGZ) {
-    //   t.z = t.ceilingz - mapinfo[i].height;
-    // } else {
-    //   t.z = z;
-    // }
 
     let ss = (this.wallRenderer.solidsegs =
       this.solidSegsManager.clearSolidsegs(this.wallRenderer.solidsegs));

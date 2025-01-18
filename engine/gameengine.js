@@ -116,6 +116,8 @@ class GameEngine {
         flatManager
       );
     }
+
+    // this.levelManager.loadThings();
   }
 
   initializePlayer(levels, scaleX, scaleY, minX, minY) {
