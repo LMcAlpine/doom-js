@@ -204,7 +204,7 @@ class WallRenderer {
   storeWallRange(seg, xScreenV1, xScreenV2) {
     let line = seg.linedef;
     //  let side = seg.linedef.rightSidedef;
-    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures. 
+    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures.
 
     // Taking the angle of the seg in the worldspace and adding 90 degrees to it
     // this results in a perpendicular line (the normal)
@@ -577,7 +577,6 @@ class WallRenderer {
 
     if (maskedTexture && drawSeg_O.spriteTopClip === null) {
       // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
-      //drawSeg_O.spriteTopClip = this.upperclip;
 
       drawSeg_O.spriteTopClip = [...this.upperclip];
     }
@@ -838,8 +837,8 @@ class WallRenderer {
         wallData.lightLevel
       );
 
-      // this.upperclip[x] = CANVASHEIGHT;
-      // this.lowerclip[x] = -1;
+      this.upperclip[wallData.x] = CANVASHEIGHT;
+      this.lowerclip[wallData.x] = -1;
     }
   }
 

@@ -697,4 +697,11 @@ function parseLevelName(levelName) {
   };
 }
 
+let vissprites = [];
 
+function createVissprite(x1, x2, scale, texture, textureMid) {
+  const vis = new Vissprite(x1, x2, scale, texture, textureMid);
+  vissprites.push(vis);
+}
+
+let validCount = 1;

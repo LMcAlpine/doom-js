@@ -28,9 +28,12 @@ class LevelManager {
 
     this.linkedSubsectors = [];
     for (let i = 0; i < levelsData.subsectors.length; i++) {
+      const subsector = levelsData.subsectors[i];
+      const seg = segmentData.segs[subsector.firstSegNumber];
+      const modifiedFrontsector = { ...seg.frontsector, validCount: 0 ,thingList:null};
+
       this.linkedSubsectors[i] = {
-        sector:
-          segmentData.segs[levelsData.subsectors[i].firstSegNumber].frontsector,
+        sector: modifiedFrontsector,
         ...levelsData.subsectors[i],
       };
     }
@@ -67,7 +70,13 @@ class LevelManager {
   }
 
   draw() {
+    validCount++;
+
+    // wrong place
+    // needs to be done out of this loop
     this.loadThings();
+
+    vissprites = [];
 
     // this block is a WIP
 
