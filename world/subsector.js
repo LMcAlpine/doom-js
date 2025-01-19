@@ -132,7 +132,7 @@ class Subsector {
     );
 
     this.adjustStart(vs, x1);
-    vs.patch = lump;
+    // vs.patch = lump;
 
     vissprites.push(vs);
   }
