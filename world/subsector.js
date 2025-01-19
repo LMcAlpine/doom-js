@@ -98,16 +98,12 @@ class Subsector {
 
     let { lump, flip } = this.chooseSpriteLump(thing);
 
-    tx -= gameEngine.spriteOffset[lump];
-
-    let x1 = Math.floor(HALFWIDTH + tx * xscale);
-
-    if (x1 > CANVASWIDTH) {
-      return;
-    }
-    tx += gameEngine.spriteWidth[lump];
-
-    let x2 = Math.floor(HALFWIDTH + tx * xscale - 1);
+    let { x1, x2 } = this.computeScreenEdges(
+      tx,
+      xscale,
+      gameEngine.spriteOffset[lump],
+      gameEngine.spriteWidth[lump]
+    );
 
     if (x2 < 0) {
       return;
@@ -186,6 +182,19 @@ class Subsector {
       lump: spriteFrame.lump[rotation],
       flip: spriteFrame.flip[rotation],
     };
+  }
+
+  computeScreenEdges(tx, xscale, spriteOffset, spriteWidth) {
+    // shift tx by spriteOffset
+    let newTx = tx - spriteOffset;
+
+    let x1 = Math.floor(HALFWIDTH + newTx * xscale);
+
+    newTx += spriteWidth;
+
+    let x2 = Math.floor(HALFWIDTH + newTx * xscale - 1);
+
+    return { x1, x2 };
   }
 
   checkFOV(tx, tz) {
