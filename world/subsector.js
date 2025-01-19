@@ -80,21 +80,13 @@ class Subsector {
   }
 
   projectSprite(thing) {
-    let tr_x = thing.x - gameEngine.player.x;
-    let tr_y = thing.y - gameEngine.player.y;
-
-    let gxt =
-      tr_x * Math.cos(degreesToRadians(gameEngine.player.direction.angle));
-    let gyt = -(
-      tr_y * Math.sin(degreesToRadians(gameEngine.player.direction.angle))
-    );
-
-    let tz = gxt - gyt;
+    let { tz, gxt, tr_x, gyt, tr_y } = this.computeDepth(thing);
 
     if (tz < 4) {
       return;
     }
 
+    // scale factor for sprite width. How large it should appear on screen
     let xscale = HALFWIDTH / tz;
 
     gxt = -(
@@ -192,5 +184,21 @@ class Subsector {
     vs.patch = lump;
 
     vissprites.push(vs);
+  }
+
+  computeDepth(thing) {
+    // Relative position
+    const tr_x = thing.x - gameEngine.player.x;
+    const tr_y = thing.y - gameEngine.player.y;
+
+    const angleRad = degreesToRadians(gameEngine.player.direction.angle);
+
+    const gxt = tr_x * Math.cos(angleRad);
+    const gyt = -(tr_y * Math.sin(angleRad));
+
+    // depth in screen space. How far the object is from the camera
+    // In other words, how far the sprite is from the player
+    let tz = gxt - gyt;
+    return { tz, gxt, tr_x, gyt, tr_y };
   }
 }
