@@ -170,21 +170,22 @@ class Subsector {
 
   chooseSpriteLump(thing) {
     let spriteDef = theSprites[thing.sprite];
-
     let spriteFrame = spriteDef.spriteFrames[thing.frame];
 
-    let angle;
-    let lump;
-    let rotation;
-    let flip;
-    if (spriteFrame.rotate) {
-      angle = gameEngine.player.angleTowardsVertex(thing);
-      let tempAngle = angle.subtract(thing.angle);
-      rotation = Math.floor(((tempAngle.add(45 / 2).angle * 9) / 45) % 8);
-      lump = spriteFrame.lump[rotation];
-      flip = spriteFrame.flip[rotation];
+    if (!spriteDef.rotate) {
+      // no rotation
+      return { lump: spriteFrame.lump[0], flip: spriteFrame.flip[0] };
     }
-    return { lump, flip };
+
+    // there is a rotation
+    const angleToThing = gameEngine.player.angleTowardsVertex(thing);
+    const tempAngle = angleToThing.subtract(thing.angle);
+    const rotation = Math.floor(((tempAngle.add(45 / 2).angle * 9) / 45) % 8);
+
+    return {
+      lump: spriteFrame.lump[rotation],
+      flip: spriteFrame.flip[rotation],
+    };
   }
 
   checkFOV(tx, tz) {
