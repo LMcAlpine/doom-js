@@ -131,12 +131,16 @@ class Subsector {
       flip
     );
 
-    if (vs.x1 > x1) {
-      vs.start += vs.xiscale * (vs.x1 - x1);
-    }
+    this.adjustStart(vs, x1);
     vs.patch = lump;
 
     vissprites.push(vs);
+  }
+
+  adjustStart(vs, x1) {
+    if (vs.x1 > x1) {
+      vs.start += vs.xiscale * (vs.x1 - x1);
+    }
   }
 
   buildVisSprite(thing, lump, x1, x2, xscale, textureMid, flip) {
