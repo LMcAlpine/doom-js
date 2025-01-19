@@ -92,7 +92,7 @@ class Subsector {
     let tx;
     ({ tx, gxt, gyt } = this.computeHorizontalOffset(gxt, tr_x, gyt, tr_y));
 
-    if (Math.abs(tx) > Math.abs(tz * 4)) {
+    if (!this.checkFOV(tx, tz)) {
       return;
     }
 
@@ -180,6 +180,15 @@ class Subsector {
     vs.patch = lump;
 
     vissprites.push(vs);
+  }
+
+  checkFOV(tx, tz) {
+    // If the sprite is too far off to the side
+    if (Math.abs(tx) > Math.abs(tz * 4)) {
+      // outside FOV
+      return false;
+    }
+    return true;
   }
 
   computeHorizontalOffset(gxt, tr_x, gyt, tr_y) {
