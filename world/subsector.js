@@ -113,7 +113,10 @@ class Subsector {
       return;
     }
 
-
+    let { clampedX1, clampedX2 } = this.clampEdges(x1, x2, CANVASWIDTH);
+    if (clampedX1 > clampedX2) {
+      return;
+    }
 
     const textureMid =
       thing.z + gameEngine.spriteTopOffset[lump] - gameEngine.player.height;
@@ -131,20 +134,6 @@ class Subsector {
       textureMid,
       flip,
     };
-
-    // vissprites.push({
-    //   mapObjectFlags: thing.flags,
-    //   gx: thing.x,
-    //   gy: thing.y,
-    //   gz: thing.z,
-    //   gzt: thing.z + gameEngine.spriteTopOffset[lump],
-    //   x1,
-    //   x2,
-    //   scale: xscale,
-    //   texture: lump,
-    //   textureMid,
-    //   flip,
-    // });
 
     if (flip) {
       vs.start = gameEngine.spriteWidth[lump] - 1;
@@ -180,6 +169,20 @@ class Subsector {
       lump: spriteFrame.lump[rotation],
       flip: spriteFrame.flip[rotation],
     };
+  }
+
+  clampEdges(x1, x2, screenWidth) {
+    let clampedX1 = x1;
+    let clampedX2 = x2;
+
+    if (clampedX1 < 0) {
+      clampedX1 = 0;
+    }
+
+    if (clampedX2 >= screenWidth) {
+      clampedX2 = screenWidth - 1;
+    }
+    return { clampedX1, clampedX2 };
   }
 
   computeScreenEdges(tx, xscale, spriteOffset, spriteWidth) {
