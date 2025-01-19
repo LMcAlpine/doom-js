@@ -121,14 +121,33 @@ class Subsector {
     const textureMid =
       thing.z + gameEngine.spriteTopOffset[lump] - gameEngine.player.height;
 
+    let vs = this.buildVisSprite(
+      thing,
+      lump,
+      clampedX1,
+      clampedX2,
+      xscale,
+      textureMid,
+      flip
+    );
+
+    if (vs.x1 > x1) {
+      vs.start += vs.xiscale * (vs.x1 - x1);
+    }
+    vs.patch = lump;
+
+    vissprites.push(vs);
+  }
+
+  buildVisSprite(thing, lump, x1, x2, xscale, textureMid, flip) {
     let vs = {
       mapObjectFlags: thing.flags,
       gx: thing.x,
       gy: thing.y,
       gz: thing.z,
       gzt: thing.z + gameEngine.spriteTopOffset[lump],
-      x1: x1 < 0 ? 0 : x1,
-      x2: x2 >= CANVASWIDTH ? CANVASWIDTH - 1 : x2,
+      x1,
+      x2,
       scale: xscale,
       texture: lump,
       textureMid,
@@ -142,13 +161,7 @@ class Subsector {
       vs.start = 0;
       vs.xiscale = 1 / xscale;
     }
-
-    if (vs.x1 > x1) {
-      vs.start += vs.xiscale * (vs.x1 - x1);
-    }
-    vs.patch = lump;
-
-    vissprites.push(vs);
+    return vs;
   }
 
   chooseSpriteLump(thing) {
