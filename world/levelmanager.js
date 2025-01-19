@@ -76,10 +76,6 @@ class LevelManager {
   draw() {
     validCount++;
 
-    // wrong place
-    // needs to be done out of this loop
-    // this.loadThings();
-
     vissprites = [];
 
     let ss = (this.wallRenderer.solidsegs =
@@ -227,55 +223,7 @@ class LevelManager {
         patch
       );
 
-      // const dataView = new DataView(patch.data);
-
-      // Read header values
-      // const width = dataView.getUint16(0, true);
-      // const height = dataView.getUint16(2, true);
-      // const leftOffset = dataView.getInt16(4, true);
-      // const topOffset = dataView.getInt16(6, true);
-
-      // const columnOffsets = [];
-      // for (let i = 0; i < width; i++) {
-      //   const columnOffset = dataView.getUint32(8 + i * 4, true);
-      //   columnOffsets.push(columnOffset);
-      // }
-
-      // const columns = [];
-      // for (let i = 0; i < width; i++) {
-      //   let offset = columnOffsets[i];
-      //   const posts = [];
-
-      //   while (true) {
-      //     const topDelta = dataView.getUint8(offset++);
-      //     if (topDelta === 0xff) {
-      //       // End of column data
-      //       break;
-      //     }
-      //     const length = dataView.getUint8(offset++);
-      //     offset++; // Skip the unused padding byte
-
-      //     // Read the pixel data for the post
-      //     const data = new Uint8Array(
-      //       patch.data.slice(offset, offset + length)
-      //     );
-      //     posts.push({ topDelta, length, data });
-
-      //     offset += length;
-      //     offset++; // Skip the second unused padding byte after the pixel data
-      //   }
-      //   columns.push(posts);
-      // }
-
       let spriteYScale = vissprites[0].scale;
-
-      // console.log(`Segment X1=${x1}, X2=${x2}, Texture=${textureName}`);
-      // let {
-      //   textureWidth: textureWidth,
-      //   textureHeight: textureHeight,
-      //   textureData: textureData,
-      //   columns: columns,
-      // } = this.textureManager.getTextureInfo(textureName);
 
       let start = vissprites[0].start;
 
@@ -341,19 +289,6 @@ class LevelManager {
               }
             }
           }
-
-          // this.wallRenderer.drawColumn(
-          //   textureMid,
-          //   yl,
-          //   yh,
-          //   vissprites[0].xiscale,
-          //   textureColumn,
-          //   patch.width,
-          //   patch.height,
-          //   patch.data,
-          //   x,
-          //   1
-          // );
         }
 
         // spriteYScale += vissprites[0].xiscale;
