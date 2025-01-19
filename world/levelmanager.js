@@ -219,63 +219,55 @@ class LevelManager {
 
       let patch = gameEngine.lumpData[startIndex + vissprites[0].texture];
 
-      const dataView = new DataView(patch.data);
+      const header = this.parsePatchHeader(patch);
+
+      const columns = this.parsePatchColumns(
+        header.columnOffsets,
+        header,
+        patch
+      );
+
+      // const dataView = new DataView(patch.data);
 
       // Read header values
-      const width = dataView.getUint16(0, true);
-      const height = dataView.getUint16(2, true);
-      const leftOffset = dataView.getInt16(4, true);
-      const topOffset = dataView.getInt16(6, true);
+      // const width = dataView.getUint16(0, true);
+      // const height = dataView.getUint16(2, true);
+      // const leftOffset = dataView.getInt16(4, true);
+      // const topOffset = dataView.getInt16(6, true);
 
-      const columnOffsets = [];
-      for (let i = 0; i < width; i++) {
-        const columnOffset = dataView.getUint32(8 + i * 4, true);
-        columnOffsets.push(columnOffset);
-      }
+      // const columnOffsets = [];
+      // for (let i = 0; i < width; i++) {
+      //   const columnOffset = dataView.getUint32(8 + i * 4, true);
+      //   columnOffsets.push(columnOffset);
+      // }
 
-      const columns = [];
-      for (let i = 0; i < width; i++) {
-        let offset = columnOffsets[i];
-        const posts = [];
+      // const columns = [];
+      // for (let i = 0; i < width; i++) {
+      //   let offset = columnOffsets[i];
+      //   const posts = [];
 
-        while (true) {
-          const topDelta = dataView.getUint8(offset++);
-          if (topDelta === 0xff) {
-            // End of column data
-            break;
-          }
-          const length = dataView.getUint8(offset++);
-          offset++; // Skip the unused padding byte
+      //   while (true) {
+      //     const topDelta = dataView.getUint8(offset++);
+      //     if (topDelta === 0xff) {
+      //       // End of column data
+      //       break;
+      //     }
+      //     const length = dataView.getUint8(offset++);
+      //     offset++; // Skip the unused padding byte
 
-          // Read the pixel data for the post
-          const data = new Uint8Array(
-            patch.data.slice(offset, offset + length)
-          );
-          posts.push({ topDelta, length, data });
+      //     // Read the pixel data for the post
+      //     const data = new Uint8Array(
+      //       patch.data.slice(offset, offset + length)
+      //     );
+      //     posts.push({ topDelta, length, data });
 
-          offset += length;
-          offset++; // Skip the second unused padding byte after the pixel data
-        }
-        columns.push(posts);
-      }
-
-      // let currentLine = this.wallRenderer.drawSegments[i].currentLine;
-      // // console.log(`Left Texture: ${currentLine.leftSidedef.middleTexture}`);
-      // // console.log(`Right Texture: ${currentLine.rightSidedef.middleTexture}`);
-      // let frontSector = currentLine.rightSidedef.sector;
-      // let backSector = currentLine.leftSidedef.sector;
-
-      // let textureName;
-
-      // textureName = this.wallRenderer.drawSegments[i].sidedef.middleTexture;
-
-      // let maskedTextureCol = this.wallRenderer.drawSegments[i].maskedTextureCol;
-      // let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
+      //     offset += length;
+      //     offset++; // Skip the second unused padding byte after the pixel data
+      //   }
+      //   columns.push(posts);
+      // }
 
       let spriteYScale = vissprites[0].scale;
-      // let floorClip = this.wallRenderer.drawSegments[i].spriteBottomClip;
-      // let ceilingClip = this.wallRenderer.drawSegments[i].spriteTopClip;
-      // let textureMid;
 
       // console.log(`Segment X1=${x1}, X2=${x2}, Texture=${textureName}`);
       // let {
@@ -291,20 +283,22 @@ class LevelManager {
         let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
         let inverseScale = 1.0 / spriteYScale;
 
-        // if (textureColumnIndex != null) {
-        //   textureColumnIndex %= columns.length;
-        // if (textureColumnIndex < 0) {
-        //   textureColumnIndex += columns.length; // Fix negative indices
-        // }
-
-        // console.log("After Wrapping:", textureColumnIndex);
         let column;
 
-        // column = columns[textureColumnIndex];
         let textureColumn = Math.floor(start);
-        column = columns[textureColumn];
+
+        //bandaid
+        if (textureColumn < columns.length) {
+          column = columns[textureColumn];
+        } else {
+          break;
+        }
+
+        console.log(columns.length + "\n");
 
         // Process each post in the texture column
+        // console.log(start);
+        // console.log(textureColumn);
         for (let j = 0; j < column.length; j++) {
           const post = column[j];
 
@@ -324,22 +318,44 @@ class LevelManager {
           //   yl = ceilingClip[x] + 1;
           // }
 
-          this.wallRenderer.drawColumn(
-            textureMid,
-            yl,
-            yh,
-            vissprites[0].xiscale,
-            textureColumn,
-            patch.width,
-            patch.height,
-            patch.data,
-            x,
-            1
-          );
+          for (let row = yl; row <= yh; row++) {
+            let rowInPost = Math.floor((row - topscreen) / spriteYScale);
+
+            if (rowInPost >= 0 && rowInPost < post.data.length) {
+              let colorIndex = post.data[rowInPost];
+
+              if (colorIndex !== 0) {
+                let colorObj = gameEngine.palette.palettes[0][colorIndex];
+                let r = colorObj.red;
+                let g = colorObj.green;
+                let b = colorObj.blue;
+                let a = 255;
+
+                let screenPos = row * CANVASWIDTH + x;
+                gameEngine.canvas.screenBuffer[screenPos] =
+                  (a << 24) | (b << 16) | (g << 8) | r;
+              }
+            }
+          }
+
+          // this.wallRenderer.drawColumn(
+          //   textureMid,
+          //   yl,
+          //   yh,
+          //   vissprites[0].xiscale,
+          //   textureColumn,
+          //   patch.width,
+          //   patch.height,
+          //   patch.data,
+          //   x,
+          //   1
+          // );
         }
 
         // spriteYScale += vissprites[0].xiscale;
-        start += vissprites[0].xiscale;
+        // start += vissprites[0].xiscale;
+
+        start += inverseScale;
       }
     }
 
@@ -582,7 +598,7 @@ class LevelManager {
 
     let state = {
       sprite: spriteMarkersNums.SPR_TROO,
-      frame: 1,
+      frame: 0,
       tics: 10,
       action: null,
       nextState: 0,
@@ -627,6 +643,97 @@ class LevelManager {
         sec.thingList.sprev = thing;
       }
       sec.thingList = thing;
+    }
+  }
+
+  parsePatchHeader(patch) {
+    const dataView = new DataView(patch.data);
+
+    // Read header values
+    const width = dataView.getUint16(0, true);
+    const height = dataView.getUint16(2, true);
+    const leftOffset = dataView.getInt16(4, true);
+    const topOffset = dataView.getInt16(6, true);
+
+    const columnOffsets = [];
+    for (let i = 0; i < width; i++) {
+      const columnOffset = dataView.getUint32(8 + i * 4, true);
+      columnOffsets.push(columnOffset);
+    }
+    return {
+      width,
+      height,
+      leftOffset,
+      topOffset,
+      columnOffsets,
+    };
+  }
+
+  parsePatchColumns(columnOffsets, header, patch) {
+    const dataView = new DataView(patch.data);
+
+    const width = header.width;
+    const columns = [];
+    for (let i = 0; i < width; i++) {
+      let offset = columnOffsets[i];
+      const posts = [];
+
+      while (true) {
+        const topDelta = dataView.getUint8(offset++);
+        if (topDelta === 0xff) {
+          // End of column data
+          break;
+        }
+        const length = dataView.getUint8(offset++);
+        offset++; // Skip the unused padding byte
+
+        // Read the pixel data for the post
+        const data = new Uint8Array(patch.data.slice(offset, offset + length));
+        posts.push({ topDelta, length, data });
+
+        offset += length;
+        offset++; // Skip the second unused padding byte after the pixel data
+      }
+      columns.push(posts);
+    }
+
+    return columns;
+  }
+
+  drawPatch(columns, xStart, yStart, textureWidth, textureUint32Array) {
+    const maxColumns = Math.min(columns.length, textureWidth - xStart);
+
+    for (let i = 0; i < maxColumns; i++) {
+      const column = columns[i];
+      for (let j = 0; j < column.length; j++) {
+        const post = column[j];
+        for (let k = 0; k < post.data.length; k++) {
+          const pixelIndex = post.data[k];
+          const pixelDraw = this.palette[pixelIndex];
+          const x = xStart + i;
+          const y = yStart + post.topDelta + k;
+          const pos = y * textureWidth + x;
+
+          let packedPixel;
+          if (ENDIAN) {
+            // Correctly pack RGBA into a single Uint32 value for little-endian systems
+            // ABGR (little-endian)
+            packedPixel =
+              (FULL_ALPHA << 24) |
+              (pixelDraw.blue << 16) |
+              (pixelDraw.green << 8) |
+              pixelDraw.red;
+          } else {
+            packedPixel =
+              (pixelDraw.red << 24) |
+              (pixelDraw.green << 16) |
+              (pixelDraw.blue << 8) |
+              FULL_ALPHA;
+          }
+
+          textureUint32Array[pos] = packedPixel;
+        }
+      }
     }
   }
 
