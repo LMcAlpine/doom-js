@@ -287,13 +287,12 @@ class LevelManager {
 
         let textureColumn = Math.floor(start);
 
-        //bandaid
-        if (textureColumn < columns.length) {
-          column = columns[textureColumn];
-        } else {
-          break;
+        if (textureColumn < 0 || textureColumn >= columns.length) {
+          // skip or continue
+          start += inverseScale; // keep the logic consistent
+          continue;
         }
-
+        column = columns[textureColumn];
         console.log(columns.length + "\n");
 
         // Process each post in the texture column
