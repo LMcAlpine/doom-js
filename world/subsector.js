@@ -142,7 +142,7 @@ class Subsector {
     const textureMid =
       thing.z + gameEngine.spriteTopOffset[lump] - gameEngine.player.height;
 
-    vissprites.push({
+    let vs = {
       mapObjectFlags: thing.flags,
       gx: thing.x,
       gy: thing.y,
@@ -154,6 +154,35 @@ class Subsector {
       texture: lump,
       textureMid,
       flip,
-    });
+    };
+
+    // vissprites.push({
+    //   mapObjectFlags: thing.flags,
+    //   gx: thing.x,
+    //   gy: thing.y,
+    //   gz: thing.z,
+    //   gzt: thing.z + gameEngine.spriteTopOffset[lump],
+    //   x1,
+    //   x2,
+    //   scale: xscale,
+    //   texture: lump,
+    //   textureMid,
+    //   flip,
+    // });
+
+    if (flip) {
+      vs.start = gameEngine.spriteWidth[lump] - 1;
+      vs.xiscale = -(1 / xscale);
+    } else {
+      vs.start = 0;
+      vs.xiscale = 1 / xscale;
+    }
+
+    if (vs.x1 > x1) {
+      vs.start += vs.xiscale * (vs.x1 - x1);
+    }
+    vs.patch = lump;
+
+    vissprites.push(vs);
   }
 }

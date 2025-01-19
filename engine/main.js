@@ -42,6 +42,7 @@ async function initializeGameData(file) {
   spriteManager = new SpriteManager(lumpData, patchNames);
 
   gameEngine = new GameEngine("myCanvas", 50);
+  gameEngine.lumpData = lumpData;
   gameEngine.patchNames = patchNames;
   gameEngine.palette = paletteField;
   gameEngine.textures = textureField;
