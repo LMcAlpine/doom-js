@@ -104,7 +104,7 @@ class Subsector {
 
     let tx = -(gyt + gxt);
 
-    if (Math.abs(tx) > Math.abs(tz)) {
+    if (Math.abs(tx) > Math.abs(tz * 4)) {
       return;
     }
 
@@ -139,6 +139,14 @@ class Subsector {
       return;
     }
 
+    // if (x1 < 0) {
+    //   x1 = 0;
+    // }
+
+    // if (x2 > CANVASWIDTH) {
+    //   x2 = CANVASWIDTH - 1;
+    // }
+
     const textureMid =
       thing.z + gameEngine.spriteTopOffset[lump] - gameEngine.player.height;
 
@@ -148,8 +156,8 @@ class Subsector {
       gy: thing.y,
       gz: thing.z,
       gzt: thing.z + gameEngine.spriteTopOffset[lump],
-      x1,
-      x2,
+      x1: x1 < 0 ? 0 : x1,
+      x2: x2 >= CANVASWIDTH ? CANVASWIDTH - 1 : x2,
       scale: xscale,
       texture: lump,
       textureMid,

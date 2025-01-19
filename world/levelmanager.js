@@ -360,7 +360,7 @@ class LevelManager {
 
     for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
       if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
-        this.renderMaskedSegRange(i);
+        //this.renderMaskedSegRange(i);
         //console.log("");
       }
     }
