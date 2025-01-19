@@ -89,12 +89,8 @@ class Subsector {
     // scale factor for sprite width. How large it should appear on screen
     let xscale = HALFWIDTH / tz;
 
-    gxt = -(
-      tr_x * Math.sin(degreesToRadians(gameEngine.player.direction.angle))
-    );
-    gyt = tr_y * Math.cos(degreesToRadians(gameEngine.player.direction.angle));
-
-    let tx = -(gyt + gxt);
+    let tx;
+    ({ tx, gxt, gyt } = this.computeHorizontalOffset(gxt, tr_x, gyt, tr_y));
 
     if (Math.abs(tx) > Math.abs(tz * 4)) {
       return;
@@ -184,6 +180,15 @@ class Subsector {
     vs.patch = lump;
 
     vissprites.push(vs);
+  }
+
+  computeHorizontalOffset(gxt, tr_x, gyt, tr_y) {
+    const angleRad = degreesToRadians(gameEngine.player.direction.angle);
+    gxt = -(tr_x * Math.sin(angleRad));
+    gyt = tr_y * Math.cos(angleRad);
+
+    let tx = -(gyt + gxt);
+    return { tx, gxt, gyt };
   }
 
   computeDepth(thing) {
