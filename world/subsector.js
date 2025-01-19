@@ -105,17 +105,15 @@ class Subsector {
       gameEngine.spriteWidth[lump]
     );
 
+    if (x1 > CANVASWIDTH) {
+      return;
+    }
+
     if (x2 < 0) {
       return;
     }
 
-    // if (x1 < 0) {
-    //   x1 = 0;
-    // }
 
-    // if (x2 > CANVASWIDTH) {
-    //   x2 = CANVASWIDTH - 1;
-    // }
 
     const textureMid =
       thing.z + gameEngine.spriteTopOffset[lump] - gameEngine.player.height;
