@@ -96,21 +96,7 @@ class Subsector {
       return;
     }
 
-    let spriteDef = theSprites[thing.sprite];
-
-    let spriteFrame = spriteDef.spriteFrames[thing.frame];
-
-    let angle;
-    let lump;
-    let rotation;
-    let flip;
-    if (spriteFrame.rotate) {
-      angle = gameEngine.player.angleTowardsVertex(thing);
-      let tempAngle = angle.subtract(thing.angle);
-      rotation = Math.floor(((tempAngle.add(45 / 2).angle * 9) / 45) % 8);
-      lump = spriteFrame.lump[rotation];
-      flip = spriteFrame.flip[rotation];
-    }
+    let { lump, flip } = this.chooseSpriteLump(thing);
 
     tx -= gameEngine.spriteOffset[lump];
 
@@ -180,6 +166,25 @@ class Subsector {
     vs.patch = lump;
 
     vissprites.push(vs);
+  }
+
+  chooseSpriteLump(thing) {
+    let spriteDef = theSprites[thing.sprite];
+
+    let spriteFrame = spriteDef.spriteFrames[thing.frame];
+
+    let angle;
+    let lump;
+    let rotation;
+    let flip;
+    if (spriteFrame.rotate) {
+      angle = gameEngine.player.angleTowardsVertex(thing);
+      let tempAngle = angle.subtract(thing.angle);
+      rotation = Math.floor(((tempAngle.add(45 / 2).angle * 9) / 45) % 8);
+      lump = spriteFrame.lump[rotation];
+      flip = spriteFrame.flip[rotation];
+    }
+    return { lump, flip };
   }
 
   checkFOV(tx, tz) {
