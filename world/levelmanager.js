@@ -286,14 +286,15 @@ class LevelManager {
         let column;
 
         let textureColumn = Math.floor(start);
-
+        console.log(`Column ${x}: textureColumn=${textureColumn}`);
         if (textureColumn < 0 || textureColumn >= columns.length) {
           // skip or continue
           start += inverseScale; // keep the logic consistent
           continue;
         }
+
         column = columns[textureColumn];
-        console.log(columns.length + "\n");
+        // console.log(columns.length + "\n");
 
         // Process each post in the texture column
         // console.log(start);
@@ -307,6 +308,10 @@ class LevelManager {
 
           let yl = Math.ceil(topscreen);
           let yh = Math.floor(bottomscreen);
+
+          console.log(
+            `Post top= ${topscreen} bottom= ${bottomscreen} (yl=${yl} yh=${yh})`
+          );
 
           // Apply vertical clipping
           // if (yh >= floorClip[x]) {
@@ -352,9 +357,10 @@ class LevelManager {
         }
 
         // spriteYScale += vissprites[0].xiscale;
-        // start += vissprites[0].xiscale;
+        // so sprites can flip. xiscale is negative when it needs to flip
+        start += vissprites[0].xiscale;
 
-        start += inverseScale;
+        //  start += inverseScale;
       }
     }
 
