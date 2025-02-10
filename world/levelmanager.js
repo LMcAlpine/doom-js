@@ -207,13 +207,13 @@ class LevelManager {
   }
 
   drawMasked() {
-    if (vissprites.length > 0) {
-      let x1 = vissprites[0].x1;
-      let x2 = vissprites[0].x2;
+    for (let i = 0; i < vissprites.length; i++) {
+      let x1 = vissprites[i].x1;
+      let x2 = vissprites[i].x2;
 
-      let textureMid = vissprites[0].textureMid;
+      let textureMid = vissprites[i].textureMid;
 
-      let patch = gameEngine.lumpData[startIndex + vissprites[0].texture];
+      let patch = gameEngine.lumpData[startIndex + vissprites[i].texture];
 
       const header = this.parsePatchHeader(patch);
 
@@ -223,9 +223,9 @@ class LevelManager {
         patch
       );
 
-      let spriteYScale = vissprites[0].scale;
+      let spriteYScale = vissprites[i].scale;
 
-      let start = vissprites[0].start;
+      let start = vissprites[i].start;
 
       for (let x = x1; x <= x2; x++) {
         let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
@@ -293,7 +293,7 @@ class LevelManager {
 
         // spriteYScale += vissprites[0].xiscale;
         // so sprites can flip. xiscale is negative when it needs to flip
-        start += vissprites[0].xiscale;
+        start += vissprites[i].xiscale;
 
         //  start += inverseScale;
       }
