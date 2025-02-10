@@ -534,10 +534,22 @@ class LevelManager {
 
     mapObject.angle;
 
-    // set a temporary state...
+    let stateName = spawnStateNames[info.spawnstate];
+    if (stateName.startsWith("S_")) {
+      stateName = stateName.slice(2);
+    }
+    let family = stateName.split("_")[0];
+    let sprMark = "SPR_" + family;
+
+    let k;
+    for (k = 0; k < spriteMarkers.length; k++) {
+      if (sprMark === spriteMarkers[k]) {
+        break;
+      }
+    }
 
     let state = {
-      sprite: spriteMarkersNums.SPR_TROO,
+      sprite: k,
       frame: 0,
       tics: 10,
       action: null,
