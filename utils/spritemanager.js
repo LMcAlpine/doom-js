@@ -49,6 +49,14 @@ class SpriteManager {
     endIndex++;
 
     for (let i = 0; i < spriteNames.length; i++) {
+
+      // change this
+      // needed to reset spriteTemp for each new sprite
+      for (let z = 0; z < 29; z++) {
+        spriteTemp[z] = new SpriteFrame();
+      }
+
+      console.log(i);
       maxFrame = -1;
       for (let j = startIndex + 1; j < endIndex; j++) {
         let sprite = this.lumpData[j].name;
@@ -72,8 +80,9 @@ class SpriteManager {
       }
       maxFrame++;
 
+      const temp = Object.assign({}, spriteTemp);
       theSprites[i].framesCount = maxFrame;
-      theSprites[i].spriteFrames = spriteTemp;
+      theSprites[i].spriteFrames = temp;
     }
   }
 
