@@ -351,11 +351,28 @@ class LevelManager {
 
         let silhouette = this.wallRenderer.drawSegments[j].silhouette;
 
+        // if (sprite.gzt <= wall.tsilheight) {
+        //   silhouette &= ~SIL_TOP;
+        // }
+
         if (silhouette === 1) {
           for (let col = r1; col <= r2; col++) {
             // Merge only these columns
             // the overlapping range of the bottom wall portion and sprite
             clipbot[col] = wall.spriteBottomClip[col];
+          }
+        } else if (silhouette === 2) {
+          for (let col = r1; col <= r2; col++) {
+            // Merge only these columns
+            // the overlapping range of the bottom wall portion and sprite
+            cliptop[col] = wall.spriteTopClip[col];
+          }
+        } else if (silhouette === 3) {
+          for (let col = r1; col <= r2; col++) {
+            // Merge only these columns
+
+            clipbot[col] = wall.spriteBottomClip[col];
+            cliptop[col] = wall.spriteTopClip[col];
           }
         }
 
@@ -367,9 +384,9 @@ class LevelManager {
         // if (sprite.gz >= wall.bsilheight) {
         //   silhouette &= ~SIL_BOTTOM;
         // }
-        // // if (sprite.gzt <= wall.tsilheight) {
-        // //   silhouette &= ~SIL_TOP;
-        // // }
+        // if (sprite.gzt <= wall.tsilheight) {
+        //   silhouette &= ~SIL_TOP;
+        // }
 
         // // Update clip arrays over the overlapping range:
         // for (let i = startIndex; i <= endIndex; i++) {
@@ -395,15 +412,20 @@ class LevelManager {
         if (clipbot[x] === -2) {
           clipbot[x] = CANVASHEIGHT;
         }
+        if (cliptop[x] === -2) {
+          cliptop[x] = -1;
+        }
       }
 
       for (let x = x1; x <= x2; x++) {
         //  const index = x - sprite.x1;
         // const allowedTop = cliptop[index];
         //  const allowedBottom = clipbot[index];
-        
+
         // the cutoff for the bottom of the sprite for this column. Based off silhouette
         let allowedBottom = clipbot[x];
+
+        const allowedTop = cliptop[x];
 
         let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
         let inverseScale = 1.0 / spriteYScale;
@@ -431,9 +453,9 @@ class LevelManager {
 
           let bottomscreen = topscreen + spriteYScale * post.length;
 
-          let yl = Math.ceil(topscreen);
+          // let yl = Math.ceil(topscreen);
           // let yh = Math.floor(bottomscreen);
-          // let yl = Math.max(Math.ceil(topscreen), allowedTop + 1);
+          let yl = Math.max(Math.ceil(topscreen), allowedTop + 1);
           let yh = Math.min(Math.floor(bottomscreen), allowedBottom - 1);
 
           // console.log(

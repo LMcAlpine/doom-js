@@ -347,6 +347,11 @@ class WallRenderer {
         drawSeg_O.bsilheight = rightSector.floorHeight;
       }
 
+      if (rightSector.ceilingHeight < leftSector.ceilingHeight) {
+        drawSeg_O.silhouette |= SIL_TOP;
+        drawSeg_O.tsilheight = rightSector.ceilingHeight;
+      }
+
       if (leftSector.ceilingHeight <= rightSector.floorHeight) {
         drawSeg_O.spriteBottomClip = this.negativeOneArray;
       }
@@ -583,7 +588,14 @@ class WallRenderer {
       lightLevel,
       drawSeg_O
     );
+    if (
+      (drawSeg_O.silhouette & SIL_TOP || maskedTexture) &&
+      drawSeg_O.spriteTopClip === null
+    ) {
+      // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
 
+      drawSeg_O.spriteTopClip = [...this.upperclip];
+    }
     if (
       (drawSeg_O.silhouette & SIL_BOTTOM || maskedTexture) &&
       drawSeg_O.spriteBottomClip === null
@@ -591,11 +603,6 @@ class WallRenderer {
       drawSeg_O.spriteBottomClip = [...this.lowerclip];
     }
 
-    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
-      // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
-
-      drawSeg_O.spriteTopClip = [...this.upperclip];
-    }
     // if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
     //   //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
     //   // drawSeg_O.spriteBottomClip = this.lowerclip;

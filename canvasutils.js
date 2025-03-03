@@ -719,6 +719,7 @@ function createSpriteClipArrays(sprite) {
   const clipbot = new Array(numColumns);
   for (let x = sprite.x1; x <= sprite.x2; x++) {
     clipbot[x] = -2;
+    cliptop[x] = -2;
   }
   return { cliptop, clipbot };
 }
