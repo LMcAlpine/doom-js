@@ -252,6 +252,9 @@ class WallRenderer {
         radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
+    // needs to get reset for each seg else data stays from one seg to another
+    drawSeg_O = { x1: 0, x2: 0 };
+
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
     drawSeg_O.currentLine = line;
@@ -335,8 +338,14 @@ class WallRenderer {
       // two sided line
       drawSeg_O.spriteTopClip = null;
       drawSeg_O.spriteBottomClip = null;
+      drawSeg_O.silhouette = 0;
 
       const leftSector = seg.leftSector;
+
+      if (rightSector.floorHeight > leftSector.floorHeight) {
+        drawSeg_O.silhouette = SIL_BOTTOM;
+        drawSeg_O.bsilheight = rightSector.floorHeight;
+      }
 
       if (leftSector.ceilingHeight <= rightSector.floorHeight) {
         drawSeg_O.spriteBottomClip = this.negativeOneArray;
@@ -575,16 +584,23 @@ class WallRenderer {
       drawSeg_O
     );
 
+    if (
+      (drawSeg_O.silhouette & SIL_BOTTOM || maskedTexture) &&
+      drawSeg_O.spriteBottomClip === null
+    ) {
+      drawSeg_O.spriteBottomClip = [...this.lowerclip];
+    }
+
     if (maskedTexture && drawSeg_O.spriteTopClip === null) {
       // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
 
       drawSeg_O.spriteTopClip = [...this.upperclip];
     }
-    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-      //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
-      // drawSeg_O.spriteBottomClip = this.lowerclip;
-      drawSeg_O.spriteBottomClip = [...this.lowerclip];
-    }
+    // if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
+    //   //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
+    //   // drawSeg_O.spriteBottomClip = this.lowerclip;
+    //   drawSeg_O.spriteBottomClip = [...this.lowerclip];
+    // }
     drawSeg_O.point1 = point1;
     drawSeg_O.point2 = point2;
     drawSeg_O.seg = seg;

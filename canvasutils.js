@@ -705,3 +705,64 @@ function createVissprite(x1, x2, scale, texture, textureMid) {
 }
 
 let validCount = 1;
+
+const SIL_TOP = 2;
+const SIL_BOTTOM = 1;
+const SIL_BOTH = 3;
+
+function createSpriteClipArrays(sprite) {
+  // const numColumns = sprite.x2 - sprite.x1 + 1;
+  const numColumns = 320;
+  // const cliptop = new Array(numColumns).fill(-2);
+  // const clipbot = new Array(numColumns).fill(-2);
+  const cliptop = new Array(numColumns);
+  const clipbot = new Array(numColumns);
+  for (let x = sprite.x1; x <= sprite.x2; x++) {
+    clipbot[x] = -2;
+  }
+  return { cliptop, clipbot };
+}
+
+function updateSpriteClipArrays(sprite, wall, clipArrays) {
+  const { cliptop, clipbot } = clipArrays;
+  // Calculate overlapping horizontal range:
+  const r1 = Math.max(wall.x1, sprite.x1);
+  const r2 = Math.min(wall.x2, sprite.x2);
+  if (r1 > r2) return; // No overlap
+
+  const startIndex = r1 - sprite.x1;
+  const endIndex = r2 - sprite.x1;
+
+  // Adjust silhouette based on vertical extents and wall boundaries:
+  let silhouette = wall.silhouette;
+  if (sprite.gz >= wall.bsilheight) {
+    silhouette &= ~SIL_BOTTOM;
+  }
+  // if (sprite.gzt <= wall.tsilheight) {
+  //   silhouette &= ~SIL_TOP;
+  // }
+
+  // Update clip arrays over the overlapping range:
+  for (let i = startIndex; i <= endIndex; i++) {
+    if (
+      (silhouette === SIL_BOTTOM || silhouette === SIL_BOTH) &&
+      clipbot[i] === -2
+    ) {
+      clipbot[i] = wall.sprbottomclip[i]; // wall's precomputed bottom clip for this column
+    }
+    if (
+      (silhouette === SIL_TOP || silhouette === SIL_BOTH) &&
+      cliptop[i] === -2
+    ) {
+      cliptop[i] = wall.sprtopclip[i]; // wall's precomputed top clip for this column
+    }
+  }
+}
+
+function finalizeClipArrays(clipArrays, viewHeight) {
+  const { cliptop, clipbot } = clipArrays;
+  for (let i = 0; i < cliptop.length; i++) {
+    if (cliptop[i] === -2) cliptop[i] = -1;
+    if (clipbot[i] === -2) clipbot[i] = viewHeight;
+  }
+}
