@@ -239,6 +239,7 @@ class LevelManager {
 
     //vissprites.sort((a, b) => a.scale - b.scale);
 
+
     for (let i = 0; i < vissprites.length; i++) {
       let x1 = vissprites[i].x1;
       let x2 = vissprites[i].x2;
@@ -263,75 +264,6 @@ class LevelManager {
 
       let start = vissprites[i].start;
 
-      // for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
-
-      //   // what exactly is this even doing? I don't think it is doing what I intended
-      //   // if (
-      //   //   this.wallRenderer.drawSegments[j].x1 > x2 ||
-      //   //   this.wallRenderer.drawSegments[j].x2 < x1 ||
-      //   //   !this.wallRenderer.drawSegments[j].maskedTextureCol
-      //   // ) {
-      //   //   continue;
-      //   // }
-
-      //   let r1 = Math.max(this.wallRenderer.drawSegments[j].x1, x1);
-
-      //   // let r1 =
-      //   //   this.wallRenderer.drawSegments[j].x1 < x1
-      //   //     ? x1
-      //   //     : this.wallRenderer.drawSegments[j].x1;
-
-      //   // let r2 =
-      //   //   this.wallRenderer.drawSegments[j].x2 > x2
-      //   //     ? x2
-      //   //     : this.wallRenderer.drawSegments[j].x2;
-
-      //   let r2 = Math.min(this.wallRenderer.drawSegments[j].x2, x2);
-
-      //   let lowScale;
-      //   let scale;
-      //   if (
-      //     this.wallRenderer.drawSegments[j].scale1 >
-      //     this.wallRenderer.drawSegments[j].scale2
-      //   ) {
-      //     lowScale = this.wallRenderer.drawSegments[j].scale2;
-      //     scale = this.wallRenderer.drawSegments[j].scale1;
-      //   } else {
-      //     lowScale = this.wallRenderer.drawSegments[j].scale1;
-      //     scale = this.wallRenderer.drawSegments[j].scale2;
-      //   }
-      //   let wall = this.wallRenderer.drawSegments[j];
-      //   console.log(`masked wall Scale ${scale}`);
-
-      //   console.log(vissprites[i]);
-      //   console.log(vissprites.length);
-      //   console.log(vissprites);
-      //   console.log(vissprites[i].gx);
-      //   if (
-      //     scale < spriteYScale ||
-      //     (lowScale < spriteYScale &&
-      //       !this.isPointOnLeftSide(
-      //         vissprites[i].gx,
-      //         vissprites[i].gy,
-      //         this.wallRenderer.drawSegments[j].currentLine
-      //       ))
-      //   ) {
-      //     if (this.wallRenderer.drawSegments[j].maskedTextureCol) {
-      //       // this.wallRenderer.drawSegments[i].x1 = r1;
-      //       // this.wallRenderer.drawSegments[i].x2 = r2;
-
-      //       // console.log("here");
-      //       // console.log(`masked wall Scale ${scale}`);
-
-      //       // console.log(`Demon Scale ${spriteYScale}: name=${patch.name}`);
-      //       updateSpriteClipArrays(sprite, wall, clipArrays);
-      //       this.renderMaskedSegRange(j, r1, r2);
-      //       continue;
-      //     }
-      //   }
-
-      //   //let silhouette = this.wallRenderer.drawSegments[j].silhouette;
-      // }
       let { cliptop, clipbot } = clipArrays;
       for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
         if (
@@ -348,6 +280,35 @@ class LevelManager {
         // Calculate overlapping horizontal range:
         const r1 = Math.max(wall.x1, sprite.x1);
         const r2 = Math.min(wall.x2, sprite.x2);
+
+        let lowScale;
+        let scale;
+        if (
+          this.wallRenderer.drawSegments[j].scale1 >
+          this.wallRenderer.drawSegments[j].scale2
+        ) {
+          lowScale = this.wallRenderer.drawSegments[j].scale2;
+          scale = this.wallRenderer.drawSegments[j].scale1;
+        } else {
+          lowScale = this.wallRenderer.drawSegments[j].scale1;
+          scale = this.wallRenderer.drawSegments[j].scale2;
+        }
+
+        if (
+          scale < spriteYScale ||
+          (lowScale < spriteYScale &&
+            !this.isPointOnLeftSide(
+              vissprites[i].gx,
+              vissprites[i].gy,
+              this.wallRenderer.drawSegments[j].currentLine
+            ))
+        ) {
+          if (this.wallRenderer.drawSegments[j].maskedTextureCol) {
+            this.renderMaskedSegRange(j, r1, r2);
+          }
+          // seg is behind sprite
+          continue;
+        }
 
         let silhouette = this.wallRenderer.drawSegments[j].silhouette;
 
@@ -375,38 +336,7 @@ class LevelManager {
             cliptop[col] = wall.spriteTopClip[col];
           }
         }
-
-        // const startIndex = r1 - sprite.x1;
-        // const endIndex = r2 - sprite.x1;
-
-        // // Adjust silhouette based on vertical extents and wall boundaries:
-        // let silhouette = wall.silhouette;
-        // if (sprite.gz >= wall.bsilheight) {
-        //   silhouette &= ~SIL_BOTTOM;
-        // }
-        // if (sprite.gzt <= wall.tsilheight) {
-        //   silhouette &= ~SIL_TOP;
-        // }
-
-        // // Update clip arrays over the overlapping range:
-        // for (let i = startIndex; i <= endIndex; i++) {
-        //   if (
-        //     (silhouette === SIL_BOTTOM || silhouette === SIL_BOTH) &&
-        //     clipbot[i] === -2
-        //   ) {
-        //     clipbot[i] = wall.spriteBottomClip[i]; // wall's precomputed bottom clip for this column
-        //   }
-        //   // if (
-        //   //   (silhouette === SIL_TOP || silhouette === SIL_BOTH) &&
-        //   //   cliptop[i] === -2
-        //   // ) {
-        //   //  // cliptop[i] = wall.sprtopclip[i]; // wall's precomputed top clip for this column
-        //   // }
-        // }
       }
-
-      // finalizeClipArrays(clipArrays, HALFHEIGHT + HALFHEIGHT);
-      // const { cliptop, clipbot } = clipArrays;
 
       for (let x = x1; x <= x2; x++) {
         if (clipbot[x] === -2) {
@@ -461,15 +391,6 @@ class LevelManager {
           // console.log(
           //   `Post top= ${topscreen} bottom= ${bottomscreen} (yl=${yl} yh=${yh})`
           // );
-
-          // Apply vertical clipping
-          // if (yh >= floorClip[x]) {
-          //   yh = floorClip[x] - 1;
-          //   // yh = floorClip[x];
-          // }
-          // if (yl <= ceilingClip[x]) {
-          //   yl = ceilingClip[x] + 1;
-          // }
 
           for (let row = yl; row <= yh; row++) {
             let rowInPost = Math.floor((row - topscreen) / spriteYScale);
@@ -566,8 +487,8 @@ class LevelManager {
     // console.log(textureName);
     for (let x = r1; x <= r2; x++) {
       console.log(`Segment rx=${x}, r2=${r2}, Texture=${textureName}`);
-      let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
-      let inverseScale = 1.0 / spriteYScale;
+      // let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
+      // let inverseScale = 1.0 / spriteYScale;
 
       let textureColumnIndex = maskedTextureCol[x];
       // console.log("Y Offset:", currentLine.rightSidedef.yOffset);
@@ -577,7 +498,10 @@ class LevelManager {
       // console.log(
       //   `X=${x}, spriteYScale=${spriteYScale}, rwScaleStep=${rwScaleStep}`
       // );
-      if (textureColumnIndex != null) {
+      if (textureColumnIndex !== 0x7fff) {
+        let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
+        let inverseScale = 1.0 / spriteYScale;
+
         // console.log("Before Wrapping:", textureColumnIndex);
         // console.log(
         //   "Columns Length:",
@@ -630,6 +554,7 @@ class LevelManager {
             this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
           );
         }
+        maskedTextureCol[x] = 0x7fff;
       }
 
       spriteYScale += rwScaleStep;
@@ -906,7 +831,7 @@ class LevelManager {
     const lineDx = currentLine.endVertex.x - currentLine.startVertex.x;
     const lineDy = currentLine.endVertex.y - currentLine.startVertex.y;
 
-    const result = Math.round(dx * lineDx - dy * lineDy);
+    const result = Math.round(dx * lineDy - dy * lineDx);
 
     return result <= 0;
   }
