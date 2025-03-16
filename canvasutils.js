@@ -608,11 +608,16 @@ let startIndex;
 let endIndex;
 let maxFrame = -1;
 
-let theSprites = [];
+// let theSprites = [];
+// for (let i = 0; i < spriteNames.length; i++) {
+//   theSprites[i] = new SpriteDef();
+// }
 
-for (let i = 0; i < spriteNames.length; i++) {
-  theSprites[i] = new SpriteDef();
-}
+let theSprites = new Map();
+// for (let i = 0; i < spriteNames.length; i++) {
+//   theSprites.set("SPR_" + spriteNames[i], new SpriteDef(-1, []));
+// }
+
 let spriteTemp = [];
 
 for (let i = 0; i < 29; i++) {
@@ -630,18 +635,20 @@ function installSpriteLump(lump, frame, rotation, flipped) {
   }
 
   if (rotation === 0) {
-    if (spriteTemp[frame].rotate === false) {
-      console.log(`frame ${frame} has multiple rotation=0 lump`);
-      return;
-    }
-    if (spriteTemp[frame].rotate === true) {
-      console.log(`frame ${frame} has rotations and a rotation=0 lump`);
-      return;
+    if (spriteTemp[frame].rotate !== undefined) {
+      if (spriteTemp[frame].rotate === false) {
+        console.log(`frame ${frame} has multiple rotation=0 lump`);
+        return;
+      }
+      if (spriteTemp[frame].rotate === true) {
+        console.log(`frame ${frame} has rotations and a rotation=0 lump`);
+        return;
+      }
     }
 
     spriteTemp[frame].rotate = false;
     for (let i = 0; i < 8; i++) {
-      spriteTemp[frame].lump[i] = lump;
+      spriteTemp[frame].lump[i] = lump - startIndex;
       spriteTemp[frame].flip[i] = flipped;
     }
     return;

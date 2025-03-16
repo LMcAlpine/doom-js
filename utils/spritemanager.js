@@ -49,7 +49,6 @@ class SpriteManager {
     endIndex++;
 
     for (let i = 0; i < spriteNames.length; i++) {
-
       // change this
       // needed to reset spriteTemp for each new sprite
       for (let z = 0; z < 29; z++) {
@@ -81,8 +80,14 @@ class SpriteManager {
       maxFrame++;
 
       const temp = Object.assign({}, spriteTemp);
-      theSprites[i].framesCount = maxFrame;
-      theSprites[i].spriteFrames = temp;
+      theSprites.set("SPR_" + spriteNames[i], new SpriteDef(maxFrame, temp));
+      // theSprites[i].framesCount = maxFrame;
+      // theSprites[i].spriteFrames = temp;
+      // for (let [key, value] of theSprites) {
+      //   value.framesCount = maxFrame;
+      //   value.spriteFrames = temp;
+      //   // theSprites.set(key, value);
+      // }
     }
   }
 

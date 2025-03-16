@@ -21,6 +21,14 @@ function onLoadLevelClicked(levelName) {
 
 initDOM(onFileSelected, onLoadLevelClicked);
 
+async function loadData(name) {
+  const response = await fetch(name);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+}
+
 async function initializeGameData(file) {
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
@@ -54,6 +62,11 @@ async function initializeGameData(file) {
     gameEngine.spriteOffset = spriteOffset;
     gameEngine.spriteTopOffset = spriteTopOffset;
   }
+
+  const infoDefinitions = await loadData("info_definitions.json");
+  gameEngine.infoDefinitions = infoDefinitions;
+  const states = await loadData("states.json");
+  gameEngine.states = states;
 
   const canvas = new Canvas("myCanvas");
   gameEngine.canvas = canvas;

@@ -239,7 +239,6 @@ class LevelManager {
 
     //vissprites.sort((a, b) => a.scale - b.scale);
 
-
     for (let i = 0; i < vissprites.length; i++) {
       let x1 = vissprites[i].x1;
       let x2 = vissprites[i].x2;
@@ -626,24 +625,40 @@ class LevelManager {
       return;
     }
 
-    // find which type to spawn
-    for (i = 0; i < arr.length; i++) {
-      // map maybe instead?
-      if (mapThing.type == mapinfo[i].doomednum) {
+    if (mapThing.type === 11) {
+      return;
+    }
+
+    let key;
+    for (key in gameEngine.infoDefinitions) {
+      if (mapThing.type == gameEngine.infoDefinitions[key].doomednum) {
         break;
       }
+    }
+
+    // find which type to spawn
+    // for (i = 0; i < arr.length; i++) {
+    //   // map maybe instead?
+    //   // if (mapThing.type == mapinfo[i].doomednum) {
+    //   //   break;
+    //   // }
+
+    // }
+
+    if (i === arr.length) {
+      return;
     }
 
     x = mapThing.xPosition;
     y = mapThing.yPosition;
 
-    if (mapinfo[i].flags & 8) {
+    if (gameEngine.infoDefinitions[key].flags & 8) {
       z = ONCEILINGZ;
     } else {
       z = ONFLOORZ;
     }
 
-    mapObject = this.spawnMapObject(x, y, z, i);
+    mapObject = this.spawnMapObject(x, y, z, key);
 
     mapObject.angle = Math.floor((mapThing.direction / 45) * 45);
   }
@@ -655,7 +670,7 @@ class LevelManager {
 
   spawnMapObject(x, y, z, type) {
     let mapObject = {};
-    let info = mapinfo[type];
+    let info = gameEngine.infoDefinitions[type];
 
     mapObject.type = type;
     mapObject.info = info;
@@ -668,35 +683,50 @@ class LevelManager {
 
     mapObject.angle;
 
-    let stateName = spawnStateNames[info.spawnstate];
-    if (stateName.startsWith("S_")) {
-      stateName = stateName.slice(2);
-    }
-    let family = stateName.split("_")[0];
-    let sprMark = "SPR_" + family;
-
-    let k;
-    for (k = 0; k < spriteMarkers.length; k++) {
-      if (sprMark === spriteMarkers[k]) {
+    let stateName = info.spawnstate;
+    let state;
+    let key;
+    for (key in gameEngine.states) {
+      if (stateName == key) {
+        state = gameEngine.states[key];
         break;
       }
     }
 
-    let state = {
-      sprite: k,
-      frame: 0,
-      tics: 10,
-      action: null,
-      nextState: 0,
-    };
+    // no more index number to determine what a name is. The name is just directly in info.spawnstate now
+    // this below is problematic because the family names don't always form the the sprite marker.
+    // for example GIBS, it doesn't form the sprite for POL5
+    // let stateName = spawnStateNames[info.spawnstate];
+    // if (stateName.startsWith("S_")) {
+    //   stateName = stateName.slice(2);
+    // }
+    // let family = stateName.split("_")[0];
+    // let sprMark = "SPR_" + family;
 
+    // let k;
+    // for (k = 0; k < spriteMarkers.length; k++) {
+    //   if (sprMark === spriteMarkers[k]) {
+    //     break;
+    //   }
+    // }
+
+    // let state = {
+    //   sprite: k,
+    //   frame: 0,
+    //   tics: 10,
+    //   action: null,
+    //   nextState: 0,
+    // };
     mapObject.state = state;
+    mapObject.sprite = state[0];
+    mapObject.frame = state[1];
+    mapObject.tics = state[2];
 
-    mapObject.tics = state.tics;
+    // mapObject.tics = state.tics;
 
-    mapObject.sprite = state.sprite;
+    // mapObject.sprite = state.sprite;
 
-    mapObject.frame = state.frame;
+    // mapObject.frame = state.frame;
 
     this.setThingPosition(mapObject);
 
@@ -706,7 +736,8 @@ class LevelManager {
     if (z == ONFLOORZ) {
       mapObject.z = mapObject.floorz;
     } else if (z == ONCEILINGZ) {
-      mapObject.z = mapObject.ceilingz - mapinfo[i].height;
+      // mapObject.z = mapObject.ceilingz - mapinfo[i].height;
+      mapObject.z = mapObject.ceilingz - info.height;
     } else {
       mapObject.z = z;
     }

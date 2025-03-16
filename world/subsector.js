@@ -169,10 +169,15 @@ class Subsector {
   }
 
   chooseSpriteLump(thing) {
-    let spriteDef = theSprites[thing.sprite];
+    let spriteDef = theSprites.get(thing.sprite);
+    // ... 32768... the fullbright frames. Just set to 0 for now...
+    // 28 is the max frames
+    if (thing.frame > 28) {
+      thing.frame = 0;
+    }
     let spriteFrame = spriteDef.spriteFrames[thing.frame];
 
-    if (!spriteDef.rotate) {
+    if (!spriteFrame.rotate) {
       // no rotation
       return { lump: spriteFrame.lump[0], flip: spriteFrame.flip[0] };
     }
