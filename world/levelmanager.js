@@ -259,7 +259,7 @@ class LevelManager {
 
       let spriteYScale = vissprites[i].scale;
 
-      console.log(`Demon Scale ${spriteYScale}: name=${patch.name}`);
+      //console.log(`Demon Scale ${spriteYScale}: name=${patch.name}`);
 
       let start = vissprites[i].start;
 
@@ -606,6 +606,9 @@ class LevelManager {
     let spawnThing;
     for (let i = 0; i < this.things.length; i++) {
       mapThing = this.things[i];
+      if (mapThing.type === 81) {
+        console.log("why?");
+      }
 
       spawnThing = mapThing;
 
@@ -629,11 +632,26 @@ class LevelManager {
       return;
     }
 
+    // some definitions were never filled and were just like {}
+    // so the key is never found and then it just is stuck with the last accessed key. This is why the shotgun is not spawning
+    // I made changes to the python code to resolve it...
+    // I should add logic for if the key is never found...?
+
+    // I definitely need to keep in mind the structure of data
+    // I know now that it wasnt finding the key
+    // I wrongly make assumptions that things just work
+    // But I should keep in mind that when searching through arrays or maps or other data that what if I dont find what I am looking for?
+    let found = false;
     let key;
     for (key in gameEngine.infoDefinitions) {
       if (mapThing.type == gameEngine.infoDefinitions[key].doomednum) {
+        found = true;
         break;
       }
+    }
+
+    if (!found) {
+      console.error("NOT FOUND");
     }
 
     // find which type to spawn

@@ -157,6 +157,11 @@ class Subsector {
       textureMid,
       flip,
     };
+    console.log(thing.z);
+    console.log(gameEngine.spriteTopOffset[lump]);
+    if (gameEngine.spriteTopOffset[lump] === undefined) {
+      console.log(thing.z);
+    }
 
     if (flip) {
       vs.start = gameEngine.spriteWidth[lump] - 1;
