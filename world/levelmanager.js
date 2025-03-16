@@ -764,7 +764,14 @@ class LevelManager {
   }
 
   setThingPosition(thing) {
-    let subsec = this.pointInSubsector(thing.xPosition, thing.yPosition);
+    // mistakenly thought x and y were named xPosition and yPosition....
+    // this above caused the program to not find the correct subsector... how long was this mistake here?
+    // the x and y are named xPosition and yPosition at one point but I store the positions as x and y at a later point
+    // the sprites (barrel in my small example) were getting drawn at the wrong subsector height.
+    // I figured it out by making a small map and noticing that the program was matching the thing to a different subsector.
+    // my small map had two different sectors.
+    // let subsec = this.pointInSubsector(thing.xPosition, thing.yPosition);
+    let subsec = this.pointInSubsector(thing.x, thing.y);
     thing.subsector = subsec;
 
     let sec;
