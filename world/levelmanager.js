@@ -288,153 +288,54 @@ class LevelManager {
   }
 
   drawMasked() {
-    // Need to sort the vissprites in ascending order
+    // this function has separate responsibilities.
+    /*
+      - it loops through all the vissprites
+      - it retrieves patch, header, columns (texture related info)
+      - it loops through the draw segments
+      - it determines if a wall segment overlaps with the vissprite
+      - it calculates overlapping horizontal range
+      - it determines scales
+      - it checks if a masked seg should be drawn
+      - it sets clip arrays based off silhouette
+      - it sets clip markings if values are default (-2)
+      - it iterates through horizontal range of the sprite
+      - it calculates texture information like texture column
+      - it iterates through pixels in a column
+      - it processes each post in a column
+      - it calculates y values
+      - it iterates through the y values in a column
+      - it draws the pixels to the buffer
 
-    // check the scales...
+      - after everything it checks if there are any remaining masked segments. 
+    */
 
-    // I want to sort based off the scales. How can I sort off the scales?
-
-    // The challenge is I don't know if the current scale I am looking at is the greatest scale
-    // In other words, I don't know if it is the correct order.
-    // It is like I need to iterate through and just find the greatest scale. But what does that do for me?
-    // I could try a linked list...
-
-    // bubble sort...
-
-    // let length = vissprites.length - 1;
-    // let sorted = false;
-
-    // while (!sorted) {
-    //   sorted = true;
-    //   for (let i = 0; i < length; i++) {
-    //     if (vissprites[i].scale > vissprites[i + 1].scale) {
-    //       let temp = vissprites[i];
-    //       vissprites[i] = vissprites[i + 1];
-    //       vissprites[i + 1] = temp;
-    //       sorted = false;
-    //     }
-    //   }
-    //   length -= 1;
-    // }
-    // console.log(vissprites);
-
-    //vissprites.sort((a, b) => a.scale - b.scale);
+    // What is the main decision or action this function needs to perform?
+    // draw masked...
 
     for (let i = 0; i < vissprites.length; i++) {
-      let x1 = vissprites[i].x1;
-      let x2 = vissprites[i].x2;
-      let sprite = vissprites[i];
+      let { sprite, x2, x1, spriteYScale, textureMid, start } =
+        this.getSpriteProperties(i);
       const clipArrays = createSpriteClipArrays(sprite);
 
-      let textureMid = vissprites[i].textureMid;
-
-      let patch = gameEngine.lumpData[startIndex + vissprites[i].texture];
-
-      const header = this.parsePatchHeader(patch);
-
-      const columns = this.parsePatchColumns(
-        header.columnOffsets,
-        header,
-        patch
-      );
-
-      let spriteYScale = vissprites[i].scale;
-
-      //console.log(`Demon Scale ${spriteYScale}: name=${patch.name}`);
-
-      let start = vissprites[i].start;
+      const columns = this.getColumnData(i);
 
       let { cliptop, clipbot } = clipArrays;
-      for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
-        if (
-          this.wallRenderer.drawSegments[j].x1 > x2 ||
-          this.wallRenderer.drawSegments[j].x2 < x1 ||
-          (!this.wallRenderer.drawSegments[j].silhouette &&
-            !this.wallRenderer.drawSegments[j].maskedTextureCol)
-        ) {
-          continue;
-        }
+      this.checkIfWallOverlapsSprite(
+        x2,
+        x1,
+        sprite,
+        spriteYScale,
+        i,
+        clipbot,
+        cliptop
+      );
 
-        let wall = this.wallRenderer.drawSegments[j];
-
-        // Calculate overlapping horizontal range:
-        const r1 = Math.max(wall.x1, sprite.x1);
-        const r2 = Math.min(wall.x2, sprite.x2);
-
-        let lowScale;
-        let scale;
-        if (
-          this.wallRenderer.drawSegments[j].scale1 >
-          this.wallRenderer.drawSegments[j].scale2
-        ) {
-          lowScale = this.wallRenderer.drawSegments[j].scale2;
-          scale = this.wallRenderer.drawSegments[j].scale1;
-        } else {
-          lowScale = this.wallRenderer.drawSegments[j].scale1;
-          scale = this.wallRenderer.drawSegments[j].scale2;
-        }
-
-        if (
-          scale < spriteYScale ||
-          (lowScale < spriteYScale &&
-            !this.isPointOnLeftSide(
-              vissprites[i].gx,
-              vissprites[i].gy,
-              this.wallRenderer.drawSegments[j].currentLine
-            ))
-        ) {
-          if (this.wallRenderer.drawSegments[j].maskedTextureCol) {
-            this.renderMaskedSegRange(j, r1, r2);
-          }
-          // seg is behind sprite
-          continue;
-        }
-
-        let silhouette = this.wallRenderer.drawSegments[j].silhouette;
-
-        // if (sprite.gzt <= wall.tsilheight) {
-        //   silhouette &= ~SIL_TOP;
-        // }
-
-        if (silhouette === 1) {
-          for (let col = r1; col <= r2; col++) {
-            // Merge only these columns
-            // the overlapping range of the bottom wall portion and sprite
-            clipbot[col] = wall.spriteBottomClip[col];
-          }
-        } else if (silhouette === 2) {
-          for (let col = r1; col <= r2; col++) {
-            // Merge only these columns
-            // the overlapping range of the bottom wall portion and sprite
-            cliptop[col] = wall.spriteTopClip[col];
-          }
-        } else if (silhouette === 3) {
-          for (let col = r1; col <= r2; col++) {
-            // Merge only these columns
-
-            clipbot[col] = wall.spriteBottomClip[col];
-            cliptop[col] = wall.spriteTopClip[col];
-          }
-        }
-      }
+      this.setClipMarkings(x1, x2, clipbot, cliptop);
 
       for (let x = x1; x <= x2; x++) {
-        if (clipbot[x] === -2) {
-          clipbot[x] = CANVASHEIGHT;
-        }
-        if (cliptop[x] === -2) {
-          cliptop[x] = -1;
-        }
-      }
-
-      for (let x = x1; x <= x2; x++) {
-        //  const index = x - sprite.x1;
-        // const allowedTop = cliptop[index];
-        //  const allowedBottom = clipbot[index];
-
         // the cutoff for the bottom of the sprite for this column. Based off silhouette
-        let allowedBottom = clipbot[x];
-
+        const allowedBottom = clipbot[x];
         const allowedTop = cliptop[x];
 
         let spritetopscreen = HALFHEIGHT - spriteYScale * textureMid;
@@ -451,56 +352,25 @@ class LevelManager {
         }
 
         column = columns[textureColumn];
-        // console.log(columns.length + "\n");
 
-        // Process each post in the texture column
-        // console.log(start);
-        // console.log(textureColumn);
-        for (let j = 0; j < column.length; j++) {
-          const post = column[j];
+        this.processEachPostInTextureColumn(
+          column,
+          spritetopscreen,
+          spriteYScale,
+          allowedTop,
+          allowedBottom,
+          x
+        );
 
-          let topscreen = spritetopscreen + spriteYScale * post.topDelta;
-
-          let bottomscreen = topscreen + spriteYScale * post.length;
-
-          // let yl = Math.ceil(topscreen);
-          // let yh = Math.floor(bottomscreen);
-          let yl = Math.max(Math.ceil(topscreen), allowedTop + 1);
-          let yh = Math.min(Math.floor(bottomscreen), allowedBottom - 1);
-
-          // console.log(
-          //   `Post top= ${topscreen} bottom= ${bottomscreen} (yl=${yl} yh=${yh})`
-          // );
-
-          for (let row = yl; row <= yh; row++) {
-            let rowInPost = Math.floor((row - topscreen) / spriteYScale);
-
-            if (rowInPost >= 0 && rowInPost < post.data.length) {
-              let colorIndex = post.data[rowInPost];
-
-              if (colorIndex !== 0) {
-                let colorObj = gameEngine.palette.palettes[0][colorIndex];
-                let r = colorObj.red;
-                let g = colorObj.green;
-                let b = colorObj.blue;
-                let a = 255;
-
-                let screenPos = row * CANVASWIDTH + x;
-                gameEngine.canvas.screenBuffer[screenPos] =
-                  (a << 24) | (b << 16) | (g << 8) | r;
-              }
-            }
-          }
-        }
-
-        // spriteYScale += vissprites[0].xiscale;
         // so sprites can flip. xiscale is negative when it needs to flip
         start += vissprites[i].xiscale;
-
-        //  start += inverseScale;
       }
     }
 
+    this.drawRemainingMaskedSegments();
+  }
+
+  drawRemainingMaskedSegments() {
     for (let i = this.wallRenderer.drawSegments.length - 1; i >= 0; i--) {
       if (this.wallRenderer.drawSegments[i].maskedTextureCol) {
         this.renderMaskedSegRange(
@@ -511,6 +381,191 @@ class LevelManager {
         //console.log("");
       }
     }
+  }
+
+  processEachPostInTextureColumn(
+    column,
+    spritetopscreen,
+    spriteYScale,
+    allowedTop,
+    allowedBottom,
+    x
+  ) {
+    for (let j = 0; j < column.length; j++) {
+      const post = column[j];
+
+      let topscreen = spritetopscreen + spriteYScale * post.topDelta;
+
+      let bottomscreen = topscreen + spriteYScale * post.length;
+
+      let yl = Math.max(Math.ceil(topscreen), allowedTop + 1);
+      let yh = Math.min(Math.floor(bottomscreen), allowedBottom - 1);
+
+      this.iterateThroughSpriteRows(yl, yh, topscreen, spriteYScale, post, x);
+    }
+  }
+
+  iterateThroughSpriteRows(yl, yh, topscreen, spriteYScale, post, x) {
+    for (let row = yl; row <= yh; row++) {
+      let rowInPost = Math.floor((row - topscreen) / spriteYScale);
+
+      if (rowInPost >= 0 && rowInPost < post.data.length) {
+        let colorIndex = post.data[rowInPost];
+
+        if (colorIndex !== 0) {
+          this.drawSpritePixels(colorIndex, row, x);
+        }
+      }
+    }
+  }
+
+  drawSpritePixels(colorIndex, row, x) {
+    let colorObj = gameEngine.palette.palettes[0][colorIndex];
+    let r = colorObj.red;
+    let g = colorObj.green;
+    let b = colorObj.blue;
+    let a = 255;
+
+    let screenPos = row * CANVASWIDTH + x;
+    gameEngine.canvas.screenBuffer[screenPos] =
+      (a << 24) | (b << 16) | (g << 8) | r;
+  }
+
+  getSpriteProperties(i) {
+    let sprite = vissprites[i];
+    let x1 = sprite.x1;
+    let x2 = sprite.x2;
+
+    let spriteYScale = sprite.scale;
+    let textureMid = sprite.textureMid;
+    let start = sprite.start;
+    return { sprite, x2, x1, spriteYScale, textureMid, start };
+  }
+
+  getColumnData(i) {
+    let patch = gameEngine.lumpData[startIndex + vissprites[i].texture];
+
+    const header = this.parsePatchHeader(patch);
+
+    const columns = this.parsePatchColumns(header.columnOffsets, header, patch);
+    return columns;
+  }
+
+  setClipMarkings(x1, x2, clipbot, cliptop) {
+    for (let x = x1; x <= x2; x++) {
+      if (clipbot[x] === -2) {
+        clipbot[x] = CANVASHEIGHT;
+      }
+      if (cliptop[x] === -2) {
+        cliptop[x] = -1;
+      }
+    }
+  }
+
+  checkIfWallOverlapsSprite(x2, x1, sprite, spriteYScale, i, clipbot, cliptop) {
+    for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
+      let wall = this.wallRenderer.drawSegments[j];
+      if (
+        wall.x1 > x2 ||
+        wall.x2 < x1 ||
+        (!wall.silhouette && !wall.maskedTextureCol)
+      ) {
+        continue;
+      }
+
+      const { r1, r2 } = this.calculateOverlapBetweenWallAndSprite(
+        wall,
+        sprite
+      );
+
+      let lowScale;
+      let scale;
+      ({ lowScale, scale } = this.determineScale(j, lowScale, scale));
+
+      if (this.isWallBehindSprite(wall, sprite, lowScale, scale)) {
+        if (wall.maskedTextureCol) {
+          this.renderMaskedSegRange(j, r1, r2);
+        }
+        // seg is behind sprite
+        continue;
+      }
+
+      let silhouette = this.wallRenderer.drawSegments[j].silhouette;
+
+      // if (sprite.gzt <= wall.tsilheight) {
+      //   silhouette &= ~SIL_TOP;
+      // }
+      this.setClipArraysBasedOnSilhouette(
+        silhouette,
+        r1,
+        r2,
+        clipbot,
+        wall,
+        cliptop
+      );
+    }
+  }
+
+  isWallBehindSprite(wall, sprite, lowScale, scale) {
+    return (
+      scale < sprite.scale ||
+      (lowScale < sprite.scale &&
+        !this.isPointOnLeftSide(sprite.gx, sprite.gy, wall.currentLine))
+    );
+  }
+
+  calculateOverlapBetweenWallAndSprite(wall, sprite) {
+    const r1 = Math.max(wall.x1, sprite.x1);
+    const r2 = Math.min(wall.x2, sprite.x2);
+    return { r1, r2 };
+  }
+
+  setClipArraysBasedOnSilhouette(silhouette, r1, r2, clipbot, wall, cliptop) {
+    if (silhouette === 1) {
+      this.setBottomClipArray(r1, r2, clipbot, wall);
+    } else if (silhouette === 2) {
+      this.setTopClipArray(r1, r2, cliptop, wall);
+    } else if (silhouette === 3) {
+      this.setTopAndBottomClipArray(r1, r2, clipbot, wall, cliptop);
+    }
+  }
+
+  setTopAndBottomClipArray(r1, r2, clipbot, wall, cliptop) {
+    for (let col = r1; col <= r2; col++) {
+      // Merge only these columns
+      clipbot[col] = wall.spriteBottomClip[col];
+      cliptop[col] = wall.spriteTopClip[col];
+    }
+  }
+
+  setTopClipArray(r1, r2, cliptop, wall) {
+    for (let col = r1; col <= r2; col++) {
+      // Merge only these columns
+      // the overlapping range of the bottom wall portion and sprite
+      cliptop[col] = wall.spriteTopClip[col];
+    }
+  }
+
+  setBottomClipArray(r1, r2, clipbot, wall) {
+    for (let col = r1; col <= r2; col++) {
+      // Merge only these columns
+      // the overlapping range of the bottom wall portion and sprite
+      clipbot[col] = wall.spriteBottomClip[col];
+    }
+  }
+
+  determineScale(j, lowScale, scale) {
+    if (
+      this.wallRenderer.drawSegments[j].scale1 >
+      this.wallRenderer.drawSegments[j].scale2
+    ) {
+      lowScale = this.wallRenderer.drawSegments[j].scale2;
+      scale = this.wallRenderer.drawSegments[j].scale1;
+    } else {
+      lowScale = this.wallRenderer.drawSegments[j].scale1;
+      scale = this.wallRenderer.drawSegments[j].scale2;
+    }
+    return { lowScale, scale };
   }
 
   renderMaskedSegRange(i, r1, r2) {
