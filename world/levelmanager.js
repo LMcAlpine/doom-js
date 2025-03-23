@@ -91,6 +91,23 @@ class LevelManager {
     traverseCount = 0;
 
     // visplanes
+    this.drawVisplanes();
+
+    // masked wall
+    this.drawMasked();
+  }
+
+  drawVisplanes() {
+    // this function has separate responsibilities.
+    /*
+      - it loops through all the visplanes
+      - it branches based off texture type (SKY versus regular flat)
+      - it calculates texture data
+      - it renders columns and pixels (inner loops that do the actual drawing)
+    */
+
+    // What is the main decision or action this function needs to perform?
+    // this function needs to draw visplanes
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];
 
@@ -98,51 +115,12 @@ class LevelManager {
       let textureHeightSky;
       let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
-        let { episode, map, game } = gameEngine.currentLevelInfo;
-        let skyname;
-
-        switch (episode) {
-          case 1:
-            skyname = "SKY1";
-            break;
-          case 2:
-            skyname = "SKY2";
-            break;
-          case 3:
-            skyname = "SKY3";
-            break;
-          case 4:
-            skyname = "SKY4";
-            break;
-        }
-
-        let r = this.wallRenderer.textureManager.texturePool.get(skyname);
-        textureWidthSky = r.textureWidth;
-        textureHeightSky = r.textureHeight;
-        textureDataSky = r.textureImageData;
-
-        for (let x = visplane.minX; x <= visplane.maxX; x++) {
-          let topY = visplane.top[x];
-          let bottomY = visplane.bottom[x];
-
-          if (topY <= bottomY) {
-            let textureColumn =
-              (gameEngine.player.direction.angle + getXToAngle(x)) * 2.8444; // Random number. No idea. Credit to room4doom for the random number
-
-            this.wallRenderer.drawColumn(
-              CANVASHEIGHT / 2,
-              topY,
-              bottomY,
-              1,
-              textureColumn,
-              textureWidthSky,
-              textureHeightSky,
-              textureDataSky,
-              x,
-              1
-            );
-          }
-        }
+        this.handleSkyVisplane(
+          textureWidthSky,
+          textureHeightSky,
+          textureDataSky,
+          visplane
+        );
         continue;
       }
 
@@ -201,9 +179,94 @@ class LevelManager {
         }
       }
     }
+  }
 
-    // masked wall
-    this.drawMasked();
+  handleSkyVisplane(
+    textureWidthSky,
+    textureHeightSky,
+    textureDataSky,
+    visplane
+  ) {
+    let skyname = this.calculateSkyName();
+
+    ({ textureWidthSky, textureHeightSky, textureDataSky } =
+      this.getSkyTextureInfo(
+        skyname,
+        textureWidthSky,
+        textureHeightSky,
+        textureDataSky
+      ));
+
+    this.renderSkyTexture(
+      visplane,
+      textureWidthSky,
+      textureHeightSky,
+      textureDataSky
+    );
+  }
+
+  renderSkyTexture(
+    visplane,
+    textureWidthSky,
+    textureHeightSky,
+    textureDataSky
+  ) {
+    for (let x = visplane.minX; x <= visplane.maxX; x++) {
+      let topY = visplane.top[x];
+      let bottomY = visplane.bottom[x];
+
+      if (topY <= bottomY) {
+        let textureColumn =
+          (gameEngine.player.direction.angle + getXToAngle(x)) * 2.8444; // Random number. No idea. Credit to room4doom for the random number
+
+        this.wallRenderer.drawColumn(
+          CANVASHEIGHT / 2,
+          topY,
+          bottomY,
+          1,
+          textureColumn,
+          textureWidthSky,
+          textureHeightSky,
+          textureDataSky,
+          x,
+          1
+        );
+      }
+    }
+  }
+
+  getSkyTextureInfo(
+    skyname,
+    textureWidthSky,
+    textureHeightSky,
+    textureDataSky
+  ) {
+    let r = this.wallRenderer.textureManager.texturePool.get(skyname);
+    textureWidthSky = r.textureWidth;
+    textureHeightSky = r.textureHeight;
+    textureDataSky = r.textureImageData;
+    return { textureWidthSky, textureHeightSky, textureDataSky };
+  }
+
+  calculateSkyName() {
+    let { episode, map, game } = gameEngine.currentLevelInfo;
+    let skyname;
+
+    switch (episode) {
+      case 1:
+        skyname = "SKY1";
+        break;
+      case 2:
+        skyname = "SKY2";
+        break;
+      case 3:
+        skyname = "SKY3";
+        break;
+      case 4:
+        skyname = "SKY4";
+        break;
+    }
+    return skyname;
   }
 
   drawMasked() {
