@@ -124,52 +124,90 @@ class LevelManager {
       const textureHeightFlat = flat.height;
       const textureData = flat.data;
 
-      for (let j = visplane.minX; j <= visplane.maxX; j++) {
-        let topY = visplane.top[j];
-        let bottomY = visplane.bottom[j];
+      this.renderFlatTexture(
+        visplane,
+        textureWidthFlat,
+        textureHeightFlat,
+        textureData
+      );
+    }
+  }
 
-        if (topY <= bottomY) {
-          // Calculate direction vectors for texture mapping
-          let playerDirectionX = Math.cos(
-            degreesToRadians(gameEngine.player.direction.angle)
-          );
-          let playerDirectionY = Math.sin(
-            degreesToRadians(gameEngine.player.direction.angle)
-          );
+  renderFlatTexture(
+    visplane,
+    textureWidthFlat,
+    textureHeightFlat,
+    textureData
+  ) {
+    for (let j = visplane.minX; j <= visplane.maxX; j++) {
+      let topY = visplane.top[j];
+      let bottomY = visplane.bottom[j];
 
-          // Iterate from top to bottom in this column
-          for (let y = topY; y <= bottomY; y++) {
-            let z = (HALFWIDTH * visplane.worldFront) / (HALFHEIGHT - y);
-            let px = playerDirectionX * z + gameEngine.player.x;
-            let py = playerDirectionY * z + gameEngine.player.y;
+      if (topY <= bottomY) {
+        // Calculate direction vectors for texture mapping
+        let playerDirectionX = Math.cos(
+          degreesToRadians(gameEngine.player.direction.angle)
+        );
+        let playerDirectionY = Math.sin(
+          degreesToRadians(gameEngine.player.direction.angle)
+        );
 
-            let leftX = -playerDirectionY * z + px;
-            let leftY = playerDirectionX * z + py;
-            let rightX = playerDirectionY * z + px;
-            let rightY = -playerDirectionX * z + py;
-
-            let dx = (rightX - leftX) / CANVASWIDTH;
-            let dy = (rightY - leftY) / CANVASWIDTH;
-            let tx = Math.floor(leftX + dx * j) & (textureWidthFlat - 1);
-            let ty = Math.floor(leftY + dy * j) & (textureHeightFlat - 1);
-            const texPos = (ty * textureWidthFlat + tx) * 4;
-
-            let screenPosition = y * CANVASWIDTH + j;
-
-            // Apply color to the screen buffer
-            let r = textureData[texPos];
-            let g = textureData[texPos + 1];
-            let b = textureData[texPos + 2];
-            let a = textureData[texPos + 3];
-            r = adjustColorComponent(r, visplane.lightLevel);
-            g = adjustColorComponent(g, visplane.lightLevel);
-            b = adjustColorComponent(b, visplane.lightLevel);
-
-            gameEngine.canvas.screenBuffer[screenPosition] =
-              (a << 24) | (b << 16) | (g << 8) | r;
-          }
-        }
+        // Iterate from top to bottom in this column
+        this.drawFlat(
+          topY,
+          bottomY,
+          visplane,
+          playerDirectionX,
+          playerDirectionY,
+          j,
+          textureWidthFlat,
+          textureHeightFlat,
+          textureData
+        );
       }
+    }
+  }
+
+  drawFlat(
+    topY,
+    bottomY,
+    visplane,
+    playerDirectionX,
+    playerDirectionY,
+    j,
+    textureWidthFlat,
+    textureHeightFlat,
+    textureData
+  ) {
+    for (let y = topY; y <= bottomY; y++) {
+      let z = (HALFWIDTH * visplane.worldFront) / (HALFHEIGHT - y);
+      let px = playerDirectionX * z + gameEngine.player.x;
+      let py = playerDirectionY * z + gameEngine.player.y;
+
+      let leftX = -playerDirectionY * z + px;
+      let leftY = playerDirectionX * z + py;
+      let rightX = playerDirectionY * z + px;
+      let rightY = -playerDirectionX * z + py;
+
+      let dx = (rightX - leftX) / CANVASWIDTH;
+      let dy = (rightY - leftY) / CANVASWIDTH;
+      let tx = Math.floor(leftX + dx * j) & (textureWidthFlat - 1);
+      let ty = Math.floor(leftY + dy * j) & (textureHeightFlat - 1);
+      const texPos = (ty * textureWidthFlat + tx) * 4;
+
+      let screenPosition = y * CANVASWIDTH + j;
+
+      // Apply color to the screen buffer
+      let r = textureData[texPos];
+      let g = textureData[texPos + 1];
+      let b = textureData[texPos + 2];
+      let a = textureData[texPos + 3];
+      r = adjustColorComponent(r, visplane.lightLevel);
+      g = adjustColorComponent(g, visplane.lightLevel);
+      b = adjustColorComponent(b, visplane.lightLevel);
+
+      gameEngine.canvas.screenBuffer[screenPosition] =
+        (a << 24) | (b << 16) | (g << 8) | r;
     }
   }
 
