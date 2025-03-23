@@ -322,7 +322,7 @@ class LevelManager {
       const columns = this.getColumnData(i);
 
       let { cliptop, clipbot } = clipArrays;
-      this.checkIfWallOverlapsSprite(x2, x1, sprite, clipbot, cliptop);
+      this.checkIfWallOverlapsSprite(x1, x2, sprite, clipbot, cliptop);
 
       this.setClipMarkings(x1, x2, clipbot, cliptop);
 
@@ -454,7 +454,7 @@ class LevelManager {
     }
   }
 
-  checkIfWallOverlapsSprite(x2, x1, sprite, clipbot, cliptop) {
+  checkIfWallOverlapsSprite(x1, x2, sprite, clipbot, cliptop) {
     for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
       let wall = this.wallRenderer.drawSegments[j];
       if (
