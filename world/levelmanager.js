@@ -315,18 +315,24 @@ class LevelManager {
 
     for (let i = 0; i < vissprites.length; i++) {
       const sprite = vissprites[i];
-      let { x1, x2, spriteYScale, textureMid, start } =
+      let { spriteLeftX, spriteRightX, spriteYScale, textureMid, start } =
         this.getSpriteProperties(sprite);
       const clipArrays = createSpriteClipArrays(sprite);
 
       const columns = this.getColumnData(i);
 
       let { cliptop, clipbot } = clipArrays;
-      this.checkIfWallOverlapsSprite(x1, x2, sprite, clipbot, cliptop);
+      this.checkIfWallOverlapsSprite(
+        spriteLeftX,
+        spriteRightX,
+        sprite,
+        clipbot,
+        cliptop
+      );
 
-      this.setClipMarkings(x1, x2, clipbot, cliptop);
+      this.setClipMarkings(spriteLeftX, spriteRightX, clipbot, cliptop);
 
-      for (let x = x1; x <= x2; x++) {
+      for (let x = spriteLeftX; x <= spriteRightX; x++) {
         // the cutoff for the bottom of the sprite for this column. Based off silhouette
         const allowedBottom = clipbot[x];
         const allowedTop = cliptop[x];
@@ -425,13 +431,13 @@ class LevelManager {
   }
 
   getSpriteProperties(sprite) {
-    let x1 = sprite.x1;
-    let x2 = sprite.x2;
+    let spriteLeftX = sprite.x1;
+    let spriteRightX = sprite.x2;
 
     let spriteYScale = sprite.scale;
     let textureMid = sprite.textureMid;
     let start = sprite.start;
-    return { x1, x2, spriteYScale, textureMid, start };
+    return { spriteLeftX, spriteRightX, spriteYScale, textureMid, start };
   }
 
   getColumnData(i) {
@@ -454,12 +460,18 @@ class LevelManager {
     }
   }
 
-  checkIfWallOverlapsSprite(x1, x2, sprite, clipbot, cliptop) {
+  checkIfWallOverlapsSprite(
+    spriteLeftX,
+    spriteRightX,
+    sprite,
+    clipbot,
+    cliptop
+  ) {
     for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
       let wall = this.wallRenderer.drawSegments[j];
       if (
-        wall.x1 > x2 ||
-        wall.x2 < x1 ||
+        wall.x1 > spriteRightX ||
+        wall.x2 < spriteLeftX ||
         (!wall.silhouette && !wall.maskedTextureCol)
       ) {
         continue;
