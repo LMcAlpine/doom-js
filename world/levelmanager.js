@@ -482,11 +482,20 @@ class LevelManager {
         sprite
       );
 
-      let lowScale;
-      let scale;
-      ({ lowScale, scale } = this.determineScale(wall));
+      // the smaller scale. The scale that is from the wall endpoint that is farther away
+      let minimumWallProjectionScale;
+      let wallProjectionScale;
+      ({ minimumWallProjectionScale, wallProjectionScale } =
+        this.determineScale(wall));
 
-      if (this.isWallBehindSprite(wall, sprite, lowScale, scale)) {
+      if (
+        this.isWallBehindSprite(
+          wall,
+          sprite,
+          minimumWallProjectionScale,
+          wallProjectionScale
+        )
+      ) {
         if (wall.maskedTextureCol) {
           this.renderMaskedSegRange(j, r1, r2);
         }
@@ -510,11 +519,29 @@ class LevelManager {
     }
   }
 
-  isWallBehindSprite(wall, sprite, lowScale, scale) {
+  isWallBehindSprite(
+    wall,
+    sprite,
+    minimumWallProjectionScale,
+    wallProjectionScale
+  ) {
+    // a larger wall scale means it appears bigger (closer)
+    // if the wall's closest point is farther away than the sprite (entire wall segment behind sprite)
+    let isEntireWallSegmentBehindSprite = wallProjectionScale < sprite.scale;
+
+    // if the farther endpoint of the wall (minimumWallProjectionScale) is behind the sprite
+    let isFartherEndpointBehindSprite =
+      minimumWallProjectionScale < sprite.scale;
+
+    let isSpriteNotOnOccludingSide = !this.isPointOnLeftSide(
+      sprite.gx,
+      sprite.gy,
+      wall.currentLine
+    );
+
     return (
-      scale < sprite.scale ||
-      (lowScale < sprite.scale &&
-        !this.isPointOnLeftSide(sprite.gx, sprite.gy, wall.currentLine))
+      isEntireWallSegmentBehindSprite ||
+      (isFartherEndpointBehindSprite && isSpriteNotOnOccludingSide)
     );
   }
 
@@ -559,16 +586,18 @@ class LevelManager {
   }
 
   determineScale(wall) {
-    let lowScale;
-    let scale;
-    if (wall.scale1 > wall.scale2) {
-      lowScale = wall.scale2;
-      scale = wall.scale1;
-    } else {
-      lowScale = wall.scale1;
-      scale = wall.scale2;
-    }
-    return { lowScale, scale };
+    let minimumWallProjectionScale;
+    let wallProjectionScale;
+    // if (wall.scale1 > wall.scale2) {
+    //   minimumWallProjectionScale = wall.scale2;
+    //   wallProjectionScale = wall.scale1;
+    // } else {
+    //   minimumWallProjectionScale = wall.scale1;
+    //   wallProjectionScale = wall.scale2;
+    // }
+    minimumWallProjectionScale = Math.min(wall.scale1, wall.scale2);
+    wallProjectionScale = Math.max(wall.scale1, wall.scale2);
+    return { minimumWallProjectionScale, wallProjectionScale };
   }
 
   renderMaskedSegRange(i, r1, r2) {
