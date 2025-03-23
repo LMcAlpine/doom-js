@@ -111,16 +111,8 @@ class LevelManager {
     for (let i = 0; i < this.wallRenderer.visplanes.length; i++) {
       let visplane = this.wallRenderer.visplanes[i];
 
-      let textureWidthSky;
-      let textureHeightSky;
-      let textureDataSky;
       if (visplane.textureName === "F_SKY1") {
-        this.handleSkyVisplane(
-          textureWidthSky,
-          textureHeightSky,
-          textureDataSky,
-          visplane
-        );
+        this.handleSkyVisplane(visplane);
         continue;
       }
 
@@ -181,21 +173,13 @@ class LevelManager {
     }
   }
 
-  handleSkyVisplane(
-    textureWidthSky,
-    textureHeightSky,
-    textureDataSky,
-    visplane
-  ) {
+  handleSkyVisplane(visplane) {
     let skyname = this.calculateSkyName();
-
+    let textureWidthSky;
+    let textureHeightSky;
+    let textureDataSky;
     ({ textureWidthSky, textureHeightSky, textureDataSky } =
-      this.getSkyTextureInfo(
-        skyname,
-        textureWidthSky,
-        textureHeightSky,
-        textureDataSky
-      ));
+      this.getSkyTextureInfo(skyname));
 
     this.renderSkyTexture(
       visplane,
@@ -235,16 +219,11 @@ class LevelManager {
     }
   }
 
-  getSkyTextureInfo(
-    skyname,
-    textureWidthSky,
-    textureHeightSky,
-    textureDataSky
-  ) {
+  getSkyTextureInfo(skyname) {
     let r = this.wallRenderer.textureManager.texturePool.get(skyname);
-    textureWidthSky = r.textureWidth;
-    textureHeightSky = r.textureHeight;
-    textureDataSky = r.textureImageData;
+    const textureWidthSky = r.textureWidth;
+    const textureHeightSky = r.textureHeight;
+    const textureDataSky = r.textureImageData;
     return { textureWidthSky, textureHeightSky, textureDataSky };
   }
 
