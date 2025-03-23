@@ -484,7 +484,7 @@ class LevelManager {
 
       let lowScale;
       let scale;
-      ({ lowScale, scale } = this.determineScale(j, lowScale, scale));
+      ({ lowScale, scale } = this.determineScale(wall));
 
       if (this.isWallBehindSprite(wall, sprite, lowScale, scale)) {
         if (wall.maskedTextureCol) {
@@ -558,16 +558,15 @@ class LevelManager {
     }
   }
 
-  determineScale(j, lowScale, scale) {
-    if (
-      this.wallRenderer.drawSegments[j].scale1 >
-      this.wallRenderer.drawSegments[j].scale2
-    ) {
-      lowScale = this.wallRenderer.drawSegments[j].scale2;
-      scale = this.wallRenderer.drawSegments[j].scale1;
+  determineScale(wall) {
+    let lowScale;
+    let scale;
+    if (wall.scale1 > wall.scale2) {
+      lowScale = wall.scale2;
+      scale = wall.scale1;
     } else {
-      lowScale = this.wallRenderer.drawSegments[j].scale1;
-      scale = this.wallRenderer.drawSegments[j].scale2;
+      lowScale = wall.scale1;
+      scale = wall.scale2;
     }
     return { lowScale, scale };
   }
