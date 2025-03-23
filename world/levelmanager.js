@@ -314,22 +314,15 @@ class LevelManager {
     // draw masked...
 
     for (let i = 0; i < vissprites.length; i++) {
-      let { sprite, x2, x1, spriteYScale, textureMid, start } =
-        this.getSpriteProperties(i);
+      const sprite = vissprites[i];
+      let { x1, x2, spriteYScale, textureMid, start } =
+        this.getSpriteProperties(sprite);
       const clipArrays = createSpriteClipArrays(sprite);
 
       const columns = this.getColumnData(i);
 
       let { cliptop, clipbot } = clipArrays;
-      this.checkIfWallOverlapsSprite(
-        x2,
-        x1,
-        sprite,
-        spriteYScale,
-        i,
-        clipbot,
-        cliptop
-      );
+      this.checkIfWallOverlapsSprite(x2, x1, sprite, clipbot, cliptop);
 
       this.setClipMarkings(x1, x2, clipbot, cliptop);
 
@@ -431,15 +424,14 @@ class LevelManager {
       (a << 24) | (b << 16) | (g << 8) | r;
   }
 
-  getSpriteProperties(i) {
-    let sprite = vissprites[i];
+  getSpriteProperties(sprite) {
     let x1 = sprite.x1;
     let x2 = sprite.x2;
 
     let spriteYScale = sprite.scale;
     let textureMid = sprite.textureMid;
     let start = sprite.start;
-    return { sprite, x2, x1, spriteYScale, textureMid, start };
+    return { x1, x2, spriteYScale, textureMid, start };
   }
 
   getColumnData(i) {
@@ -462,7 +454,7 @@ class LevelManager {
     }
   }
 
-  checkIfWallOverlapsSprite(x2, x1, sprite, spriteYScale, i, clipbot, cliptop) {
+  checkIfWallOverlapsSprite(x2, x1, sprite, clipbot, cliptop) {
     for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
       let wall = this.wallRenderer.drawSegments[j];
       if (
