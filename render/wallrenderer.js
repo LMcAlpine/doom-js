@@ -334,7 +334,9 @@ class WallRenderer {
 
       drawSeg_O.spriteTopClip = this.screenHeightArray;
       drawSeg_O.spriteBottomClip = this.negativeOneArray;
-      drawSeg_O.silhouette = SIL_BOTH
+      drawSeg_O.silhouette = SIL_BOTH;
+      drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+      drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
     } else {
       // two sided line
       drawSeg_O.spriteTopClip = null;

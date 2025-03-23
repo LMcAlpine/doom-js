@@ -400,6 +400,10 @@ class LevelManager {
       let yl = Math.max(Math.ceil(topscreen), allowedTop + 1);
       let yh = Math.min(Math.floor(bottomscreen), allowedBottom - 1);
 
+      if (yl > yh) {
+        continue;
+      }
+
       this.iterateThroughSpriteRows(yl, yh, topscreen, spriteYScale, post, x);
     }
   }
@@ -505,9 +509,16 @@ class LevelManager {
 
       let silhouette = this.wallRenderer.drawSegments[j].silhouette;
 
-      // if (sprite.gzt <= wall.tsilheight) {
-      //   silhouette &= ~SIL_TOP;
-      // }
+      // global/world coordinates
+      // if the bottom of the sprite is above the wall bottom sil
+      if (sprite.gz >= wall.bsilheight) {
+        silhouette &= ~SIL_BOTTOM;
+      }
+
+      // if the top of the sprite is below the wall top sil
+      if (sprite.gzt <= wall.tsilheight) {
+        silhouette &= ~SIL_TOP;
+      }
       this.setClipArraysBasedOnSilhouette(
         silhouette,
         r1,
@@ -564,8 +575,12 @@ class LevelManager {
   setTopAndBottomClipArray(r1, r2, clipbot, wall, cliptop) {
     for (let col = r1; col <= r2; col++) {
       // Merge only these columns
-      clipbot[col] = wall.spriteBottomClip[col];
-      cliptop[col] = wall.spriteTopClip[col];
+      if (clipbot[col] === -2) {
+        clipbot[col] = wall.spriteBottomClip[col];
+      }
+      if (cliptop[col] === -2) {
+        cliptop[col] = wall.spriteTopClip[col];
+      }
     }
   }
 
@@ -573,7 +588,9 @@ class LevelManager {
     for (let col = r1; col <= r2; col++) {
       // Merge only these columns
       // the overlapping range of the bottom wall portion and sprite
-      cliptop[col] = wall.spriteTopClip[col];
+      if (cliptop[col] === -2) {
+        cliptop[col] = wall.spriteTopClip[col];
+      }
     }
   }
 
@@ -581,7 +598,9 @@ class LevelManager {
     for (let col = r1; col <= r2; col++) {
       // Merge only these columns
       // the overlapping range of the bottom wall portion and sprite
-      clipbot[col] = wall.spriteBottomClip[col];
+      if (clipbot[col] === -2) {
+        clipbot[col] = wall.spriteBottomClip[col];
+      }
     }
   }
 
