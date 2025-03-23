@@ -319,7 +319,7 @@ class LevelManager {
         this.getSpriteProperties(sprite);
       const clipArrays = createSpriteClipArrays(sprite);
 
-      const columns = this.getColumnData(i);
+      const columns = this.getColumnData(sprite.texture);
 
       let { cliptop, clipbot } = clipArrays;
       this.checkIfWallOverlapsSprite(
@@ -440,8 +440,8 @@ class LevelManager {
     return { spriteLeftX, spriteRightX, spriteYScale, textureMid, start };
   }
 
-  getColumnData(i) {
-    let patch = gameEngine.lumpData[startIndex + vissprites[i].texture];
+  getColumnData(spriteTextureIndex) {
+    let patch = gameEngine.lumpData[startIndex + spriteTextureIndex];
 
     const header = this.parsePatchHeader(patch);
 
