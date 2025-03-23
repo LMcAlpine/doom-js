@@ -22,6 +22,9 @@ const CANVASHEIGHT = this.canvasHeight;
 this.margin = 10; // The size of the margin
 this.marginsPerSide = 2;
 
+// Credit to room4doom for this value
+const SKY_TEXTURE_MULTIPLIER = 2.8444;
+
 const MAXSCALE = 64.0;
 const MINSCALE = 0.00390625;
 

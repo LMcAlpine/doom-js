@@ -201,7 +201,8 @@ class LevelManager {
 
       if (topY <= bottomY) {
         let textureColumn =
-          (gameEngine.player.direction.angle + getXToAngle(x)) * 2.8444; // Random number. No idea. Credit to room4doom for the random number
+          (gameEngine.player.direction.angle + getXToAngle(x)) *
+          SKY_TEXTURE_MULTIPLIER;
 
         this.wallRenderer.drawColumn(
           CANVASHEIGHT / 2,
