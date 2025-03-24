@@ -417,9 +417,7 @@ class LevelManager {
       if (rowInPost >= 0 && rowInPost < post.data.length) {
         let colorIndex = post.data[rowInPost];
 
-        if (colorIndex !== 0) {
-          this.drawSpritePixels(colorIndex, row, x);
-        }
+        this.drawSpritePixels(colorIndex, row, x);
       }
     }
   }
