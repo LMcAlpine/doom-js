@@ -348,18 +348,28 @@ class WallRenderer {
       if (rightSector.floorHeight > leftSector.floorHeight) {
         drawSeg_O.silhouette = SIL_BOTTOM;
         drawSeg_O.bsilheight = rightSector.floorHeight;
+      } else if (leftSector.floorHeight > gameEngine.player.height) {
+        drawSeg_O.silhouette = SIL_BOTTOM;
+        drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
       }
 
       if (rightSector.ceilingHeight < leftSector.ceilingHeight) {
         drawSeg_O.silhouette |= SIL_TOP;
         drawSeg_O.tsilheight = rightSector.ceilingHeight;
+      } else if (leftSector.ceilingHeight < gameEngine.player.height) {
+        drawSeg_O.silhouette |= SIL_TOP;
+        drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
       }
 
       if (leftSector.ceilingHeight <= rightSector.floorHeight) {
         drawSeg_O.spriteBottomClip = this.negativeOneArray;
+        drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+        drawSeg_O.silhouette |= SIL_BOTTOM;
       }
       if (leftSector.floorHeight >= rightSector.ceilingHeight) {
         drawSeg_O.spriteTopClip = this.screenHeightArray;
+        drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
+        drawSeg_O.silhouette |= SIL_TOP;
       }
 
       // worldhigh

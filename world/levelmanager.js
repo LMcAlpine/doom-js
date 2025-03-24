@@ -313,6 +313,8 @@ class LevelManager {
     // What is the main decision or action this function needs to perform?
     // draw masked...
 
+    vissprites.sort((a, b) => a.scale - b.scale);
+
     for (let i = 0; i < vissprites.length; i++) {
       const sprite = vissprites[i];
       let { spriteLeftX, spriteRightX, spriteYScale, textureMid, start } =
