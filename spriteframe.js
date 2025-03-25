@@ -1,6 +1,6 @@
 class SpriteFrame {
   constructor() {
-    this.rotate = true;
+    this.rotate = undefined;
     this.lump = new Array(8);
     this.flip = new Array(8);
 

@@ -21,6 +21,14 @@ function onLoadLevelClicked(levelName) {
 
 initDOM(onFileSelected, onLoadLevelClicked);
 
+async function loadData(name) {
+  const response = await fetch(name);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+}
+
 async function initializeGameData(file) {
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
@@ -41,14 +49,25 @@ async function initializeGameData(file) {
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
   spriteManager = new SpriteManager(lumpData, patchNames);
 
-  if (spriteManager) {
-    spriteManager.processSprites();
-  }
-
   gameEngine = new GameEngine("myCanvas", 50);
+  gameEngine.lumpData = lumpData;
   gameEngine.patchNames = patchNames;
   gameEngine.palette = paletteField;
   gameEngine.textures = textureField;
+
+  if (spriteManager) {
+    const { spriteWidth, spriteOffset, spriteTopOffset } =
+      spriteManager.processSprites();
+    gameEngine.spriteWidth = spriteWidth;
+    gameEngine.spriteOffset = spriteOffset;
+    gameEngine.spriteTopOffset = spriteTopOffset;
+  }
+
+  const infoDefinitions = await loadData("info_definitions.json");
+  gameEngine.infoDefinitions = infoDefinitions;
+  const states = await loadData("states.json");
+  gameEngine.states = states;
+
   const canvas = new Canvas("myCanvas");
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
@@ -71,6 +90,9 @@ function loadLevel(levelName) {
   const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
 
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
+
+  // player needs to be initialized before
+  gameEngine.levelManager.loadThings();
 }
 
 function setupTextureAndPalettes(lumpData) {

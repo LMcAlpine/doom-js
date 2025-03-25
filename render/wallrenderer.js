@@ -204,7 +204,7 @@ class WallRenderer {
   storeWallRange(seg, xScreenV1, xScreenV2) {
     let line = seg.linedef;
     //  let side = seg.linedef.rightSidedef;
-    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures. 
+    let side = seg.sidedef; // sidedef not rightSidedef. Fixes the flipped textures.
 
     // Taking the angle of the seg in the worldspace and adding 90 degrees to it
     // this results in a perpendicular line (the normal)
@@ -252,9 +252,16 @@ class WallRenderer {
         radiansToDegrees(screenToXView(xScreenV2, canvasWidth))
     ).angle;
 
+    // needs to get reset for each seg else data stays from one seg to another
+    drawSeg_O = { x1: 0, x2: 0 };
+
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
-    drawSeg_O.currentLine = line;
+    // drawSeg_O.currentLine = line;
+    // needs to be the seg not the linedef. Segs can be different directions than the linedef. 
+    // the world map in the editor does not always represent the same direction as a seg.
+    // the editor map shows linedefs not segs.
+    drawSeg_O.currentLine = seg;
 
     drawSeg_O.sidedef = side; // store the sidedef
 
@@ -331,18 +338,42 @@ class WallRenderer {
 
       drawSeg_O.spriteTopClip = this.screenHeightArray;
       drawSeg_O.spriteBottomClip = this.negativeOneArray;
+      drawSeg_O.silhouette = SIL_BOTH;
+      drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+      drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
     } else {
       // two sided line
       drawSeg_O.spriteTopClip = null;
       drawSeg_O.spriteBottomClip = null;
+      drawSeg_O.silhouette = 0;
 
       const leftSector = seg.leftSector;
 
+      if (rightSector.floorHeight > leftSector.floorHeight) {
+        drawSeg_O.silhouette = SIL_BOTTOM;
+        drawSeg_O.bsilheight = rightSector.floorHeight;
+      } else if (leftSector.floorHeight > gameEngine.player.height) {
+        drawSeg_O.silhouette = SIL_BOTTOM;
+        drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+      }
+
+      if (rightSector.ceilingHeight < leftSector.ceilingHeight) {
+        drawSeg_O.silhouette |= SIL_TOP;
+        drawSeg_O.tsilheight = rightSector.ceilingHeight;
+      } else if (leftSector.ceilingHeight < gameEngine.player.height) {
+        drawSeg_O.silhouette |= SIL_TOP;
+        drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
+      }
+
       if (leftSector.ceilingHeight <= rightSector.floorHeight) {
         drawSeg_O.spriteBottomClip = this.negativeOneArray;
+        drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+        drawSeg_O.silhouette |= SIL_BOTTOM;
       }
       if (leftSector.floorHeight >= rightSector.ceilingHeight) {
         drawSeg_O.spriteTopClip = this.screenHeightArray;
+        drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
+        drawSeg_O.silhouette |= SIL_TOP;
       }
 
       // worldhigh
@@ -574,17 +605,28 @@ class WallRenderer {
       lightLevel,
       drawSeg_O
     );
-
-    if (maskedTexture && drawSeg_O.spriteTopClip === null) {
+    if (
+      (drawSeg_O.silhouette & SIL_TOP || maskedTexture) &&
+      drawSeg_O.spriteTopClip === null
+    ) {
       // drawSeg_O.spriteTopClip = this.upperclip.slice(rwx, rwStopX + 1);
-      //drawSeg_O.spriteTopClip = this.upperclip;
 
       drawSeg_O.spriteTopClip = [...this.upperclip];
     }
-    if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-      //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
-      // drawSeg_O.spriteBottomClip = this.lowerclip;
+    if (
+      (drawSeg_O.silhouette & SIL_BOTTOM || maskedTexture) &&
+      drawSeg_O.spriteBottomClip === null
+    ) {
       drawSeg_O.spriteBottomClip = [...this.lowerclip];
+    }
+
+    if (maskedTexture && !(drawSeg_O.silhouette & SIL_TOP)) {
+      drawSeg_O.silhouette |= SIL_TOP;
+      drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
+    }
+    if (maskedTexture && !(drawSeg_O.silhouette & SIL_BOTTOM)) {
+      drawSeg_O.silhouette |= SIL_BOTTOM;
+      drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
     }
     drawSeg_O.point1 = point1;
     drawSeg_O.point2 = point2;
@@ -838,8 +880,8 @@ class WallRenderer {
         wallData.lightLevel
       );
 
-      // this.upperclip[x] = CANVASHEIGHT;
-      // this.lowerclip[x] = -1;
+      this.upperclip[wallData.x] = CANVASHEIGHT;
+      this.lowerclip[wallData.x] = -1;
     }
   }
 

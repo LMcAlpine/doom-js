@@ -22,6 +22,9 @@ const CANVASHEIGHT = this.canvasHeight;
 this.margin = 10; // The size of the margin
 this.marginsPerSide = 2;
 
+// Credit to room4doom for this value
+const SKY_TEXTURE_MULTIPLIER = 2.8444;
+
 const MAXSCALE = 64.0;
 const MINSCALE = 0.00390625;
 
@@ -30,6 +33,9 @@ const HALFHEIGHT = this.canvasHeight / 2;
 
 const FOV = 90;
 const HALFFOV = FOV / 2;
+
+const ONFLOORZ = Number.MIN_SAFE_INTEGER;
+const ONCEILINGZ = Number.MAX_SAFE_INTEGER;
 
 // let spriteNames = ["TROO"];
 
@@ -605,11 +611,16 @@ let startIndex;
 let endIndex;
 let maxFrame = -1;
 
-let theSprites = [];
+// let theSprites = [];
+// for (let i = 0; i < spriteNames.length; i++) {
+//   theSprites[i] = new SpriteDef();
+// }
 
-for (let i = 0; i < spriteNames.length; i++) {
-  theSprites[i] = new SpriteDef();
-}
+let theSprites = new Map();
+// for (let i = 0; i < spriteNames.length; i++) {
+//   theSprites.set("SPR_" + spriteNames[i], new SpriteDef(-1, []));
+// }
+
 let spriteTemp = [];
 
 for (let i = 0; i < 29; i++) {
@@ -627,18 +638,20 @@ function installSpriteLump(lump, frame, rotation, flipped) {
   }
 
   if (rotation === 0) {
-    if (spriteTemp[frame].rotate === false) {
-      console.log(`frame ${frame} has multiple rotation=0 lump`);
-      return;
-    }
-    if (spriteTemp[frame].rotate === true) {
-      console.log(`frame ${frame} has rotations and a rotation=0 lump`);
-      return;
+    if (spriteTemp[frame].rotate !== undefined) {
+      if (spriteTemp[frame].rotate === false) {
+        console.log(`frame ${frame} has multiple rotation=0 lump`);
+        return;
+      }
+      if (spriteTemp[frame].rotate === true) {
+        console.log(`frame ${frame} has rotations and a rotation=0 lump`);
+        return;
+      }
     }
 
     spriteTemp[frame].rotate = false;
     for (let i = 0; i < 8; i++) {
-      spriteTemp[frame].lump[i] = lump;
+      spriteTemp[frame].lump[i] = lump - startIndex;
       spriteTemp[frame].flip[i] = flipped;
     }
     return;
@@ -692,4 +705,75 @@ function parseLevelName(levelName) {
     map: null,
     originalName: levelName,
   };
+}
+
+let vissprites = [];
+
+function createVissprite(x1, x2, scale, texture, textureMid) {
+  const vis = new Vissprite(x1, x2, scale, texture, textureMid);
+  vissprites.push(vis);
+}
+
+let validCount = 1;
+
+const SIL_TOP = 2;
+const SIL_BOTTOM = 1;
+const SIL_BOTH = 3;
+
+function createSpriteClipArrays(sprite) {
+  // const numColumns = sprite.x2 - sprite.x1 + 1;
+  const numColumns = 320;
+  // const cliptop = new Array(numColumns).fill(-2);
+  // const clipbot = new Array(numColumns).fill(-2);
+  const cliptop = new Array(numColumns);
+  const clipbot = new Array(numColumns);
+  for (let x = sprite.x1; x <= sprite.x2; x++) {
+    clipbot[x] = -2;
+    cliptop[x] = -2;
+  }
+  return { cliptop, clipbot };
+}
+
+function updateSpriteClipArrays(sprite, wall, clipArrays) {
+  const { cliptop, clipbot } = clipArrays;
+  // Calculate overlapping horizontal range:
+  const r1 = Math.max(wall.x1, sprite.x1);
+  const r2 = Math.min(wall.x2, sprite.x2);
+  if (r1 > r2) return; // No overlap
+
+  const startIndex = r1 - sprite.x1;
+  const endIndex = r2 - sprite.x1;
+
+  // Adjust silhouette based on vertical extents and wall boundaries:
+  let silhouette = wall.silhouette;
+  if (sprite.gz >= wall.bsilheight) {
+    silhouette &= ~SIL_BOTTOM;
+  }
+  // if (sprite.gzt <= wall.tsilheight) {
+  //   silhouette &= ~SIL_TOP;
+  // }
+
+  // Update clip arrays over the overlapping range:
+  for (let i = startIndex; i <= endIndex; i++) {
+    if (
+      (silhouette === SIL_BOTTOM || silhouette === SIL_BOTH) &&
+      clipbot[i] === -2
+    ) {
+      clipbot[i] = wall.sprbottomclip[i]; // wall's precomputed bottom clip for this column
+    }
+    if (
+      (silhouette === SIL_TOP || silhouette === SIL_BOTH) &&
+      cliptop[i] === -2
+    ) {
+      cliptop[i] = wall.sprtopclip[i]; // wall's precomputed top clip for this column
+    }
+  }
+}
+
+function finalizeClipArrays(clipArrays, viewHeight) {
+  const { cliptop, clipbot } = clipArrays;
+  for (let i = 0; i < cliptop.length; i++) {
+    if (cliptop[i] === -2) cliptop[i] = -1;
+    if (clipbot[i] === -2) clipbot[i] = viewHeight;
+  }
 }

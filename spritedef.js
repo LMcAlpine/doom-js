@@ -1,6 +1,6 @@
 class SpriteDef {
-  constructor() {
-    this.framesCount=-1;
-    this.spriteFrames = [];
+  constructor(framesCount, spriteFrames) {
+    this.framesCount = framesCount;
+    this.spriteFrames = spriteFrames;
   }
 }

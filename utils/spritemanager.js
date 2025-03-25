@@ -36,6 +36,8 @@ class SpriteManager {
       this.calculateOffsets(sprites);
 
     this.installSprites(spriteNames, startIndex, endIndex);
+
+    return { spriteWidth, spriteOffset, spriteTopOffset };
   }
 
   installSprites(spriteNames, startIndex, endIndex) {
@@ -47,6 +49,13 @@ class SpriteManager {
     endIndex++;
 
     for (let i = 0; i < spriteNames.length; i++) {
+      // change this
+      // needed to reset spriteTemp for each new sprite
+      for (let z = 0; z < 29; z++) {
+        spriteTemp[z] = new SpriteFrame();
+      }
+
+      console.log(i);
       maxFrame = -1;
       for (let j = startIndex + 1; j < endIndex; j++) {
         let sprite = this.lumpData[j].name;
@@ -70,8 +79,15 @@ class SpriteManager {
       }
       maxFrame++;
 
-      theSprites[i].framesCount = maxFrame;
-      theSprites[i].spriteFrames = spriteTemp;
+      const temp = Object.assign({}, spriteTemp);
+      theSprites.set("SPR_" + spriteNames[i], new SpriteDef(maxFrame, temp));
+      // theSprites[i].framesCount = maxFrame;
+      // theSprites[i].spriteFrames = temp;
+      // for (let [key, value] of theSprites) {
+      //   value.framesCount = maxFrame;
+      //   value.spriteFrames = temp;
+      //   // theSprites.set(key, value);
+      // }
     }
   }
 
