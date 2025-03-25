@@ -639,6 +639,9 @@ class LevelManager {
     let textureName;
 
     textureName = this.wallRenderer.drawSegments[i].sidedef.middleTexture;
+    if (textureName === "-") {
+      return;
+    }
 
     let maskedTextureCol = this.wallRenderer.drawSegments[i].maskedTextureCol;
     let rwScaleStep = this.wallRenderer.drawSegments[i].scaleStep;
@@ -741,7 +744,7 @@ class LevelManager {
             textureHeight,
             textureData,
             x,
-            currentLine.sidedef.sector.lightLevel
+            this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
           );
         }
         maskedTextureCol[x] = 0x7fff;
