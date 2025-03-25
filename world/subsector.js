@@ -157,8 +157,8 @@ class Subsector {
       textureMid,
       flip,
     };
-    console.log(thing.z);
-    console.log(gameEngine.spriteTopOffset[lump]);
+    // console.log(thing.z);
+    // console.log(gameEngine.spriteTopOffset[lump]);
     if (gameEngine.spriteTopOffset[lump] === undefined) {
       console.log(thing.z);
     }

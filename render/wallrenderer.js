@@ -257,7 +257,11 @@ class WallRenderer {
 
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
-    drawSeg_O.currentLine = line;
+    // drawSeg_O.currentLine = line;
+    // needs to be the seg not the linedef. Segs can be different directions than the linedef. 
+    // the world map in the editor does not always represent the same direction as a seg.
+    // the editor map shows linedefs not segs.
+    drawSeg_O.currentLine = seg;
 
     drawSeg_O.sidedef = side; // store the sidedef
 
@@ -616,11 +620,14 @@ class WallRenderer {
       drawSeg_O.spriteBottomClip = [...this.lowerclip];
     }
 
-    // if (maskedTexture && drawSeg_O.spriteBottomClip === null) {
-    //   //drawSeg_O.spriteBottomClip = this.lowerclip.slice(rwx, rwStopX + 1);
-    //   // drawSeg_O.spriteBottomClip = this.lowerclip;
-    //   drawSeg_O.spriteBottomClip = [...this.lowerclip];
-    // }
+    if (maskedTexture && !(drawSeg_O.silhouette & SIL_TOP)) {
+      drawSeg_O.silhouette |= SIL_TOP;
+      drawSeg_O.tsilheight = Number.MIN_SAFE_INTEGER;
+    }
+    if (maskedTexture && !(drawSeg_O.silhouette & SIL_BOTTOM)) {
+      drawSeg_O.silhouette |= SIL_BOTTOM;
+      drawSeg_O.bsilheight = Number.MAX_SAFE_INTEGER;
+    }
     drawSeg_O.point1 = point1;
     drawSeg_O.point2 = point2;
     drawSeg_O.seg = seg;

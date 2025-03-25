@@ -626,8 +626,12 @@ class LevelManager {
     let currentLine = this.wallRenderer.drawSegments[i].currentLine;
     // console.log(`Left Texture: ${currentLine.leftSidedef.middleTexture}`);
     // console.log(`Right Texture: ${currentLine.rightSidedef.middleTexture}`);
-    let frontSector = currentLine.rightSidedef.sector;
-    let backSector = currentLine.leftSidedef.sector;
+    // let frontSector = currentLine.rightSidedef.sector;
+    // let backSector = currentLine.leftSidedef.sector;
+
+    // dealing with the seg here not the linedef. Using the linedef was incorrect.
+    let frontSector = currentLine.rightSector;
+    let backSector = currentLine.leftSector;
 
     // let textureName = currentLine.rightSidedef.middleTexture; // wrong sides because I am only getting the rightSidedef texture....
     // for example, if the right side is a left texture and then the left side is the right texture.
@@ -654,7 +658,7 @@ class LevelManager {
       columns: columns,
     } = this.textureManager.getTextureInfo(textureName);
 
-    if (currentLine.flag & 16) {
+    if (currentLine.linedef.flag & 16) {
       textureMid =
         frontSector.floorHeight > backSector.floorHeight
           ? frontSector.floorHeight
@@ -668,7 +672,7 @@ class LevelManager {
 
       textureMid = textureMid - gameEngine.player.height;
     }
-    textureMid += currentLine.rightSidedef.yOffset;
+    textureMid += currentLine.sidedef.yOffset;
     console.log(`Segment X1=${x1}, X2=${x2}, Texture=${textureName}`);
     // console.log(textureName);
     for (let x = r1; x <= r2; x++) {
@@ -737,7 +741,7 @@ class LevelManager {
             textureHeight,
             textureData,
             x,
-            this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
+            currentLine.sidedef.sector.lightLevel
           );
         }
         maskedTextureCol[x] = 0x7fff;
