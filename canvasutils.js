@@ -688,16 +688,16 @@ function parseLevelName(levelName) {
     };
   }
 
-  // const doom2Regex = /^MAP(\d+)$/i;
-  // match = levelName.match(doom2Regex);
-  // if (match) {
-  //   return {
-  //     game: "DOOM2",
-  //     episode: null,
-  //     map: parseInt(match[1], 10),
-  //     originalName: levelName,
-  //   };
-  // }
+  const doom2Regex = /^MAP(\d+)$/i;
+  match = levelName.match(doom2Regex);
+  if (match) {
+    return {
+      game: "DOOM2",
+      episode: null,
+      map: parseInt(match[1], 10),
+      originalName: levelName,
+    };
+  }
 
   return {
     game: "UNKNOWN",

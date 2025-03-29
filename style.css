@@ -16,3 +16,12 @@ body {
 #upload {
   margin-bottom: 20px;
 }
+
+#selectorD1 {
+  visibility: hidden;
+
+}
+
+#selectorD2 {
+  visibility: hidden;
+}
