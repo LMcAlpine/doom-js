@@ -267,26 +267,10 @@ class LevelManager {
   }
 
   calculateSkyName() {
-    let { episode, map, game } = gameEngine.currentLevelInfo;
+    let { episode, map, game, originalName } = gameEngine.currentLevelInfo;
     let skyname;
 
-    if (game === "DOOM1") {
-      switch (episode) {
-        case 1:
-          skyname = "SKY1";
-          break;
-        case 2:
-          skyname = "SKY2";
-          break;
-        case 3:
-          skyname = "SKY3";
-          break;
-        case 4:
-          skyname = "SKY4";
-          break;
-      }
-    }
-    if (game === "DOOM2") {
+    if (originalName.startsWith("MAP")) {
       switch (map) {
         case 1:
           skyname = "SKY1";
@@ -302,6 +286,40 @@ class LevelManager {
           break;
       }
     }
+
+    if (originalName.charAt(0) === "E") {
+      switch (episode) {
+        case 1:
+          skyname = "SKY1";
+          break;
+        case 2:
+          skyname = "SKY2";
+          break;
+        case 3:
+          skyname = "SKY3";
+          break;
+        case 4:
+          skyname = "SKY4";
+          break;
+      }
+    }
+
+    // if (game === "DOOM2") {
+    //   switch (map) {
+    //     case 1:
+    //       skyname = "SKY1";
+    //       break;
+    //     case 2:
+    //       skyname = "SKY2";
+    //       break;
+    //     case 3:
+    //       skyname = "SKY3";
+    //       break;
+    //     case 4:
+    //       skyname = "SKY4";
+    //       break;
+    //   }
+    // }
 
     return skyname;
   }
