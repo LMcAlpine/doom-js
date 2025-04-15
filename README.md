@@ -2,8 +2,6 @@
 
 **Note: This repository is currently under construction.**
 
-Doom-JS is a personal project that renders Doom levels using JavaScript. The original Doom Engine inspires this project, but where possible, modifications to support modern JavaScript development practices. 
-
 ## Requirements
 Doom shareware WAD
 
