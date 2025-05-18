@@ -864,7 +864,7 @@ class LevelManager {
     x = mapThing.xPosition;
     y = mapThing.yPosition;
 
-    if (gameEngine.infoDefinitions[key].flags & 8) {
+    if (gameEngine.infoDefinitions[key].flags & SPAWNCEILING) {
       z = ONCEILINGZ;
     } else {
       z = ONFLOORZ;
