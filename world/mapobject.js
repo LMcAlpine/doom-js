@@ -31,6 +31,8 @@ class MapObject {
     } else {
       this.z = z;
     }
+
+    this.ticTimer = 0;
   }
 
   findState(stateName) {
@@ -42,24 +44,24 @@ class MapObject {
     }
   }
   update() {
-    this.tics--;
     if (this.tics <= 0) {
-      let stateName = this.state[4];
-      let state = this.findState(stateName);
+      return;
+    }
+    this.ticTimer += gameEngine.clockTick;
+    while (this.ticTimer >= 1 / 35) {
+      this.ticTimer -= 1 / 35;
+      this.tics--;
+      if (this.tics <= 0) {
+        let stateName = this.state[4];
+        let state = this.findState(stateName);
 
-      this.state = state;
-      this.sprite = state[0];
-      this.frame = state[1];
-      this.tics = state[2];
+        this.state = state;
+        this.sprite = state[0];
+        this.frame = state[1];
+        this.tics = state[2];
+      }
     }
   }
 
-  draw(ctx) {
-    drawDebugText(
-      5,
-      20,
-      `Tics: ${this.tics} state: ${this.state[4]}`,
-      [255, 255, 0]
-    );
-  }
+  draw(ctx) {}
 }
