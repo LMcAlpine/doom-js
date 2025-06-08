@@ -65,6 +65,12 @@ class MapObject {
     this.sprite = state[0];
     this.frame = state[1];
     this.tics = state[2];
+
+    let actionName = this.state[3];
+    if (actionName !== "NULL") {
+      drawDebugText(5, 5, `performing action: ${actionName}`, [255, 255, 0]);
+      
+    }
   }
 
   draw(ctx) {}
