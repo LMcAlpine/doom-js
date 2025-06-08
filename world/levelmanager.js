@@ -873,6 +873,8 @@ class LevelManager {
     mapObject = this.spawnMapObject(x, y, z, key);
 
     mapObject.angle = Math.floor((mapThing.direction / 45) * 45);
+
+    gameEngine.addEntity(mapObject);
   }
 
   spawnPlayer(mapThing) {
@@ -881,80 +883,51 @@ class LevelManager {
   }
 
   spawnMapObject(x, y, z, type) {
-    let mapObject = {};
-    let info = gameEngine.infoDefinitions[type];
+    // let mapObject = {};
+    // let info = gameEngine.infoDefinitions[type];
 
-    mapObject.type = type;
-    mapObject.info = info;
-    mapObject.x = x;
-    mapObject.y = y;
-    mapObject.radius = info.radius;
-    mapObject.height = info.height;
-    mapObject.flags = info.flags;
-    mapObject.health = info.spawnhealth;
+    // mapObject.type = type;
+    // mapObject.info = info;
+    // mapObject.x = x;
+    // mapObject.y = y;
+    // mapObject.radius = info.radius;
+    // mapObject.height = info.height;
+    // mapObject.flags = info.flags;
+    // mapObject.health = info.spawnhealth;
 
-    mapObject.angle;
+    // mapObject.angle;
 
-    let stateName = info.spawnstate;
-    let state;
-    let key;
-    for (key in gameEngine.states) {
-      if (stateName == key) {
-        state = gameEngine.states[key];
-        break;
-      }
-    }
-
-    // no more index number to determine what a name is. The name is just directly in info.spawnstate now
-    // this below is problematic because the family names don't always form the the sprite marker.
-    // for example GIBS, it doesn't form the sprite for POL5
-    // let stateName = spawnStateNames[info.spawnstate];
-    // if (stateName.startsWith("S_")) {
-    //   stateName = stateName.slice(2);
-    // }
-    // let family = stateName.split("_")[0];
-    // let sprMark = "SPR_" + family;
-
-    // let k;
-    // for (k = 0; k < spriteMarkers.length; k++) {
-    //   if (sprMark === spriteMarkers[k]) {
+    // let stateName = info.spawnstate;
+    // let state;
+    // let key;
+    // for (key in gameEngine.states) {
+    //   if (stateName == key) {
+    //     state = gameEngine.states[key];
     //     break;
     //   }
     // }
 
-    // let state = {
-    //   sprite: k,
-    //   frame: 0,
-    //   tics: 10,
-    //   action: null,
-    //   nextState: 0,
-    // };
-    mapObject.state = state;
-    mapObject.sprite = state[0];
-    mapObject.frame = state[1];
-    mapObject.tics = state[2];
+    // mapObject.state = state;
+    // mapObject.sprite = state[0];
+    // mapObject.frame = state[1];
+    // mapObject.tics = state[2];
 
-    // mapObject.tics = state.tics;
+    // this.setThingPosition(mapObject);
 
-    // mapObject.sprite = state.sprite;
+    // mapObject.floorz = mapObject.subsector.sector.floorHeight;
+    // mapObject.ceilingz = mapObject.subsector.sector.ceilingHeight;
 
-    // mapObject.frame = state.frame;
+    // if (z == ONFLOORZ) {
+    //   mapObject.z = mapObject.floorz;
+    // } else if (z == ONCEILINGZ) {
+    //   // mapObject.z = mapObject.ceilingz - mapinfo[i].height;
+    //   mapObject.z = mapObject.ceilingz - info.height;
+    // } else {
+    //   mapObject.z = z;
+    // }
 
-    this.setThingPosition(mapObject);
-
-    mapObject.floorz = mapObject.subsector.sector.floorHeight;
-    mapObject.ceilingz = mapObject.subsector.sector.ceilingHeight;
-
-    if (z == ONFLOORZ) {
-      mapObject.z = mapObject.floorz;
-    } else if (z == ONCEILINGZ) {
-      // mapObject.z = mapObject.ceilingz - mapinfo[i].height;
-      mapObject.z = mapObject.ceilingz - info.height;
-    } else {
-      mapObject.z = z;
-    }
-
-    return mapObject;
+    // return mapObject;
+    return new MapObject(x, y, z, type, this);
   }
 
   setThingPosition(thing) {
