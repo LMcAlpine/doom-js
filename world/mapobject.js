@@ -11,8 +11,8 @@ class MapObject {
 
     this.angle;
 
-    let stateName = info.spawnstate;
-    let state = this.findState(stateName);
+    this.stateName = info.spawnstate;
+    let state = gameEngine.states[this.stateName];
 
     this.state = state;
     this.sprite = state[0];
@@ -52,15 +52,19 @@ class MapObject {
       this.ticTimer -= 1 / 35;
       this.tics--;
       if (this.tics <= 0) {
-        let stateName = this.state[4];
-        let state = this.findState(stateName);
-
-        this.state = state;
-        this.sprite = state[0];
-        this.frame = state[1];
-        this.tics = state[2];
+        this.changeState();
       }
     }
+  }
+
+  changeState() {
+    this.stateName = this.state[4];
+    let state = gameEngine.states[this.stateName];
+
+    this.state = state;
+    this.sprite = state[0];
+    this.frame = state[1];
+    this.tics = state[2];
   }
 
   draw(ctx) {}
