@@ -299,21 +299,17 @@ async function initializeGameData(file) {
     },
   };
 
-  const uniqueActionNames = new Set();
+  gameEngine.actions = actions;
+  // const uniqueActionNames = new Set();
 
-  for (const [key, value] of Object.entries(states)) {
-    console.log(key, value);
-    let action = value[3];
-    if (!uniqueActionNames.has(action)) {
-      uniqueActionNames.add(action);
-    }
-  }
+  // for (const [key, value] of Object.entries(states)) {
+  //   console.log(key, value);
+  //   let action = value[3];
+  //   if (!uniqueActionNames.has(action)) {
+  //     uniqueActionNames.add(action);
+  //   }
+  // }
 
-  for (let name of uniqueActionNames) {
-    actions[name] = new (function (name) {})();
-  }
-
-  console.log(uniqueActionNames.size);
   const canvas = new Canvas("myCanvas");
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;

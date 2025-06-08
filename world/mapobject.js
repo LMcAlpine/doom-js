@@ -68,8 +68,11 @@ class MapObject {
 
     let actionName = this.state[3];
     if (actionName !== "NULL") {
-      drawDebugText(5, 5, `performing action: ${actionName}`, [255, 255, 0]);
-      
+      // drawDebugText(5, 5, `performing action: ${actionName}`, [255, 255, 0]);
+      let fn = gameEngine.actions[actionName];
+      if (typeof fn === "function") {
+        fn(this);
+      }
     }
   }
 
