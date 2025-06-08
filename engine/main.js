@@ -157,7 +157,14 @@ async function initializeGameData(file) {
       console.log("XScream ", obj);
     },
     A_Look(obj) {
-      console.log("Look ", obj);
+      let geom = new Geometry();
+      let vertex = { x: obj.x, y: obj.y };
+      let dist = geom.distanceToPoint(vertex);
+      if (dist < 100) {
+        obj.target = gameEngine.player;
+        obj.stateName = gameEngine.infoDefinitions[obj.type].seestate;
+        console.log("Look ", obj.stateName);
+      }
     },
     A_Chase(obj) {
       console.log("Chase ", obj);
