@@ -41,7 +41,25 @@ class MapObject {
       }
     }
   }
-  update() {}
+  update() {
+    this.tics--;
+    if (this.tics <= 0) {
+      let stateName = this.state[4];
+      let state = this.findState(stateName);
 
-  draw(ctx) {}
+      this.state = state;
+      this.sprite = state[0];
+      this.frame = state[1];
+      this.tics = state[2];
+    }
+  }
+
+  draw(ctx) {
+    drawDebugText(
+      5,
+      20,
+      `Tics: ${this.tics} state: ${this.state[4]}`,
+      [255, 255, 0]
+    );
+  }
 }

@@ -191,7 +191,7 @@ class Subsector {
     const angleToThing = gameEngine.player.angleTowardsVertex(thing);
     const tempAngle = angleToThing.subtract(thing.angle);
     const rotation = Math.floor((tempAngle.add(45 / 2).angle / 45) % 8);
-    drawDebugText(5, 5, `Angle: ${tempAngle.angle.toFixed(2)} rot: ${rotation}`, [255,255,0]);
+    // drawDebugText(5, 5, `Angle: ${tempAngle.angle.toFixed(2)} rot: ${rotation}`, [255,255,0]);
 
     return {
       lump: spriteFrame.lump[rotation],

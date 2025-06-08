@@ -883,50 +883,6 @@ class LevelManager {
   }
 
   spawnMapObject(x, y, z, type) {
-    // let mapObject = {};
-    // let info = gameEngine.infoDefinitions[type];
-
-    // mapObject.type = type;
-    // mapObject.info = info;
-    // mapObject.x = x;
-    // mapObject.y = y;
-    // mapObject.radius = info.radius;
-    // mapObject.height = info.height;
-    // mapObject.flags = info.flags;
-    // mapObject.health = info.spawnhealth;
-
-    // mapObject.angle;
-
-    // let stateName = info.spawnstate;
-    // let state;
-    // let key;
-    // for (key in gameEngine.states) {
-    //   if (stateName == key) {
-    //     state = gameEngine.states[key];
-    //     break;
-    //   }
-    // }
-
-    // mapObject.state = state;
-    // mapObject.sprite = state[0];
-    // mapObject.frame = state[1];
-    // mapObject.tics = state[2];
-
-    // this.setThingPosition(mapObject);
-
-    // mapObject.floorz = mapObject.subsector.sector.floorHeight;
-    // mapObject.ceilingz = mapObject.subsector.sector.ceilingHeight;
-
-    // if (z == ONFLOORZ) {
-    //   mapObject.z = mapObject.floorz;
-    // } else if (z == ONCEILINGZ) {
-    //   // mapObject.z = mapObject.ceilingz - mapinfo[i].height;
-    //   mapObject.z = mapObject.ceilingz - info.height;
-    // } else {
-    //   mapObject.z = z;
-    // }
-
-    // return mapObject;
     return new MapObject(x, y, z, type, this);
   }
 
