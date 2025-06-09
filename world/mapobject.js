@@ -72,12 +72,12 @@ class MapObject {
       if (typeof fn === "function") {
         fn(this);
       }
-      drawDebugText(
-        5,
-        5,
-        `performing action: ${this.stateName}`,
-        [255, 255, 0]
-      );
+      // drawDebugText(
+      //   5,
+      //   5,
+      //   `performing action: ${actionName}`,
+      //   [255, 255, 0]
+      // );
     }
   }
 
