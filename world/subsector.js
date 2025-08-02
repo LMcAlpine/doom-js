@@ -21,7 +21,6 @@ class Subsector {
    * @param {number} subsectorID - ID of the current subsector.
    */
   handleSubsector(subsectorID) {
-    //const subsector = this.subsectors[subsectorID];
     const subsector = this.linkedSubsectors[subsectorID];
 
     // check floor visibility

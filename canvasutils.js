@@ -180,38 +180,12 @@ function getRandomInt(min, max, seed) {
   return Math.floor(seededRandom(seed) * (max - min + 1)) + min;
 }
 
-// function angleToX(angle) {
-//   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
-//   let x = 0;
-//   if (angle > 90) {
-//     angle = new Angle(angle - 90);
-
-//     x =
-//       SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-//   } else {
-//     angle = Angle.subtract(90, angle);
-//     x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-//     x += SCREENDISTANCE;
-//   }
-//   return Math.floor(x);
-// }
 function angleToX(angle) {
   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
   angle = new Angle(angle - 90);
   return Math.floor(
     SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE
   );
-  // if (angle > 90) {
-  //   angle = new Angle(angle - 90);
-
-  //   x =
-  //     SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-  // } else {
-  //   angle = Angle.subtract(90, angle);
-  //   x = Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE;
-  //   x += SCREENDISTANCE;
-  // }
-  //return Math.floor(x);
 }
 
 function getXToAngle(x) {
@@ -266,11 +240,6 @@ function adjustColorComponent(component, lightLevel) {
   return Math.min(255, Math.max(0, Math.floor(component * lightLevel)));
 }
 
-// flats
-// function adjustColorComponent(color, lightLevel) {
-//   return Math.min(255, Math.floor(color * lightLevel));
-// }
-
 const debugCanvas = document.getElementById("debugCanvas");
 const debugCtx = debugCanvas.getContext("2d");
 
@@ -317,15 +286,7 @@ let startIndex;
 let endIndex;
 let maxFrame = -1;
 
-// let theSprites = [];
-// for (let i = 0; i < spriteNames.length; i++) {
-//   theSprites[i] = new SpriteDef();
-// }
-
 let theSprites = new Map();
-// for (let i = 0; i < spriteNames.length; i++) {
-//   theSprites.set("SPR_" + spriteNames[i], new SpriteDef(-1, []));
-// }
 
 let spriteTemp = [];
 
@@ -393,17 +354,6 @@ function parseLevelName(levelName) {
       originalName: levelName,
     };
   }
-
-  // const doom2Regex = /^MAP(\d+)$/i;
-  // match = levelName.match(doom2Regex);
-  // if (match) {
-  //   return {
-  //     game: "DOOM2",
-  //     episode: null,
-  //     map: parseInt(match[1], 10),
-  //     originalName: levelName,
-  //   };
-  // }
 
   return {
     game: "UNKNOWN",
