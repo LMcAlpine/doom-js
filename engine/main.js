@@ -47,7 +47,10 @@ async function initializeGameData(file) {
     patchNames
   );
   flatManager = new FlatManager(lumpData, palette.palettes[0]);
-  spriteManager = new SpriteManager(lumpData, patchNames);
+
+  const spriteNames = await loadData("sprite_names.json");
+
+  spriteManager = new SpriteManager(lumpData, patchNames, spriteNames);
 
   gameEngine = new GameEngine("myCanvas", 50);
   gameEngine.lumpData = lumpData;
