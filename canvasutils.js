@@ -37,15 +37,6 @@ const HALFFOV = FOV / 2;
 const ONFLOORZ = Number.MIN_SAFE_INTEGER;
 const ONCEILINGZ = Number.MAX_SAFE_INTEGER;
 
-const ANG45 = 0x20000000;
-const ANG90 = 0x40000000;
-const ANG180 = 0x80000000;
-const ANG270 = 0xc0000000;
-const ANG_MAX = 0xffffffff;
-
-const ANG1 = ANG45 / 45;
-const ANG60 = ANG180 / 3;
-
 let traverseBSP;
 let traverseCount = 0;
 
