@@ -45,21 +45,6 @@ const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 const SPAWNCEILING = 256;
 const NOSECTOR = 8;
 
-const FRACBITS = 16;
-const FRACUNIT = 1 << FRACBITS;
-const TABLE_SIZE = 65536; // full circle in fine angles
-let finetangent = new Int32Array(TABLE_SIZE);
-
-for (let i = 0; i < TABLE_SIZE; i++) {
-  let angleRadians = (i * 2 * Math.PI) / TABLE_SIZE;
-  let t = Math.tan(angleRadians);
-  let fixedT = Math.floor(t * FRACUNIT);
-  finetangent[i] = fixedT;
-}
-
-function degreesToFineAngle(deg) {
-  return Math.floor((deg / 360) * TABLE_SIZE) & (TABLE_SIZE - 1);
-}
 
 // temp
 let floorPlane;
