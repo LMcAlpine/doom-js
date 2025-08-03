@@ -41,7 +41,7 @@ class SpriteManager {
     for (let i = 0; i < this.spriteNames.length; i++) {
       // change this
       // needed to reset spriteTemp for each new sprite
-      for (let z = 0; z < 29; z++) {
+      for (let z = 0; z < MAX_FRAMES; z++) {
         spriteTemp[z] = new SpriteFrame();
       }
 
