@@ -59,6 +59,7 @@ class Subsector {
         const angleV2 = result[1];
 
         this.wallRenderer.addWall(seg, angleV1, angleV2);
+        //return { seg, angleV1, angleV2 };
       }
     }
   }
