@@ -811,7 +811,6 @@ class LevelManager {
   }
 
   spawnMapThing(mapThing) {
-    let i;
     let mapObject = {};
     let x;
     let y;
@@ -848,18 +847,9 @@ class LevelManager {
       console.error("NOT FOUND");
     }
 
-    // find which type to spawn
-    // for (i = 0; i < arr.length; i++) {
-    //   // map maybe instead?
-    //   // if (mapThing.type == mapinfo[i].doomednum) {
-    //   //   break;
-    //   // }
 
-    // }
 
-    if (i === arr.length) {
-      return;
-    }
+
 
     x = mapThing.xPosition;
     y = mapThing.yPosition;

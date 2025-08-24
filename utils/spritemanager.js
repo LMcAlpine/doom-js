@@ -1,7 +1,8 @@
 class SpriteManager {
-  constructor(lumpData, patchNames) {
+  constructor(lumpData, patchNames, spriteNames) {
     this.lumpData = lumpData;
     this.patchNames = patchNames;
+    this.spriteNames = spriteNames;
   }
 
   getSprites(startMarker, endMarker) {
@@ -21,26 +22,15 @@ class SpriteManager {
     startIndex = this.getIndex("S_START") + 1;
     endIndex = this.getIndex("S_END") - 1;
 
-    // let patch;
-    // let spriteWidth = [];
-    // let spriteOffset = [];
-    // let spriteTopOffset = [];
-
-    // for (let i = 0; i < sprites.length; i++) {
-    //   patch = gameEngine.patchNames.parsePatchHeader(sprites[i].name);
-    //   spriteWidth[i] = patch.width;
-    //   spriteOffset[i] = patch.leftOffset;
-    //   spriteTopOffset[i] = patch.topOffset;
-    // }
     const { spriteWidth, spriteOffset, spriteTopOffset } =
       this.calculateOffsets(sprites);
 
-    this.installSprites(spriteNames, startIndex, endIndex);
+    this.installSprites(startIndex, endIndex);
 
     return { spriteWidth, spriteOffset, spriteTopOffset };
   }
 
-  installSprites(spriteNames, startIndex, endIndex) {
+  installSprites(startIndex, endIndex) {
     let spriteName;
     let frame;
     let rotation;
@@ -48,10 +38,10 @@ class SpriteManager {
     startIndex--;
     endIndex++;
 
-    for (let i = 0; i < spriteNames.length; i++) {
+    for (let i = 0; i < this.spriteNames.length; i++) {
       // change this
       // needed to reset spriteTemp for each new sprite
-      for (let z = 0; z < 29; z++) {
+      for (let z = 0; z < MAX_FRAMES; z++) {
         spriteTemp[z] = new SpriteFrame();
       }
 
@@ -60,7 +50,7 @@ class SpriteManager {
       for (let j = startIndex + 1; j < endIndex; j++) {
         let sprite = this.lumpData[j].name;
 
-        if (sprite.startsWith(spriteNames[i])) {
+        if (sprite.startsWith(this.spriteNames[i])) {
           spriteName = sprite;
           frame = sprite[4].charCodeAt(0) - "A".charCodeAt(0);
           rotation = sprite[5] - "0";
@@ -80,14 +70,10 @@ class SpriteManager {
       maxFrame++;
 
       const temp = Object.assign({}, spriteTemp);
-      theSprites.set("SPR_" + spriteNames[i], new SpriteDef(maxFrame, temp));
-      // theSprites[i].framesCount = maxFrame;
-      // theSprites[i].spriteFrames = temp;
-      // for (let [key, value] of theSprites) {
-      //   value.framesCount = maxFrame;
-      //   value.spriteFrames = temp;
-      //   // theSprites.set(key, value);
-      // }
+      theSprites.set(
+        "SPR_" + this.spriteNames[i],
+        new SpriteDef(maxFrame, temp)
+      );
     }
   }
 

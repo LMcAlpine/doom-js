@@ -5,6 +5,7 @@ class BSPTraversal {
     this.nodes = levels.nodes;
 
     this.subsector = subsector;
+    
   }
 
   traverseBSP(nodeID) {

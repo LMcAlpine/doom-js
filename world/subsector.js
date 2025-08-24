@@ -21,7 +21,6 @@ class Subsector {
    * @param {number} subsectorID - ID of the current subsector.
    */
   handleSubsector(subsectorID) {
-    //const subsector = this.subsectors[subsectorID];
     const subsector = this.linkedSubsectors[subsectorID];
 
     // check floor visibility
@@ -60,6 +59,7 @@ class Subsector {
         const angleV2 = result[1];
 
         this.wallRenderer.addWall(seg, angleV1, angleV2);
+        //return { seg, angleV1, angleV2 };
       }
     }
   }

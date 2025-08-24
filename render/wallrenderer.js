@@ -61,29 +61,38 @@ class WallRenderer {
     if (xScreenV1 === xScreenV2) {
       return;
     }
+
+    const segType = this.determineSegType(seg);
+
+    if (segType === "skip") return;
+
+    if (segType === "solid") this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1);
+
+    if (segType === "portal")
+      this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1);
+  }
+
+  determineSegType(seg) {
     //left sector == backsector
     //right sector == front sector
     if (seg.leftSector === null) {
-      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1);
-      return;
+      return "solid";
     }
 
-    // // doors
+    // doors
     if (
       seg.leftSector.ceilingHeight <= seg.rightSector.floorHeight ||
       seg.leftSector.floorHeight >= seg.rightSector.ceilingHeight
     ) {
-      this.clipSolidWalls(seg, xScreenV1, xScreenV2 - 1);
-      return;
+      return "solid";
     }
 
-    // // portal because there are height differences
+    //portal because there are height differences
     if (
       seg.rightSector.ceilingHeight !== seg.leftSector.ceilingHeight ||
       seg.rightSector.floorHeight !== seg.leftSector.floorHeight
     ) {
-      this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1);
-      return;
+      return "portal";
     }
 
     if (
@@ -92,10 +101,10 @@ class WallRenderer {
       seg.leftSector.lightLevel === seg.rightSector.lightLevel &&
       seg.linedef.rightSidedef.middleTexture === "-"
     ) {
-      return;
+      return "skip";
     }
 
-    this.clipPortalWalls(seg, xScreenV1, xScreenV2 - 1);
+    return "portal";
   }
 
   clipPortalWalls(seg, xScreenV1, xScreenV2) {
@@ -258,7 +267,7 @@ class WallRenderer {
     drawSeg_O.x1 = xScreenV1;
     drawSeg_O.x2 = xScreenV2;
     // drawSeg_O.currentLine = line;
-    // needs to be the seg not the linedef. Segs can be different directions than the linedef. 
+    // needs to be the seg not the linedef. Segs can be different directions than the linedef.
     // the world map in the editor does not always represent the same direction as a seg.
     // the editor map shows linedefs not segs.
     drawSeg_O.currentLine = seg;
