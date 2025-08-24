@@ -1,6 +1,6 @@
 # Doom-JS
 
-**Note: This repository is currently under construction.**
+Playable vertical slice; rendering, sprite system, and level loading implemented.
 
 ## Requirements
 Doom shareware WAD
@@ -8,28 +8,43 @@ Doom shareware WAD
 Download link listed under external links at the bottom:
 https://doomwiki.org/wiki/DOOM1.WAD
 
-## Project Status
+Also works with the retail DOOM WAD—no support for DOOM 2 (yet). 
 
-This project is still in progress, and development is ongoing. 
+## Project Features
 
-## Project Goals
+- Renderer
+- WAD Parsing
+- Sprite system
+- Level loading
 
-The primary goal of Doom-JS is to reproduce the aesthetics of the classic Doom Game while utilizing modern web technologies.
+## Immediate Goals
+
+- Collision Detection
+- Enemy AI
+
+## Controls
+
+W, A, S, D for movement, and the left and right arrow keys for rotation.
+
+## How to play
+
+1. Click Choose File
+2. Select DOOM1.WAD or DOOM.WAD
+3. Select the desired level in the level select dropdown, or leave it as the default.
+4. Click Load Level.
+5. Click into the game window.
+6. Use the keys W, A, S, D, and the left and right arrows for movement and rotation.
+7. Change the level anytime by repeating steps 3 and 4.
 
 ## Screenshots
 
-![Screenshot 2024-08-31 231241](https://github.com/user-attachments/assets/51a304d5-96fa-4da4-bffa-d601d582fa59)
-
-![Screenshot 2024-09-01 000436](https://github.com/user-attachments/assets/4341980f-c79f-4e7b-8b06-5cbed45946f1)
-
-![image](https://github.com/user-attachments/assets/55303fd4-8008-431e-99da-11de7051a470)
+<img width="954" height="596" alt="image" src="https://github.com/user-attachments/assets/e91fb12d-d5d9-4403-abe0-69c77cbf07d5" />
 
 
+<img width="954" height="596" alt="image" src="https://github.com/user-attachments/assets/2012bee7-bb80-4d79-962e-5d44c527e53a" />
 
 
-## Technologies Used
-
-This project is developed using JavaScript and HTML.
+<img width="954" height="596" alt="image" src="https://github.com/user-attachments/assets/38d3ef7d-c043-452d-9a5c-bcfa24f65daf" />
 
 ## References
 - The Game Engine Black Book: DOOM
