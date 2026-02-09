@@ -11,7 +11,7 @@ class LevelManager {
       colorGenerator,
       wallRendererDependencies,
       textureManager,
-      flatManager
+      flatManager,
     );
 
     this.solidSegsManager = wallRendererDependencies.solidSegsManager;
@@ -46,7 +46,7 @@ class LevelManager {
       levelsData,
       segmentData,
       this.wallRenderer,
-      this.linkedSubsectors
+      this.linkedSubsectors,
     );
     this.bspTraversal = new BSPTraversal(levels, subsector);
 
@@ -64,6 +64,19 @@ class LevelManager {
     this.vertices = levels.vertices;
     this.nodes = levels.nodes;
     this.things = levels.things;
+    this.blockmap = levels.blocklists;
+
+    let { maxX, minX, maxY, minY } = calculateMinMax(this.vertices);
+
+    const { scaleX, scaleY } = calculateScale2D(maxX, minX, maxY, minY);
+
+    this.maxX = maxX;
+    this.minX = minX;
+    this.maxY = maxY;
+    this.minY = minY;
+
+    this.scaleX = scaleX;
+    this.scaleY = scaleY;
 
     this.yslope = [];
     let dy;
@@ -71,6 +84,8 @@ class LevelManager {
       dy = Math.abs(i - CANVASWIDTH / 2);
       this.yslope[i] = CANVASWIDTH / 2 / dy;
     }
+
+    this.collisionSystem = new CollisionSystem(this.linedefs);
   }
 
   draw() {
@@ -85,6 +100,26 @@ class LevelManager {
     this.wallRenderer.clearVisplanes();
     this.wallRenderer.clearDrawSegs();
 
+    // let linedefs = this.linedefs;
+
+    // linedefs.forEach((linedef) => {
+    //   const vertex1 = this.vertices[linedef.startVertex];
+    //   const vertex2 = this.vertices[linedef.endVertex];
+
+    //   const drawX = remapXToScreen(vertex1.x, this.minX, this.scaleX);
+    //   const drawY = remapYToScreen(vertex1.y, this.minY, this.scaleY);
+
+    //   const drawX2 = remapXToScreen(vertex2.x, this.minX, this.scaleX);
+    //   const drawY2 = remapYToScreen(vertex2.y, this.minY, this.scaleY);
+    //   gameEngine.canvas.drawLine(drawX, drawY, drawX2, drawY2, [100, 30, 4]);
+    // });
+
+    // const drawX = remapXToScreen(gameEngine.player.x, this.minX, this.scaleX);
+    // const drawY = remapYToScreen(gameEngine.player.y, this.minY, this.scaleY);
+
+    // gameEngine.canvas.drawSolidCircle(drawX, drawY, 10, [255, 0, 0]);
+    // let blockmap = levelData.blockmap;
+
     this.bspTraversal.traverseBSP(this.nodes.length - 1);
 
     traverseBSP = true;
@@ -95,6 +130,24 @@ class LevelManager {
 
     // masked wall
     this.drawMasked();
+
+    let linedefs = this.linedefs;
+
+    linedefs.forEach((linedef) => {
+      const oneSided =
+        linedef.leftSidedef === -1 || linedef.rightSidedef === -1;
+      const hardBlocked = (linedef.flags & ML_BLOCKING) !== 0;
+      if (oneSided || hardBlocked) {
+        const vertex1 = this.vertices[linedef.startVertex];
+        const vertex2 = this.vertices[linedef.endVertex];
+
+        this.collisionSystem.resolveMovement(
+          gameEngine.player,
+          vertex1,
+          vertex2,
+        );
+      }
+    });
   }
 
   drawVisplanes() {
@@ -128,7 +181,7 @@ class LevelManager {
         visplane,
         textureWidthFlat,
         textureHeightFlat,
-        textureData
+        textureData,
       );
     }
   }
@@ -137,7 +190,7 @@ class LevelManager {
     visplane,
     textureWidthFlat,
     textureHeightFlat,
-    textureData
+    textureData,
   ) {
     for (let j = visplane.minX; j <= visplane.maxX; j++) {
       let topY = visplane.top[j];
@@ -146,10 +199,10 @@ class LevelManager {
       if (topY <= bottomY) {
         // Calculate direction vectors for texture mapping
         let playerDirectionX = Math.cos(
-          degreesToRadians(gameEngine.player.direction.angle)
+          degreesToRadians(gameEngine.player.direction.angle),
         );
         let playerDirectionY = Math.sin(
-          degreesToRadians(gameEngine.player.direction.angle)
+          degreesToRadians(gameEngine.player.direction.angle),
         );
 
         // Iterate from top to bottom in this column
@@ -162,7 +215,7 @@ class LevelManager {
           j,
           textureWidthFlat,
           textureHeightFlat,
-          textureData
+          textureData,
         );
       }
     }
@@ -177,7 +230,7 @@ class LevelManager {
     j,
     textureWidthFlat,
     textureHeightFlat,
-    textureData
+    textureData,
   ) {
     for (let y = topY; y <= bottomY; y++) {
       let z = (HALFWIDTH * visplane.worldFront) / (HALFHEIGHT - y);
@@ -223,7 +276,7 @@ class LevelManager {
       visplane,
       textureWidthSky,
       textureHeightSky,
-      textureDataSky
+      textureDataSky,
     );
   }
 
@@ -231,7 +284,7 @@ class LevelManager {
     visplane,
     textureWidthSky,
     textureHeightSky,
-    textureDataSky
+    textureDataSky,
   ) {
     for (let x = visplane.minX; x <= visplane.maxX; x++) {
       let topY = visplane.top[x];
@@ -252,7 +305,7 @@ class LevelManager {
           textureHeightSky,
           textureDataSky,
           x,
-          1
+          1,
         );
       }
     }
@@ -329,7 +382,7 @@ class LevelManager {
         spriteRightX,
         sprite,
         clipbot,
-        cliptop
+        cliptop,
       );
 
       this.setClipMarkings(spriteLeftX, spriteRightX, clipbot, cliptop);
@@ -360,7 +413,7 @@ class LevelManager {
           spriteYScale,
           allowedTop,
           allowedBottom,
-          x
+          x,
         );
 
         // so sprites can flip. xiscale is negative when it needs to flip
@@ -377,7 +430,7 @@ class LevelManager {
         this.renderMaskedSegRange(
           i,
           this.wallRenderer.drawSegments[i].x1,
-          this.wallRenderer.drawSegments[i].x2
+          this.wallRenderer.drawSegments[i].x2,
         );
         //console.log("");
       }
@@ -390,7 +443,7 @@ class LevelManager {
     spriteYScale,
     allowedTop,
     allowedBottom,
-    x
+    x,
   ) {
     for (let j = 0; j < column.length; j++) {
       const post = column[j];
@@ -469,7 +522,7 @@ class LevelManager {
     spriteRightX,
     sprite,
     clipbot,
-    cliptop
+    cliptop,
   ) {
     for (let j = this.wallRenderer.drawSegments.length - 1; j >= 0; j--) {
       let wall = this.wallRenderer.drawSegments[j];
@@ -483,7 +536,7 @@ class LevelManager {
 
       const { r1, r2 } = this.calculateOverlapBetweenWallAndSprite(
         wall,
-        sprite
+        sprite,
       );
 
       // the smaller scale. The scale that is from the wall endpoint that is farther away
@@ -497,7 +550,7 @@ class LevelManager {
           wall,
           sprite,
           minimumWallProjectionScale,
-          wallProjectionScale
+          wallProjectionScale,
         )
       ) {
         if (wall.maskedTextureCol) {
@@ -525,7 +578,7 @@ class LevelManager {
         r2,
         clipbot,
         wall,
-        cliptop
+        cliptop,
       );
     }
   }
@@ -534,7 +587,7 @@ class LevelManager {
     wall,
     sprite,
     minimumWallProjectionScale,
-    wallProjectionScale
+    wallProjectionScale,
   ) {
     // a larger wall scale means it appears bigger (closer)
     // if the wall's closest point is farther away than the sprite (entire wall segment behind sprite)
@@ -547,7 +600,7 @@ class LevelManager {
     let isSpriteNotOnOccludingSide = !this.isPointOnLeftSide(
       sprite.gx,
       sprite.gy,
-      wall.currentLine
+      wall.currentLine,
     );
 
     return (
@@ -744,7 +797,7 @@ class LevelManager {
             textureHeight,
             textureData,
             x,
-            this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel
+            this.wallRenderer.drawSegments[i].sidedef.sector.lightLevel,
           );
         }
         maskedTextureCol[x] = 0x7fff;
@@ -761,7 +814,7 @@ class LevelManager {
       let isOnLeft = this.bspTraversal.isPointOnLeftSide(
         gameEngine.player.x,
         gameEngine.player.y,
-        this.nodes[subsectorID]
+        this.nodes[subsectorID],
       );
       if (isOnLeft) {
         subsectorID = this.nodes[subsectorID].leftChild;
@@ -782,7 +835,7 @@ class LevelManager {
       let isOnLeft = this.bspTraversal.isPointOnLeftSide(
         x,
         y,
-        this.nodes[subsectorID]
+        this.nodes[subsectorID],
       );
       if (isOnLeft) {
         subsectorID = this.nodes[subsectorID].leftChild;
@@ -846,10 +899,6 @@ class LevelManager {
     if (!found) {
       console.error("NOT FOUND");
     }
-
-
-
-
 
     x = mapThing.xPosition;
     y = mapThing.yPosition;

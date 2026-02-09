@@ -33,6 +33,8 @@ class Player {
     this.realWallAngle1;
 
     this.zVel = 0;
+
+    this.radius = 16;
   }
 
   /**
@@ -97,13 +99,13 @@ class Player {
    * Method to update the state of the player for each frame.
    */
   update() {
+    this.prevX = this.x;
+    this.prevY = this.y;
     // console.log("x: " + this.x);
     // console.log("y ;" + this.y);
     // console.log("angle: " + this.direction.angle);
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
-
-
 
     const radians = (this.direction.angle * Math.PI) / 180;
     const dx = Math.sin(radians);
@@ -145,7 +147,7 @@ class Player {
     if (gameEngine.keys["ArrowRight"] === true) {
       //this.direction -= magRotation * gameEngine.clockTick;
       this.direction = this.direction.subtract(
-        magRotation * gameEngine.clockTick
+        magRotation * gameEngine.clockTick,
       );
     }
 

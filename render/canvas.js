@@ -7,7 +7,7 @@ class Canvas {
       0,
       0,
       canvas.width,
-      canvas.height
+      canvas.height,
     );
     this.canvasPitch = this.canvasBuffer.width * 4;
     this.canvasWidth = canvas.width;
@@ -15,7 +15,7 @@ class Canvas {
 
     this.screenImageData = this.ctx.createImageData(
       canvas.width,
-      canvas.height
+      canvas.height,
     );
     this.screenBuffer = new Uint32Array(this.screenImageData.data.buffer);
 
@@ -31,54 +31,132 @@ class Canvas {
 
   updateCanvas() {
     this.ctx.putImageData(this.screenImageData, 0, 0);
-    
   }
 
   drawLine(x1, y1, x2, y2, color) {
-    const { screenBuffer, ylookup, canvasWidth } = this;
-    const [red, green, blue] = color; // Color as [R, G, B]
-    const rgbaColor = (255 << 24) | (blue << 16) | (green << 8) | red;
+    const { screenBuffer, canvasWidth } = this;
+    // Clamp once (avoid out-of-bounds & JIT deopts)
+    const W = canvasWidth;
+    const H = this.canvasHeight; // ensure you have this
+    x1 = x1 | 0;
+    y1 = y1 | 0;
+    x2 = x2 | 0;
+    y2 = y2 | 0;
+    if (x1 < 0) x1 = 0;
+    else if (x1 >= W) x1 = W - 1;
+    if (x2 < 0) x2 = 0;
+    else if (x2 >= W) x2 = W - 1;
+    if (y1 < 0) y1 = 0;
+    else if (y1 >= H) y1 = H - 1;
+    if (y2 < 0) y2 = 0;
+    else if (y2 >= H) y2 = H - 1;
 
-    // Vertical Line
+    // Pack once
+    const r = color[0] | 0,
+      g = color[1] | 0,
+      b = color[2] | 0;
+    const rgba = (255 << 24) | (b << 16) | (g << 8) | r;
+
     if (x1 === x2) {
-      const startY = Math.min(y1, y2);
-      const endY = Math.max(y1, y2);
-      for (let y = startY; y <= endY; y++) {
-        const dest = ylookup[y] + x1;
-        screenBuffer[dest] = rgbaColor;
+      // Vertical: walk the buffer with a stride
+      let y = y1,
+        end = y2;
+      if (y > end) {
+        const t = y;
+        y = end;
+        end = t;
+      }
+      let idx = y * W + x1;
+      const step = W;
+      for (; y <= end; y++, idx += step) screenBuffer[idx] = rgba;
+      return;
+    }
+
+    if (y1 === y2) {
+      // Horizontal: contiguous write
+      let x = x1,
+        end = x2;
+      if (x > end) {
+        const t = x;
+        x = end;
+        end = t;
+      }
+      let idx = y1 * W + x;
+      for (; x <= end; x++, idx++) screenBuffer[idx] = rgba;
+      return;
+    }
+
+    // Bresenham (integer math, no extra table lookups)
+    let dx = Math.abs(x2 - x1),
+      sx = x1 < x2 ? 1 : -1;
+    let dy = -Math.abs(y2 - y1),
+      sy = y1 < y2 ? 1 : -1;
+    let err = dx + dy;
+
+    while (true) {
+      screenBuffer[y1 * W + x1] = rgba;
+      if (x1 === x2 && y1 === y2) break;
+      const e2 = err << 1;
+      if (e2 >= dy) {
+        err += dy;
+        x1 += sx;
+      }
+      if (e2 <= dx) {
+        err += dx;
+        y1 += sy;
       }
     }
-    // Horizontal Line
-    else if (y1 === y2) {
-      const startX = Math.min(x1, x2);
-      const endX = Math.max(x1, x2);
-      const row = ylookup[y1];
-      for (let x = startX; x <= endX; x++) {
-        screenBuffer[row + x] = rgbaColor;
+  }
+
+  drawSolidCircle(cx, cy, radius, color) {
+    const { screenBuffer, canvasWidth: W, canvasHeight: H, ylookup } = this;
+
+    cx = cx | 0;
+    cy = cy | 0;
+    radius = radius | 0;
+    if (radius <= 0) return;
+
+    // Pack once (same packing style as your drawLine)
+    const r = color[0] | 0,
+      g = color[1] | 0,
+      b = color[2] | 0;
+    const rgba = (255 << 24) | (b << 16) | (g << 8) | r;
+
+    // Fill a horizontal segment on a single scanline y
+    const fillSpan = (y, x0, x1) => {
+      if (y < 0 || y >= H) return;
+      if (x0 > x1) {
+        const t = x0;
+        x0 = x1;
+        x1 = t;
       }
-    }
-    // Diagonal/Bresenham's Line Algorithm (Optional for non-axis-aligned lines)
-    else {
-      const dx = Math.abs(x2 - x1);
-      const dy = Math.abs(y2 - y1);
-      const sx = x1 < x2 ? 1 : -1;
-      const sy = y1 < y2 ? 1 : -1;
-      let err = dx - dy;
 
-      while (true) {
-        const dest = ylookup[y1] + x1;
-        screenBuffer[dest] = rgbaColor;
+      if (x1 < 0 || x0 >= W) return;
+      if (x0 < 0) x0 = 0;
+      if (x1 >= W) x1 = W - 1;
 
-        if (x1 === x2 && y1 === y2) break;
-        const e2 = 2 * err;
-        if (e2 > -dy) {
-          err -= dy;
-          x1 += sx;
-        }
-        if (e2 < dx) {
-          err += dx;
-          y1 += sy;
-        }
+      let idx = (ylookup ? ylookup[y] : y * W) + x0;
+      for (let x = x0; x <= x1; x++) screenBuffer[idx++] = rgba;
+    };
+
+    // Midpoint circle algorithm + span filling
+    let x = radius;
+    let y = 0;
+    let err = 1 - x;
+
+    while (x >= y) {
+      // For each (x,y), fill the 4 unique scanlines with appropriate spans
+      fillSpan(cy + y, cx - x, cx + x);
+      fillSpan(cy - y, cx - x, cx + x);
+      fillSpan(cy + x, cx - y, cx + y);
+      fillSpan(cy - x, cx - y, cx + y);
+
+      y++;
+      if (err < 0) {
+        err += (y << 1) + 1;
+      } else {
+        x--;
+        err += ((y - x) << 1) + 1;
       }
     }
   }
