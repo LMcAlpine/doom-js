@@ -103,8 +103,7 @@ class Player {
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 
-    const speed = 0.3 * gameEngine.clockTick;
-    const rot = 0.12 * gameEngine.clockTick;
+
 
     const radians = (this.direction.angle * Math.PI) / 180;
     const dx = Math.sin(radians);

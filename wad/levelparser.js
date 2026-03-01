@@ -26,7 +26,7 @@ class LevelParser {
     }
 
     // Extract just the lumps for this level
-    const levelLumps = this.lumps.slice(levelStartIndex, levelStartIndex + 10); // 10 is usually the number of lumps for a level
+    const levelLumps = this.lumps.slice(levelStartIndex, levelStartIndex + 11); // 10 is usually the number of lumps for a level
 
     // Parse the vertices, linedefs, etc. from the level lumps
     const verticesLump = levelLumps.find((lump) => lump.name === "VERTEXES");
@@ -56,6 +56,9 @@ class LevelParser {
     // const pnamesLump = levelLumps.find((lump) => lump.name === "PNAMES");
     // const names = this.parsePatchNames(pnamesLump);
 
+    const blockmapLump = levelLumps.find((lump) => lump.name === "BLOCKMAP");
+    const blocklists = this.parseBlockMap(blockmapLump);
+
     return {
       vertices,
       linedefs,
@@ -65,6 +68,7 @@ class LevelParser {
       segs,
       sectors,
       things,
+      blocklists,
     };
   }
 
@@ -153,7 +157,7 @@ class LevelParser {
   parseSidedefs(sidedefsLump) {
     const dataView = new DataView(sidedefsLump.data);
     const sidedefs = [];
-    const textDecoder = new TextDecoder('utf-8');
+    const textDecoder = new TextDecoder("utf-8");
 
     for (let i = 0; i < sidedefsLump.size; i += 30) {
       const xOffset = dataView.getInt16(i, true);
@@ -164,12 +168,9 @@ class LevelParser {
       // ).replace(/\u0000/g, ""); // Remove null characters
 
       const rawName = new Uint8Array(sidedefsLump.data.slice(i + 4, i + 12));
-      const nullIndex = rawName.indexOf(0);  // Find the first null byte
+      const nullIndex = rawName.indexOf(0); // Find the first null byte
       const validData = nullIndex >= 0 ? rawName.slice(0, nullIndex) : rawName;
       const upperTextureName = textDecoder.decode(validData).trim();
-
-
-
 
       const lowerTextureName = String.fromCharCode(
         ...new Uint8Array(sidedefsLump.data.slice(i + 12, i + 20))
@@ -376,5 +377,34 @@ class LevelParser {
       things.push({ xPosition, yPosition, direction, type, flag });
     }
     return things;
+  }
+
+  parseBlockMap(blockmapLump) {
+    const dataView = new DataView(blockmapLump.data);
+    let offset = 0;
+
+    const header = {
+      x: dataView.getInt16(offset, true),
+      y: dataView.getInt16((offset += 2), true),
+      numberOfColumns: dataView.getInt16((offset += 2), true),
+      numberOfRows: dataView.getInt16((offset += 2), true),
+    };
+
+    let offsets = [];
+    const blocksCount = header.numberOfColumns * header.numberOfRows;
+    for (let i = 0; i < blocksCount; i++) {
+      offsets.push(dataView.getInt16((offset += 2), true));
+    }
+
+    let blockLists = [];
+    for (let i = 0; i < offsets.length; i++) {
+      let offset = offsets[i] * 2;
+      const firstLinedefIndex = dataView.getInt16(offset, true);
+      const secondLinedefIndex = dataView.getInt16((offset += 2), true);
+
+      blockLists.push({ firstLinedefIndex, secondLinedefIndex });
+    }
+
+    return blockLists;
   }
 }
