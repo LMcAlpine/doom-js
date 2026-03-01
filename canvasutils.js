@@ -45,9 +45,6 @@ const SCREENDISTANCE = HALFWIDTH / Math.tan(degreesToRadians(HALFFOV));
 const SPAWNCEILING = 256;
 const NOSECTOR = 8;
 
-const ML_BLOCKING = 0x0001; // impassable
-const ML_BLOCKMONSTERS = 0x0002; // blocks monsters only
-
 // temp
 let floorPlane;
 let ceilingPlane;
@@ -162,7 +159,7 @@ function angleToX(angle) {
   let SCREENDISTANCE = gameEngine.canvas.canvasWidth / 2.0 + 1.0;
   angle = new Angle(angle - 90);
   return Math.floor(
-    SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE,
+    SCREENDISTANCE - Math.tan(degreesToRadians(angle.angle)) * SCREENDISTANCE
   );
 }
 
@@ -187,11 +184,11 @@ function scaleFromViewAngle(
   realWallNormalAngle,
   realWallDistance,
   viewangle,
-  screenwidth,
+  screenwidth
 ) {
   let anglea = new Angle(RIGHT_ANGLE_DEGREES + (visangle - viewangle));
   let angleb = new Angle(
-    RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle),
+    RIGHT_ANGLE_DEGREES + (visangle - realWallNormalAngle)
   );
 
   let sinea = Math.abs(Math.sin(degreesToRadians(anglea.angle)));
@@ -347,8 +344,4 @@ function finalizeClipArrays(clipArrays, viewHeight) {
     if (cliptop[i] === -2) cliptop[i] = -1;
     if (clipbot[i] === -2) clipbot[i] = viewHeight;
   }
-}
-
-function dot(u, v) {
-  return u.x * v.x + u.y * v.y;
 }
