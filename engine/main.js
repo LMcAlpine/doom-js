@@ -1,6 +1,7 @@
 import { initDOM } from "../uimanager.js";
 
 import { createActions } from "./gameplay/actions.js";
+import { createEngineContext } from "./enginecontext.js";
 
 let lumpData = null;
 let patchNames = null;
@@ -32,6 +33,8 @@ async function loadData(name) {
 }
 
 async function initializeGameData(file) {
+  console.time("init_wad_total");
+
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
   const wadParser = new WADParser(arrayBuffer);
@@ -86,13 +89,49 @@ async function initializeGameData(file) {
   // }
 
   const canvas = new Canvas("myCanvas");
+
+  const engineContext = createEngineContext({
+    canvas,
+    ctx: canvas.ctx,
+    assets: {
+      lumpData,
+      patchNames,
+      palette: paletteField,
+      textures: textureField,
+      textureManager,
+      flatManager,
+      spriteManager,
+      spriteWidth: gameEngine.spriteWidth,
+      spriteOffset: gameEngine.spriteOffset,
+      spriteTopOffset: gameEngine.spriteTopOffset,
+    },
+    gameplay: {
+      infoDefinitions: gameEngine.infoDefinitions,
+      states: gameEngine.states,
+      actions: gameEngine.actions,
+    },
+    deps: {
+      LevelManager,
+      Player,
+      buildSectors,
+      buildSidedefs,
+      buildLinedefs,
+      buildSegs,
+      buildThings,
+    },
+  });
+
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
-  gameEngine.init();
+  gameEngine.init(engineContext);
   gameEngine.start();
+
+  console.timeEnd("init_wad_total");
 }
 
 function loadLevel(levelName) {
+  console.time(`load_level:${levelName}`);
+
   // load lumps just for this level
   const levelParser = new LevelParser(lumpData);
   const levelData = levelParser.parse(levelName);
@@ -110,6 +149,8 @@ function loadLevel(levelName) {
 
   // player needs to be initialized before
   gameEngine.levelManager.loadThings();
+
+  console.timeEnd(`load_level:${levelName}`);
 }
 
 function setupTextureAndPalettes(lumpData) {
