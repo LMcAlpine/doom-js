@@ -1,6 +1,7 @@
 import { initDOM } from "../uimanager.js";
 
 import { createActions } from "./gameplay/actions.js";
+import { createEngineContext } from "./enginecontext.js";
 
 let lumpData = null;
 let patchNames = null;
@@ -86,9 +87,41 @@ async function initializeGameData(file) {
   // }
 
   const canvas = new Canvas("myCanvas");
+
+  const engineContext = createEngineContext({
+    canvas,
+    ctx: canvas.ctx,
+    assets: {
+      lumpData,
+      patchNames,
+      palette: paletteField,
+      textures: textureField,
+      textureManager,
+      flatManager,
+      spriteManager,
+      spriteWidth: gameEngine.spriteWidth,
+      spriteOffset: gameEngine.spriteOffset,
+      spriteTopOffset: gameEngine.spriteTopOffset,
+    },
+    gameplay: {
+      infoDefinitions: gameEngine.infoDefinitions,
+      states: gameEngine.states,
+      actions: gameEngine.actions,
+    },
+    deps: {
+      LevelManager,
+      Player,
+      buildSectors,
+      buildSidedefs,
+      buildLinedefs,
+      buildSegs,
+      buildThings,
+    },
+  });
+
   gameEngine.canvas = canvas;
   gameEngine.ctx = canvas.ctx;
-  gameEngine.init();
+  gameEngine.init(engineContext);
   gameEngine.start();
 }
 

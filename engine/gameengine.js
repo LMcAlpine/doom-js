@@ -11,7 +11,19 @@ class GameEngine {
     this.keys = {};
   }
 
-  init() {
+  init(context) {
+    if (context) {
+      this.context = context;
+      this.canvas = context.canvas;
+      this.ctx = context.ctx;
+    }
+
+    if (!this.canvas) {
+      throw new Error("GameEngine.init: missing canvas");
+    }
+    if (!this.ctx) {
+      throw new Error("GameEngine.init: missing ctx");
+    }
     this.startInput();
   }
 
@@ -45,11 +57,11 @@ class GameEngine {
 
     this.ctx.canvas.addEventListener(
       "keydown",
-      (event) => (this.keys[event.key] = true)
+      (event) => (this.keys[event.key] = true),
     );
     this.ctx.canvas.addEventListener(
       "keyup",
-      (event) => (this.keys[event.key] = false)
+      (event) => (this.keys[event.key] = false),
     );
   }
 
@@ -97,25 +109,39 @@ class GameEngine {
   loadLevel(levelData) {
     const dataObjects = this.setupLevelData(levelData);
 
-    this.entities = [];
-    if (!this.levelManager && textureManager && flatManager) {
-      this.levelManager = new LevelManager(
-        levelData,
-        dataObjects,
-        textureManager,
-        flatManager
-      );
-    } else {
-      //this.levelManager.reset(levelData, dataObjects);
+    const textureMgr = this.context?.assets?.textureManager || textureManager;
+    const flatMgr = this.context?.assets?.flatManager || flatManager;
 
-      // create new instance for now....
-      this.levelManager = new LevelManager(
-        levelData,
-        dataObjects,
-        textureManager,
-        flatManager
-      );
+    if (!textureMgr || !flatMgr) {
+      throw new Error("GameEngine.loadLevel: missing texture/flat manager");
     }
+
+    this.levelManager = new LevelManager(
+      levelData,
+      dataObjects,
+      textureMgr,
+      flatMgr,
+    );
+
+    // this.entities = [];
+    // if (!this.levelManager && textureManager && flatManager) {
+    //   this.levelManager = new LevelManager(
+    //     levelData,
+    //     dataObjects,
+    //     textureManager,
+    //     flatManager,
+    //   );
+    // } else {
+    //   //this.levelManager.reset(levelData, dataObjects);
+
+    //   // create new instance for now....
+    //   this.levelManager = new LevelManager(
+    //     levelData,
+    //     dataObjects,
+    //     textureManager,
+    //     flatManager,
+    //   );
+    // }
 
     // this.levelManager.loadThings();
   }
@@ -126,7 +152,7 @@ class GameEngine {
       { minX: minX, minY: minY },
       { scaleX: scaleX, scaleY: scaleY },
       90,
-      41
+      41,
     );
     this.addEntity(player);
     this.player = player;
@@ -138,7 +164,7 @@ class GameEngine {
     const linedefObjects = buildLinedefs(
       levels.linedefs,
       levels.vertices,
-      sidedefObjects
+      sidedefObjects,
     );
     const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
     const thingObjects = buildThings(levels.things);
