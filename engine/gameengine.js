@@ -108,6 +108,7 @@ class GameEngine {
 
   loadLevel(levelData) {
     const dataObjects = this.setupLevelData(levelData);
+    this.entities = [];
 
     const textureMgr = this.context?.assets?.textureManager || textureManager;
     const flatMgr = this.context?.assets?.flatManager || flatManager;
