@@ -33,6 +33,8 @@ async function loadData(name) {
 }
 
 async function initializeGameData(file) {
+  console.time("init_wad_total");
+
   const wadFileReader = new WADFileReader(file);
   const arrayBuffer = await wadFileReader.readFile();
   const wadParser = new WADParser(arrayBuffer);
@@ -123,9 +125,13 @@ async function initializeGameData(file) {
   gameEngine.ctx = canvas.ctx;
   gameEngine.init(engineContext);
   gameEngine.start();
+
+  console.timeEnd("init_wad_total");
 }
 
 function loadLevel(levelName) {
+  console.time(`load_level:${levelName}`);
+
   // load lumps just for this level
   const levelParser = new LevelParser(lumpData);
   const levelData = levelParser.parse(levelName);
@@ -143,6 +149,8 @@ function loadLevel(levelName) {
 
   // player needs to be initialized before
   gameEngine.levelManager.loadThings();
+
+  console.timeEnd(`load_level:${levelName}`);
 }
 
 function setupTextureAndPalettes(lumpData) {
