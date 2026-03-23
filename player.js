@@ -106,34 +106,53 @@ class Player {
     const radians = (this.direction.angle * Math.PI) / 180;
     const dx = Math.sin(radians);
     const dy = Math.cos(radians);
+    let newX = this.x;
+    let newY = this.y;
 
     if (gameEngine.keys["w"] === true) {
-      this.x +=
+      newX +=
         Math.cos((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
-      this.y +=
+
+      newY +=
         Math.sin((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
+      if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
+        this.x = newX;
+        this.y = newY;
+      }
     }
     if (gameEngine.keys["s"] === true) {
-      this.x -=
+      newX -=
         Math.cos((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
-      this.y -=
+      newY -=
         Math.sin((this.direction.angle * Math.PI) / 180) *
         multiplier *
         gameEngine.clockTick;
+      if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
+        this.x = newX;
+        this.y = newY;
+      }
     }
     if (gameEngine.keys["d"] === true) {
-      this.x += dx * multiplier * gameEngine.clockTick;
-      this.y -= dy * multiplier * gameEngine.clockTick;
+      newX += dx * multiplier * gameEngine.clockTick;
+      newY -= dy * multiplier * gameEngine.clockTick;
+      if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
+        this.x = newX;
+        this.y = newY;
+      }
     }
     if (gameEngine.keys["a"] === true) {
-      this.x -= dx * multiplier * gameEngine.clockTick;
-      this.y += dy * multiplier * gameEngine.clockTick;
+      newX -= dx * multiplier * gameEngine.clockTick;
+      newY += dy * multiplier * gameEngine.clockTick;
+      if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
+        this.x = newX;
+        this.y = newY;
+      }
     }
 
     if (gameEngine.keys["ArrowLeft"] === true) {

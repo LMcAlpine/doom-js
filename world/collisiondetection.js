@@ -5,7 +5,7 @@ class CollisionDetection {
 
   canMoveTo(currentX, currentY, newX, newY) {
     for (let i = 0; i < this.linedefs.length; i++) {
-      if (intersects(currentX, currentY, newX, newY, this.linedefs[i])) {
+      if (this.intersects(currentX, currentY, newX, newY, this.linedefs[i])) {
         return false;
       }
     }
