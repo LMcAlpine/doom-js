@@ -38,12 +38,12 @@ class Player {
   /**
    *
    * Processing method to determine if this segment is in the field of view of the player.
-   * @param {Object} seg - represents the current segment being processed.
+   * @param {Object} vertices - represents the current vertices being processed.
    * @returns {Array} - containing the two angles to vertex1 and vertex2 of this segment.
    */
-  checkIfSegInFOV(seg) {
-    let angleToV1 = this.angleTowardsVertex(seg.vertex1);
-    let angleToV2 = this.angleTowardsVertex(seg.vertex2);
+  checkIfSegInFOV(vertices) {
+    let angleToV1 = this.angleTowardsVertex(vertices.vertex1);
+    let angleToV2 = this.angleTowardsVertex(vertices.vertex2);
 
     const span = Angle.subtract(angleToV1.angle, angleToV2.angle);
 
@@ -103,8 +103,6 @@ class Player {
     const multiplier = 550;
     const magRotation = 0.1875 * multiplier;
 
-
-
     const radians = (this.direction.angle * Math.PI) / 180;
     const dx = Math.sin(radians);
     const dy = Math.cos(radians);
@@ -145,7 +143,7 @@ class Player {
     if (gameEngine.keys["ArrowRight"] === true) {
       //this.direction -= magRotation * gameEngine.clockTick;
       this.direction = this.direction.subtract(
-        magRotation * gameEngine.clockTick
+        magRotation * gameEngine.clockTick,
       );
     }
 
