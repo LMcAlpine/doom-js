@@ -1,8 +1,8 @@
-# Refactor Smoke Checklist
+# Smoke Checklist
 
-Date: 03/01/26
+Date: 03/22/26
 
-Branch: cleanup/architecture
+Branch: checkSegInFovChange
 
 Browser: Google Chrome
 

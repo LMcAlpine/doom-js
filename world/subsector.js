@@ -28,7 +28,7 @@ class Subsector {
       floorPlane = this.wallRenderer.findPlane(
         subsector.sector.floorHeight,
         subsector.sector.floorTexture,
-        subsector.sector.lightLevel
+        subsector.sector.lightLevel,
       );
     } else {
       floorPlane = null;
@@ -38,7 +38,7 @@ class Subsector {
       ceilingPlane = this.wallRenderer.findPlane(
         subsector.sector.ceilingHeight,
         subsector.sector.ceilingTexture,
-        subsector.sector.lightLevel
+        subsector.sector.lightLevel,
       );
     }
 
@@ -49,10 +49,11 @@ class Subsector {
 
       const segStartVertex = seg.startVertex;
       const segEndVertex = seg.endVertex;
-      const result = gameEngine.player.checkIfSegInFOV({
+      const vertices = {
         vertex1: segStartVertex,
         vertex2: segEndVertex,
-      });
+      };
+      const result = gameEngine.player.checkIfSegInFOV(vertices);
 
       if (result.length !== 0) {
         const angleV1 = result[0];
@@ -102,7 +103,7 @@ class Subsector {
       tx,
       xscale,
       gameEngine.spriteOffset[lump],
-      gameEngine.spriteWidth[lump]
+      gameEngine.spriteWidth[lump],
     );
 
     if (x1 > CANVASWIDTH) {
@@ -128,7 +129,7 @@ class Subsector {
       clampedX2,
       xscale,
       textureMid,
-      flip
+      flip,
     );
 
     this.adjustStart(vs, x1);
