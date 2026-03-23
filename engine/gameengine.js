@@ -123,6 +123,7 @@ class GameEngine {
       textureMgr,
       flatMgr,
     );
+    this.collisionDetector = new CollisionDetection(dataObjects.linedefObjects);
 
     // this.entities = [];
     // if (!this.levelManager && textureManager && flatManager) {
