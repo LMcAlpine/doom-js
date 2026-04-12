@@ -122,6 +122,7 @@ class Player {
       if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
         this.x = newX;
         this.y = newY;
+        this.height = this.getPlayerSubsectorHeight() + 41;
       }
     }
     if (gameEngine.keys["s"] === true) {
@@ -136,6 +137,7 @@ class Player {
       if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
         this.x = newX;
         this.y = newY;
+        this.height = this.getPlayerSubsectorHeight() + 41;
       }
     }
     if (gameEngine.keys["d"] === true) {
@@ -144,6 +146,7 @@ class Player {
       if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
         this.x = newX;
         this.y = newY;
+        this.height = this.getPlayerSubsectorHeight() + 41;
       }
     }
     if (gameEngine.keys["a"] === true) {
@@ -152,6 +155,7 @@ class Player {
       if (gameEngine.collisionDetector.canMoveTo(this.x, this.y, newX, newY)) {
         this.x = newX;
         this.y = newY;
+        this.height = this.getPlayerSubsectorHeight() + 41;
       }
     }
 
@@ -170,7 +174,28 @@ class Player {
     //   this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
     // }
 
-    this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    // let nextSubsector = gameEngine.levelManager.pointInSubsector(newX, newY);
+
+    // // let seg = gameEngine.levelManager.segs[nextSubsector.firstSegNumber];
+    // // let nextFloorHeight = seg.rightSector.floorHeight;
+    // let nextFloorHeight = nextSubsector.sector.floorHeight;
+
+    // if (
+    //   Math.abs(
+    //     nextFloorHeight - gameEngine.levelManager.getPlayerSubsectorHeight(),
+    //   ) < 24
+    // ) {
+    //   this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    // }
+
+    // if (
+    //   nextFloorHeight -
+    //     gameEngine.levelManager.pointInSubsector(this.x, this.y).sector
+    //       .floorHeight <
+    //   24
+    // ) {
+    // }
+
     //   let floorHeight = gameEngine.levelManager.getPlayerSubsectorHeight();
     //   if (this.height < floorHeight + 41) {
     //     this.height += 0.4 * (floorHeight + 41 - this.height);
@@ -179,6 +204,15 @@ class Player {
     //     this.zVel -= 0.9;
     //     this.height += Math.max(-15.0, this.zVel);
     //   }
+  }
+
+  getPlayerSubsectorHeight() {
+    const currentSubsector = gameEngine.levelManager.pointInSubsector(
+      this.x,
+      this.y,
+    );
+    const currentFloorHeight = currentSubsector.sector.floorHeight;
+    return currentFloorHeight;
   }
 
   /**

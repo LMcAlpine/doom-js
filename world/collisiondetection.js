@@ -1,6 +1,7 @@
 class CollisionDetection {
-  constructor(linedefs) {
+  constructor(linedefs, pointInSubsector) {
     this.linedefs = linedefs;
+    this.pointInSubsector = pointInSubsector;
   }
 
   canMoveTo(currentX, currentY, newX, newY) {
@@ -9,13 +10,56 @@ class CollisionDetection {
       //   return false;
       // }
       let linedef = this.linedefs[i];
+      console.log(linedef.flag);
       if (linedef.flag & 0x0001 || linedef.flag & 0x0020) {
         if (this.isTooClose(newX, newY, linedef)) {
           return false;
         }
       }
     }
+    if (this.isTooHigh(currentX, currentY, newX, newY)) {
+      return false;
+    }
+
+    if (this.isTooSmall(currentX, currentY, newX, newY)) {
+      return false;
+    }
     return true;
+  }
+
+  isTooSmall(currentX, currentY, newX, newY) {
+    const currentSubsector = this.pointInSubsector(currentX, currentY);
+    const currentFloorHeight = currentSubsector.sector.floorHeight;
+
+    const nextSubsector = this.pointInSubsector(newX, newY);
+    const nextFloorHeight = nextSubsector.sector.floorHeight;
+
+    const currentCeilingHeight = currentSubsector.sector.ceilingHeight;
+    const nextCeilingHeight = nextSubsector.sector.ceilingHeight;
+
+    const lowestCeiling = Math.min(currentCeilingHeight, nextCeilingHeight);
+    const highestFloor = Math.max(currentFloorHeight, nextFloorHeight);
+
+    if (lowestCeiling - highestFloor < 56) {
+      return true;
+    }
+    return false;
+  }
+
+  isTooHigh(currentX, currentY, newX, newY) {
+    const currentSubsector = this.pointInSubsector(currentX, currentY);
+    const currentFloorHeight = currentSubsector.sector.floorHeight;
+
+    const nextSubsector = this.pointInSubsector(newX, newY);
+    const nextFloorHeight = nextSubsector.sector.floorHeight;
+    console.log(currentSubsector, nextSubsector);
+    console.log(nextFloorHeight - currentFloorHeight);
+    console.log(currentX, currentY, newX, newY);
+    if (nextFloorHeight - currentFloorHeight > 24) {
+      return true;
+    }
+
+    return false;
   }
 
   closestPoint(newX, newY, linedef) {
