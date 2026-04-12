@@ -8,8 +8,11 @@ class CollisionDetection {
       // if (this.intersects(currentX, currentY, newX, newY, this.linedefs[i])) {
       //   return false;
       // }
-      if (this.isTooClose(newX, newY, this.linedefs[i])) {
-        return false;
+      let linedef = this.linedefs[i];
+      if (linedef.flag & 0x0001) {
+        if (this.isTooClose(newX, newY, linedef)) {
+          return false;
+        }
       }
     }
     return true;
