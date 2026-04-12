@@ -166,6 +166,10 @@ class Player {
       );
     }
 
+    // if (Math.abs(gameEngine.levelManager.getPlayerSubsectorHeight - 41) < 24) {
+    //   this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
+    // }
+
     this.height = gameEngine.levelManager.getPlayerSubsectorHeight() + 41;
     //   let floorHeight = gameEngine.levelManager.getPlayerSubsectorHeight();
     //   if (this.height < floorHeight + 41) {
