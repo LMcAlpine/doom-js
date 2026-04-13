@@ -30,14 +30,16 @@ class LevelManager {
     for (let i = 0; i < levelsData.subsectors.length; i++) {
       const subsector = levelsData.subsectors[i];
       const seg = segmentData.segs[subsector.firstSegNumber];
-      const modifiedFrontsector = {
-        ...seg.frontsector,
-        validCount: 0,
-        thingList: null,
-      };
+      // const modifiedFrontsector = {
+      //   ...seg.frontsector,
+      //   validCount: 0,
+      //   thingList: null,
+      // };
+      seg.frontsector.validCount = 0;
+      seg.frontsector.thingList = null;
 
       this.linkedSubsectors[i] = {
-        sector: modifiedFrontsector,
+        sector: seg.frontsector,
         ...levelsData.subsectors[i],
       };
     }

@@ -6,13 +6,10 @@ class CollisionDetection {
 
   canMoveTo(currentX, currentY, newX, newY) {
     for (let i = 0; i < this.linedefs.length; i++) {
-      // if (this.intersects(currentX, currentY, newX, newY, this.linedefs[i])) {
-      //   return false;
-      // }
       let linedef = this.linedefs[i];
-      console.log(linedef.flag);
+      // console.log(linedef.flag);
       if (linedef.flag & 0x0001 || linedef.flag & 0x0020) {
-        if (this.isTooClose(newX, newY, linedef)) {
+        if (this.isTooClose(newX, newY, linedef, 16)) {
           return false;
         }
       }
@@ -37,9 +34,12 @@ class CollisionDetection {
     const currentCeilingHeight = currentSubsector.sector.ceilingHeight;
     const nextCeilingHeight = nextSubsector.sector.ceilingHeight;
 
+    //console.log(currentCeilingHeight, nextCeilingHeight);
     const lowestCeiling = Math.min(currentCeilingHeight, nextCeilingHeight);
     const highestFloor = Math.max(currentFloorHeight, nextFloorHeight);
 
+    // console.log(nextSubsector.sector);
+    // console.log(lowestCeiling, highestFloor);
     if (lowestCeiling - highestFloor < 56) {
       return true;
     }
@@ -52,9 +52,11 @@ class CollisionDetection {
 
     const nextSubsector = this.pointInSubsector(newX, newY);
     const nextFloorHeight = nextSubsector.sector.floorHeight;
-    console.log(currentSubsector, nextSubsector);
-    console.log(nextFloorHeight - currentFloorHeight);
-    console.log(currentX, currentY, newX, newY);
+    // console.log(currentSubsector, nextSubsector);
+    // console.log(nextFloorHeight - currentFloorHeight);
+    // console.log(currentX, currentY, newX, newY);
+
+    console.log(nextFloorHeight, currentFloorHeight);
     if (nextFloorHeight - currentFloorHeight > 24) {
       return true;
     }
@@ -83,16 +85,29 @@ class CollisionDetection {
     return { closestX, closestY };
   }
 
-  isTooClose(newX, newY, linedef) {
+  isTooClose(newX, newY, linedef, radius) {
     let { closestX, closestY } = this.closestPoint(newX, newY, linedef);
 
     let distance = this.distanceToPoint(closestX, closestY, newX, newY);
 
-    let radius = 16;
     if (distance < radius) {
       return true;
     }
     return false;
+  }
+
+  canInteract(currentX, currentY, rayX, rayY) {
+    for (let i = 0; i < this.linedefs.length; i++) {
+      const linedef = this.linedefs[i];
+      // if (this.intersects(currentX, currentY, rayX, rayY, linedef)) {
+      //   return linedef;
+      // }
+      if (linedef.specialType !== 0) {
+        if (this.isTooClose(currentX, currentY, linedef, 64)) {
+          return linedef;
+        }
+      }
+    }
   }
 
   intersects(currentX, currentY, newX, newY, linedef) {

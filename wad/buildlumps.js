@@ -23,6 +23,7 @@ function buildLinedefs(linedefs, vertices, sidedefs) {
     linedef.startVertex = vertices[linedefs[i].startVertex];
     linedef.endVertex = vertices[linedefs[i].endVertex];
     linedef.flag = linedefs[i].flags;
+    linedef.specialType = linedefs[i].specialType;
     linedef.sectorTag = linedefs[i].sectorTag;
 
     if (linedefs[i].rightSidedef === -1) {

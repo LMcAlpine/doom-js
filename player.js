@@ -33,6 +33,8 @@ class Player {
     this.realWallAngle1;
 
     this.zVel = 0;
+
+    this.door = null;
   }
 
   /**
@@ -108,6 +110,33 @@ class Player {
     const dy = Math.cos(radians);
     let newX = this.x;
     let newY = this.y;
+
+    this.rayX = this.x - Math.cos(this.direction.angle) * 64;
+    this.rayY = this.y - Math.sin(this.direction.angle) * 64;
+
+    if (gameEngine.keys["e"] === true) {
+      this.door = gameEngine.collisionDetector.canInteract(
+        this.x,
+        this.y,
+        this.rayX,
+        this.rayY,
+      );
+      console.log(this.door);
+    }
+
+    if (this.door) {
+      // console.log(door.leftSidedef.sector, door.rightSidedef.sector);
+
+      if (
+        this.door.leftSidedef.sector.ceilingHeight <=
+        this.door.rightSidedef.sector.ceilingHeight
+      ) {
+        this.door.leftSidedef.sector.ceilingHeight +=
+          128 * gameEngine.clockTick;
+      }
+      // door.leftSidedef.sector.ceilingHeight =
+      //   door.rightSidedef.sector.ceilingHeight;
+    }
 
     if (gameEngine.keys["w"] === true) {
       newX +=
