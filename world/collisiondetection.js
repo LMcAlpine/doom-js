@@ -3,7 +3,6 @@ const PLAYER_HEIGHT = 56;
 const MAX_STEP_HEIGHT = 24;
 const INTERACTION_DISTANCE = 64;
 
-
 class CollisionDetection {
   constructor(linedefs, pointInSubsector) {
     this.linedefs = linedefs;
@@ -13,10 +12,8 @@ class CollisionDetection {
   canMoveTo(currentX, currentY, newX, newY) {
     for (let i = 0; i < this.linedefs.length; i++) {
       let linedef = this.linedefs[i];
-    
-      if (linedef.flag & 0x0001 || linedef.flag & 0x0020) {
-       
 
+      if (linedef.flag & 0x0001 || linedef.flag & 0x0020) {
         if (linedef.leftSidedef && linedef.rightSidedef) {
           const lowestCeiling = Math.min(
             linedef.leftSidedef.sector.ceilingHeight,
@@ -38,12 +35,10 @@ class CollisionDetection {
       }
     }
     if (this.isTooHigh(currentX, currentY, newX, newY)) {
-     
       return false;
     }
 
     if (this.isTooSmall(currentX, currentY, newX, newY)) {
-     
       return false;
     }
     return true;
@@ -59,11 +54,9 @@ class CollisionDetection {
     const currentCeilingHeight = currentSubsector.sector.ceilingHeight;
     const nextCeilingHeight = nextSubsector.sector.ceilingHeight;
 
-  
     const lowestCeiling = Math.min(currentCeilingHeight, nextCeilingHeight);
     const highestFloor = Math.max(currentFloorHeight, nextFloorHeight);
 
-   
     if (lowestCeiling - highestFloor < PLAYER_HEIGHT) {
       return true;
     }
@@ -76,7 +69,6 @@ class CollisionDetection {
 
     const nextSubsector = this.pointInSubsector(newX, newY);
     const nextFloorHeight = nextSubsector.sector.floorHeight;
-  
 
     if (nextFloorHeight - currentFloorHeight > MAX_STEP_HEIGHT) {
       return true;
@@ -120,13 +112,12 @@ class CollisionDetection {
   canInteract(currentX, currentY, rayX, rayY) {
     for (let i = 0; i < this.linedefs.length; i++) {
       const linedef = this.linedefs[i];
-      // if (this.intersects(currentX, currentY, rayX, rayY, linedef)) {
-      //   return linedef;
-      // }
-      if (linedef.specialType !== 0) {
-        if (this.isTooClose(currentX, currentY, linedef, INTERACTION_DISTANCE)) {
-          return linedef;
-        }
+
+      if (
+        linedef.specialType !== 0 &&
+        this.intersects(currentX, currentY, rayX, rayY, linedef)
+      ) {
+        return linedef;
       }
     }
   }

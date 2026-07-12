@@ -111,8 +111,8 @@ class Player {
     let newX = this.x;
     let newY = this.y;
 
-    this.rayX = this.x - Math.cos(this.direction.angle) * 64;
-    this.rayY = this.y - Math.sin(this.direction.angle) * 64;
+    this.rayX = this.x + Math.cos(radians) * 64;
+    this.rayY = this.y + Math.sin(radians) * 64;
 
     if (gameEngine.keys["e"] === true) {
       this.door = gameEngine.collisionDetector.canInteract(
