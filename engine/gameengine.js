@@ -110,8 +110,8 @@ class GameEngine {
     const dataObjects = this.setupLevelData(levelData);
     this.entities = [];
 
-    const textureMgr = this.context?.assets?.textureManager || textureManager;
-    const flatMgr = this.context?.assets?.flatManager || flatManager;
+    const textureMgr = this.context.assets.textureManager;
+    const flatMgr = this.context.assets.flatManager;
 
     if (!textureMgr || !flatMgr) {
       throw new Error("GameEngine.loadLevel: missing texture/flat manager");
