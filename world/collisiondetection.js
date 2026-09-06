@@ -1,3 +1,8 @@
+const PLAYER_RADIUS = 16;
+const PLAYER_HEIGHT = 56;
+const MAX_STEP_HEIGHT = 24;
+const INTERACTION_DISTANCE = 64;
+
 class CollisionDetection {
   constructor(linedefs, pointInSubsector) {
     this.linedefs = linedefs;
@@ -6,13 +11,25 @@ class CollisionDetection {
 
   canMoveTo(currentX, currentY, newX, newY) {
     for (let i = 0; i < this.linedefs.length; i++) {
-      // if (this.intersects(currentX, currentY, newX, newY, this.linedefs[i])) {
-      //   return false;
-      // }
       let linedef = this.linedefs[i];
-      console.log(linedef.flag);
+
       if (linedef.flag & 0x0001 || linedef.flag & 0x0020) {
-        if (this.isTooClose(newX, newY, linedef)) {
+        if (linedef.leftSidedef && linedef.rightSidedef) {
+          const lowestCeiling = Math.min(
+            linedef.leftSidedef.sector.ceilingHeight,
+            linedef.rightSidedef.sector.ceilingHeight,
+          );
+          const highestFloor = Math.max(
+            linedef.leftSidedef.sector.floorHeight,
+            linedef.rightSidedef.sector.floorHeight,
+          );
+          const opening = lowestCeiling - highestFloor;
+          if (opening >= PLAYER_HEIGHT) {
+            continue; // opening is large enough, skip this linedef
+          }
+        }
+
+        if (this.isTooClose(newX, newY, linedef, PLAYER_RADIUS)) {
           return false;
         }
       }
@@ -40,7 +57,7 @@ class CollisionDetection {
     const lowestCeiling = Math.min(currentCeilingHeight, nextCeilingHeight);
     const highestFloor = Math.max(currentFloorHeight, nextFloorHeight);
 
-    if (lowestCeiling - highestFloor < 56) {
+    if (lowestCeiling - highestFloor < PLAYER_HEIGHT) {
       return true;
     }
     return false;
@@ -52,10 +69,8 @@ class CollisionDetection {
 
     const nextSubsector = this.pointInSubsector(newX, newY);
     const nextFloorHeight = nextSubsector.sector.floorHeight;
-    console.log(currentSubsector, nextSubsector);
-    console.log(nextFloorHeight - currentFloorHeight);
-    console.log(currentX, currentY, newX, newY);
-    if (nextFloorHeight - currentFloorHeight > 24) {
+
+    if (nextFloorHeight - currentFloorHeight > MAX_STEP_HEIGHT) {
       return true;
     }
 
@@ -83,16 +98,28 @@ class CollisionDetection {
     return { closestX, closestY };
   }
 
-  isTooClose(newX, newY, linedef) {
+  isTooClose(newX, newY, linedef, radius) {
     let { closestX, closestY } = this.closestPoint(newX, newY, linedef);
 
     let distance = this.distanceToPoint(closestX, closestY, newX, newY);
 
-    let radius = 16;
     if (distance < radius) {
       return true;
     }
     return false;
+  }
+
+  canInteract(currentX, currentY, rayX, rayY) {
+    for (let i = 0; i < this.linedefs.length; i++) {
+      const linedef = this.linedefs[i];
+
+      if (
+        linedef.specialType !== 0 &&
+        this.intersects(currentX, currentY, rayX, rayY, linedef)
+      ) {
+        return linedef;
+      }
+    }
   }
 
   intersects(currentX, currentY, newX, newY, linedef) {

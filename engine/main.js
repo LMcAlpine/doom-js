@@ -57,7 +57,8 @@ async function initializeGameData(file) {
 
   spriteManager = new SpriteManager(lumpData, patchNames, spriteNames);
 
-  gameEngine = new GameEngine("myCanvas", 50);
+  const tickLength = 50;
+  gameEngine = new GameEngine(tickLength);
   gameEngine.lumpData = lumpData;
   gameEngine.patchNames = patchNames;
   gameEngine.palette = paletteField;
@@ -109,15 +110,6 @@ async function initializeGameData(file) {
       infoDefinitions: gameEngine.infoDefinitions,
       states: gameEngine.states,
       actions: gameEngine.actions,
-    },
-    deps: {
-      LevelManager,
-      Player,
-      buildSectors,
-      buildSidedefs,
-      buildLinedefs,
-      buildSegs,
-      buildThings,
     },
   });
 
