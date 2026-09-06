@@ -113,8 +113,7 @@ async function initializeGameData(file) {
     },
   });
 
-  gameEngine.canvas = canvas;
-  gameEngine.ctx = canvas.ctx;
+
   gameEngine.init(engineContext);
   gameEngine.start();
 
