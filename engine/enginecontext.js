@@ -1,3 +1,3 @@
-export function createEngineContext({ canvas, ctx, assets, gameplay, deps }) {
-  return { canvas, ctx, assets, gameplay, deps };
+export function createEngineContext({ canvas, ctx, assets, gameplay }) {
+  return { canvas, ctx, assets, gameplay };
 }

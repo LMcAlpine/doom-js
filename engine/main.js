@@ -111,15 +111,6 @@ async function initializeGameData(file) {
       states: gameEngine.states,
       actions: gameEngine.actions,
     },
-    deps: {
-      LevelManager,
-      Player,
-      buildSectors,
-      buildSidedefs,
-      buildLinedefs,
-      buildSegs,
-      buildThings,
-    },
   });
 
   gameEngine.canvas = canvas;
