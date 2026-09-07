@@ -779,6 +779,7 @@ class LevelManager {
   loadThings() {
     let mapThing;
     let spawnThing;
+    let mapObjects = [];
     for (let i = 0; i < this.things.length; i++) {
       mapThing = this.things[i];
       if (mapThing.type === 81) {
@@ -787,8 +788,12 @@ class LevelManager {
 
       spawnThing = mapThing;
 
-      this.spawnMapThing(spawnThing);
+      const mapObject = this.spawnMapThing(spawnThing);
+      if (mapObject) {
+        mapObjects.push(mapObject);
+      }
     }
+    return mapObjects;
   }
 
   spawnMapThing(mapThing) {
@@ -841,7 +846,7 @@ class LevelManager {
 
     mapObject.angle = Math.floor((mapThing.direction / 45) * 45);
 
-    gameEngine.addEntity(mapObject);
+    return mapObject;
   }
 
   spawnPlayer(mapThing) {

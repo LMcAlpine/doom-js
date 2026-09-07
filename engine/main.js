@@ -113,7 +113,6 @@ async function initializeGameData(file) {
     },
   });
 
-
   gameEngine.init(engineContext);
   gameEngine.start();
 
@@ -138,8 +137,13 @@ function loadLevel(levelName) {
 
   gameEngine.initializePlayer(levelData, scaleX, scaleY, minX, minY);
 
-  // player needs to be initialized before
-  gameEngine.levelManager.loadThings();
+  // player needs to be initialized before Things
+  const mapObjects = gameEngine.levelManager.loadThings();
+  
+  // Register map objects for per-frame state updates
+  for (const mapObject of mapObjects) {
+    gameEngine.addEntity(mapObject);
+  }
 
   console.timeEnd(`load_level:${levelName}`);
 }
