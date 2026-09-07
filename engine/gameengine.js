@@ -152,12 +152,19 @@ class GameEngine {
   }
 
   initializePlayer(levels, scaleX, scaleY, minX, minY) {
+    const location = levels.things[0];
+    const x = location.xPosition;
+    const y = location.yPosition;
+    const initialSubsector = this.levelManager.pointInSubsector(x, y);
+    const initialFloorHeight = initialSubsector.sector.floorHeight;
+    const heightAboveFloor = 41;
+
     const player = new Player(
-      levels.things[0],
+      location,
       { minX: minX, minY: minY },
       { scaleX: scaleX, scaleY: scaleY },
       90,
-      41,
+      initialFloorHeight + heightAboveFloor,
     );
     this.addEntity(player);
     this.player = player;
