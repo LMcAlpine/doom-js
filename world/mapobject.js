@@ -43,11 +43,11 @@ class MapObject {
       }
     }
   }
-  update() {
+  update(clockTick) {
     if (this.tics <= 0) {
       return;
     }
-    this.ticTimer += gameEngine.clockTick;
+    this.ticTimer += clockTick;
     while (this.ticTimer >= 1 / 35) {
       this.ticTimer -= 1 / 35;
       this.tics--;

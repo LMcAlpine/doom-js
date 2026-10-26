@@ -95,7 +95,7 @@ class GameEngine {
       let entity = this.entities[i];
 
       if (!entity.removeFromWorld) {
-        entity.update();
+        entity.update(this.clockTick);
       }
     }
 
@@ -165,6 +165,9 @@ class GameEngine {
       { scaleX: scaleX, scaleY: scaleY },
       90,
       initialFloorHeight + heightAboveFloor,
+      this.keys,
+      this.collisionDetector,
+      (x, y) => this.levelManager.pointInSubsector(x, y),
     );
     this.addEntity(player);
     this.player = player;
