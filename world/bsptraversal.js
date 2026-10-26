@@ -1,6 +1,6 @@
 class BSPTraversal {
   constructor(levels, subsector) {
-    this.things = levels.things;
+    
 
     this.nodes = levels.nodes;
 
