@@ -182,14 +182,12 @@ class GameEngine {
       sidedefObjects,
     );
     const segObjects = buildSegs(levels.segs, levels.vertices, linedefObjects);
-    const thingObjects = buildThings(levels.things);
 
     return {
       sectorObjects,
       sidedefObjects,
       linedefObjects,
       segObjects,
-      thingObjects,
     };
   }
 
